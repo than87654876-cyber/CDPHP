@@ -39,9 +39,15 @@ Route::post('/nhom/{code}/xoa-mon/{itemId}', [GroupOrderController::class, 'remo
 Route::post('/nhom/{code}/chot-don', [GroupOrderController::class, 'checkout'])->name('nhom.checkout');
 Route::get('/api/nhom/{code}/poll', [GroupOrderController::class, 'pollItems'])->name('nhom.poll');
 
-// API Tìm kiếm món ăn theo tên & Chatbot trợ lý AI
+// API Hệ thống & Thanh toán & Chatbot
 Route::get('/api/dishes/search', [ShopController::class, 'searchDishesApi'])->name('api.dishes.search');
 Route::post('/api/chatbot/ask', [ShopController::class, 'chatbotAsk'])->name('api.chatbot.ask');
+Route::get('/api/orders/{id}/payment-status', [CartController::class, 'getPaymentStatus'])->name('api.orders.payment-status');
+Route::post('/api/payments/bank-transfer/notify', [CartController::class, 'notifyBankTransferPayment'])->name('api.payments.bank-transfer.notify');
+Route::post('/api/payments/webhook', [CartController::class, 'payosWebhook'])->name('api.payments.webhook');
+Route::get('/api/orders/track/poll', [ShopController::class, 'pollTrackedOrder'])->name('api.orders.track.poll');
+Route::get('/api/settings/poll', [ShopController::class, 'pollSettings'])->name('api.settings.poll');
+Route::post('/api/coupon/validate', [CartController::class, 'validateCoupon'])->name('api.coupon.validate');
 
 // Tra cứu đơn hàng dành cho khách vãng lai
 Route::get('/tracuu', [ShopController::class, 'trackOrder'])->name('tracuu');

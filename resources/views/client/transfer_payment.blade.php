@@ -1,312 +1,195 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.app')
 
-<head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Thanh toán Đơn hàng - FOODDAILY</title>
+@section('title', 'Thanh toán Quét mã VietQR - FOODDAILY')
 
-    <link href="{{ asset('logo.jpg') }}" rel="icon">
-
-    <link href="https://fonts.googleapis.com" rel="preconnect">
-    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" type="text/css">
-
-    <link href="{{ asset('client/assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('client/assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
-    <link href="{{ asset('client/assets/css/main.css') }}" rel="stylesheet">
-
-    <style>
-        .momo-brand-color {
-            color: #A50064;
-        }
-
-        .bank-brand-color {
-            color: #004B87;
-        }
-
-        .nav-pills .nav-link {
-            border: 2px solid #dee2e6;
-            color: #495057;
-            background-color: #fff;
-            font-weight: bold;
-            transition: all 0.2s ease-in-out;
-        }
-
-        .nav-pills .nav-link.active.tab-momo {
-            background-color: #A50064 !important;
-            border-color: #A50064 !important;
-            color: white !important;
-        }
-
-        .nav-pills .nav-link.active.tab-bank {
-            background-color: #004B87 !important;
-            border-color: #004B87 !important;
-            color: white !important;
-        }
-
-        .qr-box {
-            border-radius: 12px;
-            padding: 20px;
-            background: #fff;
-            max-width: 280px;
-            margin: 0 auto;
-        }
-
-        .qr-box.box-momo {
-            border: 2px solid #A50064;
-        }
-
-        .qr-box.box-bank {
-            border: 2px solid #004B87;
-        }
-
-        .countdown-timer {
-            font-size: 22px;
-            font-weight: bold;
-            color: #ce1126;
-            background: #fff5f5;
-            padding: 5px 15px;
-            border-radius: 20px;
-            display: inline-block;
-        }
-    </style>
-</head>
-
-<body class="bg-light text-dark">
-
-    <header id="header" class="header d-flex align-items-center sticky-top bg-white shadow-sm">
-        <div class="container d-flex align-items-center justify-content-between">
-            <a href="{{ route('trangchu') }}" class="logo d-flex align-items-center me-auto" style="text-decoration: none;">
-                <img src="{{ asset('logo.jpg') }}" alt="">
-                <h1 class="sitename text-danger m-0" style="font-size: 28px;">FOODDAILY</h1>
-            </a>
-            <span class="navbar-text fw-bold text-muted"><i class="bi bi-shield-check text-success"></i> Hệ thống thanh toán mã QR giả lập</span>
-        </div>
-    </header>
-
-    <main class="container my-5">
+@section('content')
+<div class="py-12 bg-transparent min-h-screen">
+    <div class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8">
+        
         @php
             $displayAmount = $amount < 1000 ? $amount * 100 : $amount;
         @endphp
-        <div class="row justify-content-center">
 
-            <div class="col-lg-6 col-md-10 mb-4">
-                <div class="card shadow border-0 p-4 text-center">
-                    <h5 class="fw-bold mb-4">Chọn phương thức quét mã QR</h5>
+        <!-- Main QR Payment Card -->
+        <div class="bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-200 text-center space-y-6">
+            
+            <!-- Header Title -->
+            <div class="border-b border-slate-100 pb-4">
+                <div class="inline-flex items-center gap-2 px-3 py-1 bg-rose-50 border border-rose-100 text-[#ee4d2d] rounded-full text-xs font-black mb-2 uppercase tracking-wider">
+                    <i class="fas fa-qrcode"></i> Thanh toán VietQR Hỏa Tốc
+                </div>
+                <h2 class="text-xl font-extrabold text-slate-900">Quét mã QR để chuyển khoản</h2>
+                <p class="text-xs text-slate-500 mt-1">Mã đơn hàng: <span class="font-extrabold text-[#ee4d2d]">#FDL-{{ $order_id }}</span></p>
+            </div>
 
-                    <div>
-                        <div class="text-start bg-white p-3 rounded border mb-3 text-dark mx-auto" style="max-width: 320px;">
-                            <div class="qr-box box-bank shadow-sm mb-3">
-                                <img src="https://img.vietqr.io/image/BIDV-8899408675-compact2.jpg?amount={{ $displayAmount }}&addInfo=FDL-{{ $order_id }}&accountName=Tran%20Le%20Than"
-                                    alt="Mã VietQR" class="img-fluid">
-                            </div>
-                            
-                            <div class="row small mb-1">
-                                <div class="row small mb-1">
-                                    <div class="col-5 text-muted">Ngân hàng:</div>
-                                    <div class="col-7 fw-bold">BIDV</div>
-                                </div>
-                                <div class="row small mb-1">
-                                    <div class="col-5 text-muted">Chi nhánh:</div>
-                                    <div class="col-7 fw-bold">CN TP Hồ Chí Minh</div>
-                                </div>
-                                <div class="row small mb-1">
-                                    <div class="col-5 text-muted">Số tài khoản:</div>
-                                    <div class="col-7 fw-bold text-primary">8899408675</div>
-                                </div>
-                                <div class="row small mb-1">
-                                    <div class="col-5 text-muted">Chủ tài khoản:</div>
-                                    <div class="col-7 fw-bold">TRAN LE THAN</div>
-                                </div>
-                                <div class="row small mb-1">
-                                    <div class="col-5 text-muted">Số tiền:</div>
-                                    <div class="col-7 fw-bold text-danger">{{ number_format($displayAmount, 0, ',', '.') }} đ</div>
-                                </div>
-                                <div class="row small mb-1">
-                                    <div class="col-5 text-muted">Nội dung CK:</div>
-                                    <div class="col-7 fw-bold text-success">FDL-{{ $order_id }}</div>
-                                </div>
-                            </div>
+            <!-- VietQR Image Box -->
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 max-w-xs mx-auto shadow-inner relative group">
+                <img src="https://img.vietqr.io/image/BIDV-8899408675-compact2.jpg?amount={{ $displayAmount }}&addInfo=FDL-{{ $order_id }}&accountName=Tran%20Le%20Than"
+                     alt="Mã VietQR Thanh Toán"
+                     class="w-full h-auto rounded-xl shadow-xs transition-transform duration-300 group-hover:scale-102">
+                <div class="mt-2 text-[11px] font-bold text-slate-400">Tự động nhận diện số tiền & nội dung</div>
+            </div>
 
-                        <a href="https://img.vietqr.io/image/BIDV-8899408675-compact2.jpg?amount={{ $displayAmount }}&addInfo=FDL-{{ $order_id }}&accountName=Tran%20Le%20Than" 
-                           target="_blank" 
-                           class="btn btn-sm btn-outline-primary fw-bold mb-3 d-inline-block w-100" 
-                           style="max-width: 320px;">
-                            <i class="bi bi-qr-code-scan me-1"></i> Liên kết chuyển khoản nhanh VietQR
-                        </a>
-
-                        <button type="button" 
-                                id="btn-confirm-payment" 
-                                class="btn btn-success fw-bold mb-3 w-100" 
-                                style="max-width: 320px;">
-                            <i class="bi bi-check-circle-fill me-1"></i> Xác nhận đã chuyển khoản thành công
-                        </button>
-
-                        <p class="small text-muted mb-3"><i class="bi bi-phone-vibrate me-1"></i> Sử dụng
-                            <strong>App Ngân hàng (Mobile Banking)</strong> để quét mã hoặc sử dụng thông tin trên để chuyển khoản.</p>
-                    </div>
-
-                    <div class="mb-2 mt-2 small text-secondary">Thời gian giữ mã giao dịch còn lại:</div>
-                    <div class="countdown-timer mb-2 shadow-sm"><i class="bi bi-clock-history me-2"></i><span
-                            id="timer">10:00</span></div>
-                    <div id="payment-status" class="alert alert-info small mb-0">
-                        <i class="bi bi-hourglass-split me-2"></i>⏳ Đang chờ xác nhận thanh toán...
-                    </div>
+            <!-- Bank Transfer Info Table -->
+            <div class="bg-white rounded-2xl p-4 border border-slate-200 text-left text-xs space-y-2.5 shadow-xs">
+                <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                    <span class="text-slate-500 font-bold">Ngân hàng:</span>
+                    <span class="font-extrabold text-slate-900 flex items-center gap-1">
+                        <i class="fas fa-building-columns text-[#ee4d2d]"></i> BIDV (Ngân hàng TMCP Đầu tư & Phát triển)
+                    </span>
+                </div>
+                <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                    <span class="text-slate-500 font-bold">Chủ tài khoản:</span>
+                    <span class="font-extrabold text-slate-900 uppercase">TRAN LE THAN</span>
+                </div>
+                <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                    <span class="text-slate-500 font-bold">Số tài khoản:</span>
+                    <span class="font-black text-slate-900 text-sm tracking-wider font-mono">8899408675</span>
+                </div>
+                <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                    <span class="text-slate-500 font-bold">Số tiền thanh toán:</span>
+                    <span class="font-black text-[#ee4d2d] text-base">{{ number_format($displayAmount, 0, ',', '.') }}đ</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-500 font-bold">Nội dung chuyển khoản:</span>
+                    <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 font-mono font-black text-xs rounded-lg border border-emerald-200">
+                        FDL-{{ $order_id }}
+                    </span>
                 </div>
             </div>
 
-            <div class="col-lg-5 col-md-10">
-                <div class="card shadow border-0 p-4 text-dark">
-                    <h5 class="fw-bold border-bottom pb-2 text-dark"><i class="bi bi-receipt me-2 text-danger"></i>Thông tin đơn hàng</h5>
+            <!-- Automatic Realtime Status Box -->
+            <div id="payment-status-box" class="p-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-2xl flex items-center justify-center gap-3 font-extrabold text-xs shadow-xs">
+                <i class="fas fa-spinner fa-spin text-amber-500 text-base"></i>
+                <span id="status-text">Đang chờ nhận chuyển khoản từ Ngân Hàng qua Webhook API...</span>
+            </div>
 
-                    <div class="py-2 d-flex justify-content-between">
-                        <span class="text-muted">Mã đơn hàng:</span>
-                        <strong class="text-dark">#FDL-{{ $order_id }}</strong>
-                    </div>
-                    <div class="py-2 d-flex justify-content-between">
-                        <span class="text-muted">Nhà cung cấp:</span>
-                        <span class="fw-bold">Hệ thống FOODDAILY</span>
-                    </div>
-                    <div class="py-2 d-flex justify-content-between align-items-center">
-                        <span class="text-muted">Số tiền cần thanh toán:</span>
-                        <span class="fs-4 fw-bold text-danger">{{ number_format($displayAmount, 0, ',', '.') }} đ</span>
-                    </div>
+            <!-- Countdown Timer -->
+            <div class="text-xs font-bold text-slate-400 flex items-center justify-center gap-1.5">
+                <i class="far fa-clock"></i> Thời gian giữ mã giao dịch: <span id="timer" class="font-mono text-[#ee4d2d] font-black text-sm">10:00</span>
+            </div>
 
-                    <div class="alert alert-warning small mt-3 border-0">
-                        <h6 class="fw-bold mb-1"><i class="bi bi-exclamation-triangle-fill me-1"></i> Lưu ý đối soát hệ thống:</h6>
-                        Mã QR đã tích hợp sẵn số tiền **{{ number_format($displayAmount, 0, ',', '.') }} đ** và nội dung chuyển khoản tự động. Vui lòng không tự ý thay đổi thông tin để đơn hàng được duyệt ngay lập tức.
-                    </div>
-
-                    <div class="mt-4 pt-2 border-top">
-                        <div class="alert alert-info text-start mb-3">
-                            <div class="fw-bold mb-2"><i class="bi bi-hourglass-split me-2"></i>Đang chờ hệ thống xác nhận giao dịch...</div>
-                            <div class="small">Sau khi ngân hàng xác nhận giao dịch thành công, đơn hàng sẽ tự động được cập nhật.</div>
-                        </div>
-                        <a href="{{ route('trangchu_dangnhap') }}" class="btn btn-outline-secondary w-100 py-2.5 btn-sm">Quay lại trang chủ</a>
-                    </div>
+            <!-- Localhost / Dev Webhook Simulator Button -->
+            <div class="pt-4 border-t border-slate-100 space-y-2">
+                <button type="button" onclick="simulateBankWebhook(this)" class="w-full py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-extrabold text-xs transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer active:scale-98">
+                    <i class="fas fa-bolt text-amber-400"></i>
+                    <span>Mô Phỏng Ngân Hàng Gửi Webhook Báo Tiền Vào (Bấm để thử nghiệm)</span>
+                </button>
+                <div class="text-[11px] text-slate-400 leading-relaxed text-left">
+                    💡 <strong>Vì sao chuyển tiền xong cần Webhook?</strong> Khi bạn dùng app Ngân hàng chuyển tiền, ngân hàng sẽ gọi một <strong>API Webhook</strong> tự động về server để báo tiền đã khớp mã <strong>#FDL-{{ $order_id }}</strong>. Vì trang web đang chạy môi trường thử nghiệm (Localhost), bạn có thể bấm nút màu đen ở trên để mô phỏng Webhook của ngân hàng gửi về!
                 </div>
             </div>
 
         </div>
-    </main>
 
-    <script>
-        function startTimer(duration, display) {
-            var timer = duration, minutes, seconds;
-            var interval = setInterval(function () {
-                minutes = parseInt(timer / 60, 10);
-                seconds = parseInt(timer % 60, 10);
+    </div>
+</div>
 
-                minutes = minutes < 10 ? "0" + minutes : minutes;
-                seconds = seconds < 10 ? "0" + seconds : seconds;
+<!-- Success Modal Overlay -->
+<div id="success-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl border border-slate-100 animate-bounce-once space-y-4">
+        <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-500 mx-auto flex items-center justify-center text-3xl font-black">
+            <i class="fas fa-check"></i>
+        </div>
+        <h3 class="text-lg font-extrabold text-slate-900">Thanh Toán Thành Công!</h3>
+        <p class="text-xs text-slate-500 leading-relaxed">
+            Đơn hàng <span class="font-extrabold text-slate-800">#FDL-{{ $order_id }}</span> đã được xác nhận thanh toán thành công và đang chuyển cho nhà bếp chế biến.
+        </p>
+        <div class="pt-2 text-xs font-bold text-[#ee4d2d]">
+            Đang chuyển tới trang theo dõi đơn... <i class="fas fa-spinner fa-spin ml-1"></i>
+        </div>
+    </div>
+</div>
+@endsection
 
-                display.textContent = minutes + ":" + seconds;
+@section('scripts')
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const orderId = "{{ $order_id }}";
+        
+        // 1. Countdown Timer (10 phút)
+        let duration = 60 * 10;
+        const timerDisplay = document.getElementById('timer');
+        
+        const countdown = setInterval(function () {
+            let minutes = parseInt(duration / 60, 10);
+            let seconds = parseInt(duration % 60, 10);
 
-                if (--timer < 0) {
-                    clearInterval(interval);
-                    display.textContent = "Hết hạn";
-                    document.getElementById('payment-status').className = 'alert alert-danger small mb-0';
-                    document.getElementById('payment-status').innerHTML = '<i class="bi bi-x-circle me-2"></i>❌ Mã QR đã hết hạn. Vui lòng tạo giao dịch mới.';
-                }
-            }, 1000);
-        }
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
 
-        function showSuccessModal() {
-            const modal = document.createElement('div');
-            modal.className = 'modal fade show';
-            modal.style.display = 'block';
-            modal.innerHTML = `
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content text-center p-3">
-                        <div class="modal-body">
-                            <div class="display-6 text-success mb-3"><i class="bi bi-check-circle-fill"></i></div>
-                            <h5 class="fw-bold">✅ Thanh toán thành công</h5>
-                            <p class="mb-2">Đơn hàng của bạn đã được thanh toán.</p>
-                            <p class="mb-3">Mã đơn hàng: #FDL-{{ $order_id }}</p>
-                            <p class="text-muted">Cảm ơn bạn đã sử dụng dịch vụ.</p>
-                            <div class="d-grid gap-2">
-                                <a href="{{ route('giohang') }}" class="btn btn-success">Xem đơn hàng</a>
-                                <a href="{{ route('trangchu') }}" class="btn btn-outline-secondary">Tiếp tục mua hàng</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-            document.body.appendChild(modal);
-            setTimeout(() => {
-                window.location.href = '{{ route('giohang') }}';
-            }, 3000);
-        }
+            if (timerDisplay) timerDisplay.textContent = minutes + ":" + seconds;
 
-        window.onload = function () {
-            var tenMinutes = 60 * 10,
-                display = document.querySelector('#timer');
-            startTimer(tenMinutes, display);
+            if (--duration < 0) {
+                clearInterval(countdown);
+                if (timerDisplay) timerDisplay.textContent = "00:00 (Hết hạn)";
+            }
+        }, 1000);
 
-            const poll = () => {
-                fetch('{{ route('api.orders.payment-status', ['id' => $order_id]) }}')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data && data.payment_status === 'paid') {
-                            document.getElementById('payment-status').className = 'alert alert-success small mb-0';
-                            document.getElementById('payment-status').innerHTML = '<i class="bi bi-check-circle me-2"></i>✅ Thanh toán thành công';
-                            showSuccessModal();
-                            return;
-                        }
-                    })
-                    .catch(() => {});
-            };
+        // 2. Realtime Webhook Polling
+        let isConfirmed = false;
+        window.checkPaymentStatus = function() {
+            if (isConfirmed) return;
 
-            setInterval(poll, 4000);
-            poll();
-
-            document.getElementById('btn-confirm-payment').addEventListener('click', function() {
-                const btn = this;
-                btn.disabled = true;
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Đang xử lý...';
-                
-                fetch('{{ route('api.payments.bank-transfer.notify') }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        order_id: {{ $order_id }},
-                        amount: {{ $displayAmount }},
-                        content: 'FDL-{{ $order_id }}',
-                        status: 'success',
-                        transaction_id: 'MOCK_TX_' + Date.now(),
-                        bank_reference: 'MOCK_REF_' + Date.now(),
-                        bank_code: 'BIDV',
-                        paid_at: new Date().toISOString().slice(0, 19).replace('T', ' ')
-                    })
-                })
+            fetch(`{{ route('api.orders.payment-status', ['id' => $order_id]) }}`)
                 .then(response => response.json())
                 .then(data => {
-                    if (data && data.success) {
-                        document.getElementById('payment-status').className = 'alert alert-success small mb-0';
-                        document.getElementById('payment-status').innerHTML = '<i class="bi bi-check-circle me-2"></i>✅ Thanh toán thành công';
-                        showSuccessModal();
-                    } else {
-                        alert('Lỗi xác nhận: ' + (data.message || 'Không thể xác nhận giao dịch.'));
-                        btn.disabled = false;
-                        btn.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> Xác nhận đã chuyển khoản thành công';
+                    if (data && data.payment_status === 'paid') {
+                        isConfirmed = true;
+                        
+                        const statusBox = document.getElementById('payment-status-box');
+                        const statusText = document.getElementById('status-text');
+                        
+                        if (statusBox) {
+                            statusBox.className = "p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl flex items-center justify-center gap-3 font-extrabold text-xs shadow-xs";
+                        }
+                        if (statusText) {
+                            statusText.innerHTML = "✅ Thanh toán thành công! Đơn hàng đang được nhà bếp chế biến.";
+                        }
+
+                        const successModal = document.getElementById('success-modal');
+                        if (successModal) successModal.classList.remove('hidden');
+
+                        localStorage.removeItem('fooddelicious_cart');
+
+                        setTimeout(() => {
+                            window.location.href = "{{ route('tracuu') }}?order_id=FDL-" + orderId;
+                        }, 2500);
                     }
                 })
-                .catch(err => {
-                    console.error(err);
-                    alert('Lỗi kết nối đến máy chủ.');
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> Xác nhận đã chuyển khoản thành công';
-                });
+                .catch(err => console.error('Error polling payment status:', err));
+        };
+
+        window.simulateBankWebhook = function(btn) {
+            if (btn) btn.disabled = true;
+
+            fetch("{{ route('api.payments.bank-transfer.notify') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({
+                    order_id: orderId,
+                    amount: "{{ $displayAmount }}",
+                    content: "FDL-" + orderId,
+                    status: "success",
+                    transaction_id: "TX_SIMULATED_" + Date.now()
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log('Simulated Bank Webhook response:', data);
+                checkPaymentStatus();
+            })
+            .catch(err => {
+                console.error('Simulation error:', err);
+                if (btn) btn.disabled = false;
             });
         };
-    </script>
 
-    <script src="{{ asset('client/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-</body>
-
-</html>
+        checkPaymentStatus();
+        setInterval(checkPaymentStatus, 2000);
+    });
+</script>
+@endsection

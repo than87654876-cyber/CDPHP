@@ -232,7 +232,11 @@ class CartController extends Controller
             }
             $order->payment_method = $paymentMethod;
             $order->payment_status = 'pending';
-            $order->order_status = 'preparing';
+            if ($paymentMethod === 'cash') {
+                $order->order_status = 'preparing';
+            } else {
+                $order->order_status = 'pending';
+            }
             $order->health_notes = 'Giao hàng: '.$request->cart_time.'. SĐT: '.$request->cart_phone.'. Địa chỉ: '.$request->cart_address;
             $order->save();
 
@@ -508,17 +512,15 @@ class CartController extends Controller
 
         $order = Order::findOrFail($request->order_id);
         $expectedContent = 'FDL-' . $order->id;
+        $receivedContent = strtoupper(trim($request->content));
         $expectedAmount = (float) $order->final_amount;
-        if ($expectedAmount < 1000) {
-            $expectedAmount = $expectedAmount * 100;
-        }
         $receivedAmount = (float) $request->amount;
 
         if ($request->status !== 'success') {
             return response()->json(['success' => false, 'message' => 'Giao dịch chưa thành công.']);
         }
 
-        if (trim($request->content) !== $expectedContent) {
+        if ($receivedContent !== $expectedContent && $receivedContent !== (string)$order->id && strpos($receivedContent, 'FDL' . $order->id) === false) {
             \Illuminate\Support\Facades\Log::warning('Bank transfer content mismatch', [
                 'order_id' => $order->id,
                 'expected' => $expectedContent,
@@ -548,7 +550,7 @@ class CartController extends Controller
         $order->payment_content = $request->content;
         $order->payment_paid_at = $request->paid_at ?: now();
         if ($order->order_status === 'pending') {
-            $order->order_status = 'confirmed';
+            $order->order_status = 'preparing';
         }
         $order->save();
 
@@ -583,8 +585,10 @@ class CartController extends Controller
             if ($order && $order->payment_status !== 'paid') {
                 $order->payment_status = 'paid';
                 if ($order->order_status === 'pending') {
-                    $order->order_status = 'confirmed';
+                    $order->order_status = 'preparing';
                 }
+                $order->payment_paid_at = now();
+                $order->payment_transaction_id = $data['reference'] ?? ('PAYOS_' . time());
                 $order->save();
 
                 try {
@@ -776,6 +780,21 @@ class CartController extends Controller
         return response()->json([
             'orders' => $orders,
             'timestamp' => now()->toDateTimeString()
+        ]);
+    }
+
+    // API kiểm tra trạng thái thanh toán đơn hàng (dùng cho polling chuyển khoản/momo)
+    public function getPaymentStatus(Request $request, $id)
+    {
+        $order = Order::find($id);
+        if (!$order) {
+            return response()->json(['error' => 'Order not found'], 404);
+        }
+
+        return response()->json([
+            'id' => $order->id,
+            'payment_status' => $order->payment_status,
+            'order_status' => $order->order_status,
         ]);
     }
 }

@@ -191,37 +191,39 @@ class ShopController extends Controller
         $email = $request->input('email');
         $phone = $request->input('phone');
 
-        $order = null;
-        $searched = false;
-        $error = null;
+        $myOrders = collect();
 
-        if ($orderIdInput) {
-            $searched = true;
-            // Clean order code (remove FDL- prefix)
-            $orderId = trim(str_ireplace('FDL-', '', $orderIdInput));
-
-            $query = \App\Models\Order::where('id', $orderId)->with(['orderItems.dish', 'user']);
-
-            // Validate that the order belongs to this email/phone
-            $query->whereHas('user', function($q) use ($email, $phone) {
-                $q->where(function($sub) use ($email, $phone) {
-                    if ($email) {
-                        $sub->where('email', trim($email));
-                    }
-                    if ($phone) {
-                        $sub->orWhere('phone', trim($phone));
-                    }
-                });
-            });
-
-            $order = $query->first();
-
-            if (!$order) {
-                $error = 'Không tìm thấy đơn hàng phù hợp với thông tin cung cấp. Vui lòng kiểm tra lại Mã đơn hàng và Email/SĐT.';
-            }
+        // 1. Nếu người dùng đã đăng nhập -> Lấy toàn bộ đơn hàng của họ (mới nhất lên đầu)
+        if (auth()->check()) {
+            $myOrders = \App\Models\Order::where('user_id', auth()->id())
+                ->with(['orderItems.dish', 'user'])
+                ->orderByDesc('created_at')
+                ->get();
+        } elseif ($email || $phone) {
+            // Nếu chưa đăng nhập nhưng tra cứu theo Email hoặc SĐT
+            $myOrders = \App\Models\Order::whereHas('user', function($q) use ($email, $phone) {
+                    $q->where(function($sub) use ($email, $phone) {
+                        if ($email) $sub->where('email', trim($email));
+                        if ($phone) $sub->orWhere('phone', trim($phone));
+                    });
+                })
+                ->with(['orderItems.dish', 'user'])
+                ->orderByDesc('created_at')
+                ->get();
         }
 
-        return view('client.track_order', compact('order', 'searched', 'error', 'orderIdInput', 'email', 'phone'));
+        // 2. Đơn hàng cụ thể đang được chọn xem tiến độ
+        $selectedOrder = null;
+        if ($orderIdInput) {
+            $cleanId = trim(str_ireplace('FDL-', '', $orderIdInput));
+            $selectedOrder = \App\Models\Order::where('id', $cleanId)->with(['orderItems.dish', 'user'])->first();
+        }
+
+        if (!$selectedOrder && $myOrders->isNotEmpty()) {
+            $selectedOrder = $myOrders->first();
+        }
+
+        return view('client.track_order', compact('myOrders', 'selectedOrder', 'orderIdInput', 'email', 'phone'));
     }
 
     // AJAX Polling for settings and data changes
