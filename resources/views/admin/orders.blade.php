@@ -1,112 +1,118 @@
 @extends('layouts.admin')
 
-@section('title', 'Quản lý Đơn hàng - FOODELICIOUS')
+@section('title', 'Quản lý Đơn hàng - FOODDAILY Admin')
 
 @section('content')
-<div class="container-fluid">
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800 font-weight-bold">Quản lý đơn hàng</h1>
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Danh Sách Đơn Hàng</h1>
+            <p class="text-xs text-slate-500 font-medium mt-1">Cập nhật thời gian thực trạng thái chế biến & thanh toán</p>
+        </div>
     </div>
 
+    <!-- Alert Flash Notifications -->
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show text-dark shadow-sm" role="alert">
-            <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    @endif
-    
-    @if($errors->any())
-        <div class="alert alert-danger py-2 small shadow-sm mb-3">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+        <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-2xl flex items-center justify-between shadow-xs text-xs font-semibold">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-circle-check text-emerald-600 text-sm"></i>
+                <span>{{ session('success') }}</span>
+            </div>
+            <button onclick="this.parentElement.remove()" class="text-emerald-600 hover:text-emerald-800">&times;</button>
         </div>
     @endif
 
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Danh sách đơn hàng hiện tại</h6>
+    @if($errors->any())
+        <div class="bg-rose-50 border border-rose-200 text-rose-700 p-4 rounded-2xl text-xs space-y-1">
+            @foreach ($errors->all() as $error)
+                <p class="flex items-center gap-2 font-medium"><i class="fas fa-circle-exclamation text-rose-500"></i> {{ $error }}</p>
+            @endforeach
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered text-dark" id="dataTable" width="100%" cellspacing="0">
-                    <thead>
-                        <tr>
-                            <th>Mã đơn</th>
-                            <th>Các món ăn đặt</th>
-                            <th>Tài khoản / SĐT</th>
-                            <th>Trạng thái thanh toán</th>
-                            <th>Trạng thái đơn hàng</th>
-                            <th>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($orders as $order)
-                            @php
-                                $paymentMethodText = 'COD';
-                                if ($order->payment_method === 'bank_transfer') {
-                                    $paymentMethodText = 'ATM';
-                                } elseif ($order->payment_method === 'momo') {
-                                    $paymentMethodText = 'MoMo';
-                                } elseif ($order->payment_method === 'vnpay') {
-                                    $paymentMethodText = 'VNPay';
-                                } elseif ($order->payment_method === 'zalopay') {
-                                    $paymentMethodText = 'ZaloPay';
-                                }
-                            @endphp
-                            <tr>
-                                <td>#FDL-{{ $order->id }}</td>
-                                <td class="font-weight-bold">
+    @endif
+
+    <!-- Orders Data Card Table -->
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden">
+        <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                <i class="fas fa-receipt text-[#ee4d2d]"></i> Đơn hàng vừa phát sinh
+            </h3>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-100 text-[11px] text-slate-400 uppercase font-extrabold tracking-wider">
+                        <th class="py-4 px-6">Mã đơn</th>
+                        <th class="py-4 px-6">Món ăn đặt</th>
+                        <th class="py-4 px-6">Khách hàng</th>
+                        <th class="py-4 px-6">Thanh toán</th>
+                        <th class="py-4 px-6">Trạng thái đơn</th>
+                        <th class="py-4 px-6 text-right">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @foreach($orders as $order)
+                        @php
+                            $paymentMethodText = 'COD';
+                            if ($order->payment_method === 'bank_transfer') {
+                                $paymentMethodText = 'VietQR';
+                            } elseif ($order->payment_method === 'momo') {
+                                $paymentMethodText = 'MoMo';
+                            }
+                        @endphp
+                        <tr class="hover:bg-slate-50/80 transition-colors">
+                            <!-- Mã đơn -->
+                            <td class="py-4 px-6 font-extrabold text-emerald-700">
+                                #FDL-{{ $order->id }}
+                            </td>
+                            <!-- Sản phẩm -->
+                            <td class="py-4 px-6 max-w-xs">
+                                <p class="font-bold text-slate-900 truncate">
                                     @foreach($order->orderItems as $item)
-                                        {{ $item->dish->dish_name ?? 'Món ăn' }} x{{ $item->quantity }}{{ !$loop->last ? ', ' : '' }}
+                                        {{ $item->dish->dish_name ?? 'Món ăn' }} <span class="text-emerald-600 font-extrabold">x{{ $item->quantity }}</span>{{ !$loop->last ? ', ' : '' }}
                                     @endforeach
-                                </td>
-                                <td>{{ $order->user->fullname ?? 'Khách vãng lai' }}<br><small class="text-muted">{{ $order->user->phone ?? 'Không có SĐT' }}</small></td>
-                                <td>
-                                    <select class="form-control form-control-sm font-weight-bold payment-status-select shadow-sm" 
-                                            data-order-id="{{ $order->id }}" 
-                                            data-current-val="{{ $order->payment_status }}"
-                                            style="width: auto; display: inline-block;">
-                                        <option value="pending" {{ $order->payment_status === 'pending' ? 'selected' : '' }}>Chờ thanh toán</option>
-                                        <option value="paid" {{ $order->payment_status === 'paid' ? 'selected' : '' }}>Đã thanh toán</option>
-                                        <option value="failed" {{ $order->payment_status === 'failed' ? 'selected' : '' }}>Thất bại</option>
-                                        <option value="refunded" {{ $order->payment_status === 'refunded' ? 'selected' : '' }}>Đã hoàn tiền</option>
-                                    </select>
-                                    <br><small class="text-muted font-weight-bold">Hình thức: {{ $paymentMethodText }}</small>
-                                </td>
-                                <td>
-                                    <select class="form-control form-control-sm font-weight-bold order-status-select shadow-sm" 
-                                            data-order-id="{{ $order->id }}" 
-                                            data-current-val="{{ $order->order_status }}"
-                                            style="width: auto; display: inline-block;">
-                                        <option value="pending" {{ $order->order_status === 'pending' ? 'selected' : '' }}>Chờ xác nhận</option>
-                                        <option value="confirmed" {{ $order->order_status === 'confirmed' ? 'selected' : '' }}>Đã xác nhận</option>
-                                        <option value="preparing" {{ $order->order_status === 'preparing' ? 'selected' : '' }}>Đang chuẩn bị</option>
-                                        <option value="delivering" {{ $order->order_status === 'delivering' ? 'selected' : '' }}>Đang giao hàng</option>
-                                        <option value="completed" {{ $order->order_status === 'completed' ? 'selected' : '' }}>Đã hoàn thành</option>
-                                        <option value="cancelled" {{ $order->order_status === 'cancelled' ? 'selected' : '' }}>Đã hủy</option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <a href="{{ route('donhang_xem', $order->id) }}" class="btn btn-info btn-sm"
-                                        title="Xem chi tiết"><i class="fas fa-eye"></i> Xem</a>
-                                    <a href="{{ route('donhang_chinhsua', $order->id) }}"
-                                        class="btn btn-warning btn-sm"
-                                        title="Cập nhật chi tiết"><i class="fas fa-edit"></i> Chi tiết</a>
-                                    <form action="{{ route('donhang_xoa', $order->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa đơn hàng này?');">
-                                        @csrf
-                                        <button type="submit" class="btn btn-danger btn-sm" title="Xóa đơn"><i class="fas fa-trash"></i> Xóa</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                                </p>
+                                <p class="text-[11px] text-slate-400 mt-0.5 font-medium">{{ number_format($order->final_amount ?? $order->total_price ?? 0) }}đ</p>
+                            </td>
+                            <!-- Khách hàng -->
+                            <td class="py-4 px-6">
+                                <p class="font-bold text-slate-800 text-xs">{{ $order->user->fullname ?? 'Khách vãng lai' }}</p>
+                                <p class="text-[11px] text-slate-400 font-medium">{{ $order->user->phone ?? 'Không có SĐT' }}</p>
+                            </td>
+                            <!-- Trạng thái Thanh toán -->
+                            <td class="py-4 px-6">
+                                <select class="payment-status-select px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold transition-all shadow-xs focus:ring-2 focus:ring-emerald-500/20 bg-slate-50 outline-none" 
+                                        data-order-id="{{ $order->id }}" 
+                                        data-current-val="{{ $order->payment_status }}">
+                                    <option value="pending" {{ $order->payment_status === 'pending' ? 'selected' : '' }}>Chờ thanh toán</option>
+                                    <option value="paid" {{ $order->payment_status === 'paid' ? 'selected' : '' }}>Đã thanh toán</option>
+                                    <option value="failed" {{ $order->payment_status === 'failed' ? 'selected' : '' }}>Thất bại</option>
+                                    <option value="refunded" {{ $order->payment_status === 'refunded' ? 'selected' : '' }}>Đã hoàn tiền</option>
+                                </select>
+                                <div class="text-[10px] text-slate-400 font-bold mt-1 uppercase">Hình thức: {{ $paymentMethodText }}</div>
+                            </td>
+                            <!-- Trạng thái Đơn hàng -->
+                            <td class="py-4 px-6">
+                                <select class="order-status-select px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold transition-all shadow-xs focus:ring-2 focus:ring-emerald-500/20 bg-slate-50 outline-none" 
+                                        data-order-id="{{ $order->id }}" 
+                                        data-current-val="{{ $order->order_status }}">
+                                    <option value="preparing" {{ $order->order_status === 'preparing' ? 'selected' : '' }}>🔥 Đang chuẩn bị</option>
+                                    <option value="delivering" {{ $order->order_status === 'delivering' ? 'selected' : '' }}>🚚 Đang giao hàng</option>
+                                    <option value="completed" {{ $order->order_status === 'completed' ? 'selected' : '' }}>✅ Đã giao hàng</option>
+                                    <option value="cancelled" {{ $order->order_status === 'cancelled' ? 'selected' : '' }}>❌ Đã hủy</option>
+                                </select>
+                            </td>
+                            <!-- Thao tác -->
+                            <td class="py-4 px-6 text-right space-x-2">
+                                <a href="{{ route('donhang_xem', ['id' => $order->id]) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 transition-colors">
+                                    <i class="fas fa-eye text-xs"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -114,134 +120,24 @@
 
 @section('scripts')
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        function updateSelectColor(select) {
-            const val = select.value;
-            select.classList.remove('border-left-success', 'border-left-danger', 'border-left-warning', 'border-left-primary', 'border-left-info', 'border-left-secondary', 'text-success', 'text-danger', 'text-warning', 'text-primary', 'text-info', 'text-secondary');
-            
-            if (val === 'pending') {
-                select.classList.add('border-left-secondary', 'text-secondary');
-            } else if (val === 'confirmed' || val === 'preparing') {
-                select.classList.add('border-left-info', 'text-info');
-            } else if (val === 'delivering') {
-                select.classList.add('border-left-primary', 'text-primary');
-            } else if (val === 'completed' || val === 'paid') {
-                select.classList.add('border-left-success', 'text-success');
-            } else if (val === 'cancelled' || val === 'failed') {
-                select.classList.add('border-left-danger', 'text-danger');
-            } else if (val === 'refunded') {
-                select.classList.add('border-left-secondary', 'text-muted');
-            }
-        }
-
-        // Initialize colors for all selects
-        document.querySelectorAll('.order-status-select, .payment-status-select').forEach(select => {
-            updateSelectColor(select);
-            select.addEventListener('change', function() {
-                updateSelectColor(this);
-            });
+    document.querySelectorAll('.order-status-select').forEach(select => {
+        select.addEventListener('change', function () {
+            const orderId = this.dataset.orderId;
+            const newStatus = this.value;
+            fetch(`/donhang_chinhsua/${orderId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ order_status: newStatus })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) alert('Cập nhật trạng thái đơn thành công!');
+            })
+            .catch(err => console.error(err));
         });
-
-        // Handle AJAX change events
-        $('.order-status-select, .payment-status-select').on('change', function() {
-            const select = $(this);
-            const orderId = select.data('order-id');
-            const tr = select.closest('tr');
-            
-            const isPayment = select.hasClass('payment-status-select');
-            const val = select.val();
-            
-            if (isPayment && val === 'refunded') {
-                if (!confirm('Để hoàn tiền đầy đủ kèm tải ảnh biên lai giao dịch và nhập số tiền tùy chỉnh, vui lòng sử dụng nút "Chi tiết" để thao tác. Bạn vẫn muốn cập nhật trạng thái nhanh thành Đã hoàn tiền tại đây?')) {
-                    select.val(select.data('current-val'));
-                    updateSelectColor(select[0]);
-                    return;
-                }
-            }
-            
-            const orderStatusSelect = tr.find('.order-status-select');
-            const paymentStatusSelect = tr.find('.payment-status-select');
-            
-            const orderStatus = orderStatusSelect.val();
-            const paymentStatus = paymentStatusSelect.val();
-            
-            orderStatusSelect.prop('disabled', true);
-            paymentStatusSelect.prop('disabled', true);
-            
-            $.ajax({
-                url: `/donhang_chinhsua/${orderId}`,
-                type: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    order_status: orderStatus,
-                    payment_status: paymentStatus
-                },
-                success: function(response) {
-                    if (response.success) {
-                        orderStatusSelect.data('current-val', orderStatus);
-                        paymentStatusSelect.data('current-val', paymentStatus);
-                        showToast('Thành công', response.message, 'success');
-                    } else {
-                        orderStatusSelect.val(orderStatusSelect.data('current-val'));
-                        paymentStatusSelect.val(paymentStatusSelect.data('current-val'));
-                        updateSelectColor(orderStatusSelect[0]);
-                        updateSelectColor(paymentStatusSelect[0]);
-                        showToast('Lỗi', 'Không thể cập nhật trạng thái đơn hàng.', 'error');
-                    }
-                },
-                error: function(err) {
-                    orderStatusSelect.val(orderStatusSelect.data('current-val'));
-                    paymentStatusSelect.val(paymentStatusSelect.data('current-val'));
-                    updateSelectColor(orderStatusSelect[0]);
-                    updateSelectColor(paymentStatusSelect[0]);
-                    showToast('Lỗi', 'Có lỗi xảy ra kết nối máy chủ.', 'error');
-                },
-                complete: function() {
-                    orderStatusSelect.prop('disabled', false);
-                    paymentStatusSelect.prop('disabled', false);
-                }
-            });
-        });
-
-        function showToast(title, message, type = 'success') {
-            let toastContainer = document.getElementById('toast-container');
-            if (!toastContainer) {
-                toastContainer = document.createElement('div');
-                toastContainer.id = 'toast-container';
-                toastContainer.style.position = 'fixed';
-                toastContainer.style.top = '80px';
-                toastContainer.style.right = '20px';
-                toastContainer.style.zIndex = '9999';
-                document.body.appendChild(toastContainer);
-            }
-            
-            const toast = document.createElement('div');
-            toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} shadow-lg show animate__animated animate__fadeInRight text-white`;
-            toast.style.minWidth = '300px';
-            toast.style.marginBottom = '10px';
-            toast.style.backgroundColor = type === 'success' ? '#1cc88a' : '#e74a3b';
-            toast.style.borderColor = type === 'success' ? '#1cc88a' : '#e74a3b';
-            toast.innerHTML = `
-                <div class="d-flex align-items-center">
-                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2" style="font-size: 1.2rem;"></i>
-                    <div style="flex: 1;">
-                        <strong class="text-white">${title}</strong>
-                        <div class="small text-white-50">${message}</div>
-                    </div>
-                    <button type="button" class="close ml-auto text-white" style="opacity: 0.8; outline: none; background: transparent; border: none;" onclick="this.parentElement.parentElement.remove()">
-                        <span>&times;</span>
-                    </button>
-                </div>
-            `;
-            
-            toastContainer.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transition = 'opacity 0.5s ease';
-                setTimeout(() => toast.remove(), 500);
-            }, 4000);
-        }
     });
 </script>
 @endsection

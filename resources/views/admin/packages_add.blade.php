@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Thêm gói dịch vụ mới - FOODELICIOUS')
+@section('title', 'Thêm gói dịch vụ mới - FOODDAILY')
 
 @section('content')
     <div class="d-sm-flex align-items-center justify-content-between mb-4 mt-3">
@@ -54,23 +54,29 @@
 
         <div class="row">
             <div class="col-lg-12">
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-tasks mr-2"></i>Cấu hình danh sách món ăn trong gói</h6>
-                    </div>
-                    <div class="input-group p-2">
-                        <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
-                        <div class="input-group-append">
-                            <button class="btn btn-primary" type="button">
-                                <i class="fas fa-search fa-sm"></i>
-                            </button>
-                        </div>
+                    <div class="card-header py-3 bg-white">
+                        <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-utensils mr-2"></i>Cấu hình danh sách món ăn trong gói</h6>
                     </div>
                     <div class="card-body">
-                        <p class="text-muted small">* Tích chọn vào ô đầu dòng để thêm món ăn thành phần vào cấu hình gói dịch vụ này.</p>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-hover text-dark">
-                                <thead class="bg-light">
+                        <div class="row align-items-center mb-3">
+                            <div class="col-md-6 col-sm-12 mb-2 mb-md-0">
+                                <div class="input-group">
+                                    <input type="text" id="dishSearch" class="form-control bg-light border-0 small" placeholder="Tìm kiếm món ăn đơn..." aria-label="Search">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="button" disabled style="background-color: #ce1126; border-color: #ce1126;">
+                                            <i class="fas fa-search fa-sm text-white"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-12 text-md-right text-left">
+                                <span class="text-muted small"><i class="fas fa-info-circle mr-1"></i> Tích chọn vào ô đầu dòng để thêm món ăn thành phần vào cấu hình gói dịch vụ này.</span>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                            <table class="table table-bordered table-hover text-dark table-striped">
+                                <thead class="bg-light sticky-top" style="z-index: 10;">
                                     <tr>
                                         <th style="width: 8%" class="text-center">Chọn</th>
                                         <th style="width: 15%">Hình ảnh</th>
@@ -81,16 +87,18 @@
                                 </thead>
                                 <tbody>
                                     @forelse($dishes as $dish)
-                                    <tr>
+                                    <tr class="dish-row">
                                         <td class="text-center align-middle">
-                                            <input type="checkbox" name="dishes[]" value="{{ $dish->id }}" style="width: 18px; height: 18px;" {{ old('dishes') && in_array($dish->id, old('dishes')) ? 'checked' : '' }}>
+                                            <input type="checkbox" name="dishes[]" value="{{ $dish->id }}" style="width: 18px; height: 18px; cursor: pointer;" {{ old('dishes') && in_array($dish->id, old('dishes')) ? 'checked' : '' }}>
                                         </td>
-                                        <td>
-                                            <img src="{{ $dish->image_url ? (Str::startsWith($dish->image_url, 'http') ? $dish->image_url : asset($dish->image_url)) : asset('logo.jpg') }}" alt="{{ $dish->dish_name }}" class="img-thumbnail" style="max-height: 45px;">
+                                        <td class="align-middle text-center">
+                                            <img src="{{ $dish->image_url ? (Str::startsWith($dish->image_url, 'http') ? $dish->image_url : asset($dish->image_url)) : asset('logo.jpg') }}" alt="{{ $dish->dish_name }}" class="img-thumbnail rounded shadow-sm" style="max-height: 45px; max-width: 60px; object-fit: cover;">
                                         </td>
-                                        <td class="align-middle font-weight-bold">{{ $dish->dish_name }}</td>
-                                        <td class="align-middle text-secondary">{{ number_format($dish->price, 0, ',', '.') }} đ</td>
-                                        <td class="align-middle text-success font-weight-bold">Có sẵn</td>
+                                        <td class="align-middle font-weight-bold dish-name">{{ $dish->dish_name }}</td>
+                                        <td class="align-middle text-secondary font-weight-bold">{{ number_format($dish->price, 0, ',', '.') }} đ</td>
+                                        <td class="align-middle">
+                                            <span class="badge badge-success px-2 py-1">Có sẵn</span>
+                                        </td>
                                     </tr>
                                     @empty
                                     <tr>
@@ -102,13 +110,37 @@
                         </div>
 
                         <hr>
-                        <div class="d-flex justify-content-start">
-                            <button type="submit" class="btn btn-primary shadow-sm px-4 mr-2">
+                        <div class="d-flex justify-content-start gap-2">
+                            <button type="submit" class="btn text-white shadow-sm px-4 mr-2" style="background-color: #ce1126; border: none;">
                                 <i class="fas fa-save fa-sm mr-1"></i> Thêm gói
                             </button>
                             <a href="{{ route('quanly_goidichvu') }}" class="btn btn-secondary shadow-sm px-3">Hủy bỏ</a>
                         </div>
                     </div>
+
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            const searchInput = document.getElementById("dishSearch");
+                            if (searchInput) {
+                                searchInput.addEventListener("input", function () {
+                                    const query = this.value.toLowerCase().normalize("NFC").trim();
+                                    const rows = document.querySelectorAll(".dish-row");
+                                    
+                                    rows.forEach(row => {
+                                        const dishNameEl = row.querySelector(".dish-name");
+                                        if (dishNameEl) {
+                                            const dishName = dishNameEl.textContent.toLowerCase().normalize("NFC");
+                                            if (dishName.includes(query)) {
+                                                row.style.setProperty('display', '', 'important');
+                                            } else {
+                                                row.style.setProperty('display', 'none', 'important');
+                                            }
+                                        }
+                                    });
+                                });
+                            }
+                        });
+                    </script>
                 </div>
             </div>
         </div>

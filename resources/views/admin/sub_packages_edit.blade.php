@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Chỉnh sửa phân bổ gói - FOODELICIOUS')
+@section('title', 'Chỉnh sửa phân bổ gói - FOODDAILY')
 
 @section('content')
     <div class="d-sm-flex align-items-center justify-content-between mb-4">

@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Trang chủ - FOODELICIOUS</title>
+    <title>Trang chủ - FOODDAILY</title>
     <meta name="description" content="">
     <meta name="keywords" content="">
 
@@ -68,7 +68,7 @@
 
             <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
                 <img src="{{ asset('logo.jpg') }}" alt="">
-                <h1 class="sitename">FOODELICIOUS</h1>
+                <h1 class="sitename">FOODDAILY</h1>
                 <span>.</span>
             </a>
 

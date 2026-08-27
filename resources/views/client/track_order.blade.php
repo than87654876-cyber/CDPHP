@@ -1,326 +1,200 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.app')
 
-<head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Tra cứu đơn hàng - FOODELICIOUS</title>
-    <meta name="description" content="Tra cứu trạng thái đơn hàng của bạn tại FOODELICIOUS">
+@section('title', 'Tra cứu đơn hàng - FOODDAILY')
 
-    <link href="{{ asset('logo.jpg') }}" rel="icon">
-    <link href="https://fonts.googleapis.com" rel="preconnect">
-    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" type="text/css">
-    <link href="{{ asset('client/assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('client/assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
-    <link href="{{ asset('client/assets/css/main.css') }}" rel="stylesheet">
-
-    <style>
-        .track-card {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
-            background: #fff;
-        }
-        .btn-track {
-            background-color: #ce1126;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 25px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-        .btn-track:hover {
-            background-color: #a00d20;
-            color: white;
-        }
-        .timeline-step {
-            position: relative;
-            text-align: center;
-            flex: 1;
-        }
-        .timeline-step:not(:last-child)::after {
-            content: '';
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            width: 100%;
-            height: 4px;
-            background-color: #e9ecef;
-            z-index: 1;
-        }
-        .timeline-step.active:not(:last-child)::after {
-            background-color: #28a745;
-        }
-        .step-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background-color: #e9ecef;
-            color: #6c757d;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            z-index: 2;
-            font-size: 1.2rem;
-            transition: all 0.3s ease;
-        }
-        .timeline-step.active .step-icon {
-            background-color: #28a745;
-            color: white;
-            box-shadow: 0 0 0 4px rgba(40, 167, 69, 0.25);
-        }
-        .timeline-step.current .step-icon {
-            background-color: #007bff;
-            color: white;
-            box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.25);
-        }
-        .timeline-step.cancelled .step-icon {
-            background-color: #dc3545;
-            color: white;
-        }
-    </style>
-</head>
-
-<body class="index-page">
-
-    <header id="header" class="header d-flex align-items-center sticky-top">
-        <div class="container position-relative d-flex align-items-center justify-content-between">
-            <a href="{{ route('trangchu') }}" class="logo d-flex align-items-center me-auto me-xl-0">
-                <img src="{{ isset($settings['logo_url']) ? (\Illuminate\Support\Str::startsWith($settings['logo_url'], 'http') ? $settings['logo_url'] : asset($settings['logo_url'])) : asset('logo.jpg') }}" alt="" class="setting-logo-img">
-                <h1 class="sitename">FOODELICIOUS</h1>
-                <span>.</span>
-            </a>
-
-            <nav id="navmenu" class="navmenu">
-                <ul>
-                    <li><a href="{{ route('trangchu') }}">Trang chủ</a></li>
-                    <li><a href="{{ route('tracuu') }}" class="active">Tra cứu đơn hàng</a></li>
-                </ul>
-            </nav>
-
-            <div class="d-flex align-items-center gap-3">
-                @if(Auth::check())
-                    <a href="{{ route('giohang') }}" class="btn-get-started">Giỏ hàng & Lịch sử</a>
-                @else
-                    <a href="{{ route('trangchu/dangnhap') }}" class="btn-get-started">Đăng nhập</a>
-                @endif
+@section('content')
+<div class="py-12 bg-slate-50 min-h-screen">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Search Card -->
+        <div class="bg-white rounded-3xl p-8 shadow-xl border border-slate-100 mb-8">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-5 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center font-bold">
+                    <i class="fas fa-search text-lg"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-extrabold text-slate-800">Tra cứu tiến độ đơn hàng</h2>
+                    <p class="text-xs text-slate-500">Kiểm tra thông tin và vị trí giao hàng theo mã đơn của bạn</p>
+                </div>
             </div>
+
+            @if($error)
+                <div class="mb-6 bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-2xl flex items-center gap-3 text-sm font-medium">
+                    <i class="fas fa-triangle-exclamation text-rose-500 text-base"></i>
+                    <span>{{ $error }}</span>
+                </div>
+            @endif
+
+            <form action="{{ route('tracuu') }}" method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label for="order_id" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                        Mã đơn hàng <span class="text-rose-500">*</span>
+                    </label>
+                    <input type="text" id="order_id" name="order_id" placeholder="Ví dụ: FDL-123" value="{{ $orderIdInput }}" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 text-sm font-semibold transition-all">
+                </div>
+
+                <div>
+                    <label for="phone" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Số điện thoại</label>
+                    <input type="tel" id="phone" name="phone" placeholder="VD: 0901234567" value="{{ $phone }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 text-sm font-semibold transition-all">
+                </div>
+
+                <div>
+                    <label for="email" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Địa chỉ Email</label>
+                    <input type="email" id="email" name="email" placeholder="VD: name@example.com" value="{{ $email }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 text-sm font-semibold transition-all">
+                </div>
+
+                <div class="md:col-span-3 text-center mt-2">
+                    <button type="submit" class="px-8 py-3.5 rounded-2xl food-gradient text-white font-extrabold text-sm shadow-lg shadow-rose-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 mx-auto">
+                        <i class="fas fa-magnifying-glass"></i> Tra cứu ngay
+                    </button>
+                </div>
+            </form>
         </div>
-    </header>
 
-    <main class="main my-5">
-        <div class="container text-dark" style="font-family: 'Roboto', sans-serif;">
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="card track-card p-4 mb-4">
-                        <h3 class="fw-bold text-danger border-bottom pb-3 mb-4"><i class="bi bi-search"></i> Tra cứu đơn hàng dành cho khách vãng lai</h3>
+        @if($searched && $order)
+            <!-- Progress Timeline Card -->
+            <div class="bg-white rounded-3xl p-8 shadow-xl border border-slate-100 mb-8">
+                <h3 class="text-base font-extrabold text-slate-800 mb-6 flex items-center gap-2">
+                    <i class="fas fa-truck-fast text-rose-500"></i> Tiến độ đơn hàng #FDL-{{ $order->id }}
+                </h3>
 
-                        @if(session('success'))
-                            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-                                <strong>Thành công!</strong> {{ session('success') }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        @endif
+                @php $status = $order->order_status; @endphp
 
-                        @if($error)
-                            <div class="alert alert-danger" role="alert">
-                                <i class="bi bi-exclamation-triangle-fill mr-1"></i> {{ $error }}
-                            </div>
-                        @endif
-
-                        <form action="{{ route('tracuu') }}" method="GET" class="row g-3">
-                            <div class="col-md-4">
-                                <label for="order_id" class="form-label small fw-bold">Mã đơn hàng <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="order_id" name="order_id" placeholder="VD: FDL-123" value="{{ $orderIdInput }}" required>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="phone" class="form-label small fw-bold">Số điện thoại giao hàng</label>
-                                <input type="tel" class="form-control" id="phone" name="phone" placeholder="VD: 0901234567" value="{{ $phone }}">
-                            </div>
-                            <div class="col-md-4">
-                                <label for="email" class="form-label small fw-bold">Địa chỉ Email</label>
-                                <input type="email" class="form-control" id="email" name="email" placeholder="VD: name@example.com" value="{{ $email }}">
-                            </div>
-                            <div class="col-12 text-center mt-4">
-                                <button type="submit" class="btn btn-track shadow-sm"><i class="bi bi-search"></i> Tra cứu trạng thái</button>
-                            </div>
-                        </form>
-                    </div>
-
-                    @if($searched && $order)
-                        <!-- Order Status Timeline -->
-                        <div class="card track-card p-4 mb-4">
-                            <h5 class="fw-bold text-primary mb-4"><i class="bi bi-truck"></i> Tiến độ đơn hàng FDL-{{ $order->id }}</h5>
-                            
-                            @php
-                                $status = $order->order_status;
-                            @endphp
-
-                            <div class="d-flex justify-content-between mb-4">
-                                @if($status === 'cancelled')
-                                    <div class="timeline-step cancelled">
-                                        <div class="step-icon"><i class="fas fa-times"></i></div>
-                                        <div class="small fw-bold mt-2 text-danger">Đã hủy đơn</div>
-                                    </div>
-                                @else
-                                    <div class="timeline-step {{ in_array($status, ['pending', 'preparing', 'cooked', 'shipping', 'completed']) ? 'active' : '' }} {{ $status === 'pending' ? 'current' : '' }}">
-                                        <div class="step-icon"><i class="fas fa-file-invoice"></i></div>
-                                        <div class="small fw-bold mt-2">Chờ duyệt</div>
-                                    </div>
-                                    <div class="timeline-step {{ in_array($status, ['preparing', 'cooked', 'shipping', 'completed']) ? 'active' : '' }} {{ in_array($status, ['preparing', 'cooked']) ? 'current' : '' }}">
-                                        <div class="step-icon"><i class="fas fa-utensils"></i></div>
-                                        <div class="small fw-bold mt-2">Đang chế biến</div>
-                                    </div>
-                                    <div class="timeline-step {{ in_array($status, ['shipping', 'completed']) ? 'active' : '' }} {{ $status === 'shipping' ? 'current' : '' }}">
-                                        <div class="step-icon"><i class="fas fa-motorcycle"></i></div>
-                                        <div class="small fw-bold mt-2">Đang giao hàng</div>
-                                    </div>
-                                    <div class="timeline-step {{ $status === 'completed' ? 'active current' : '' }}">
-                                        <div class="step-icon"><i class="fas fa-check"></i></div>
-                                        <div class="small fw-bold mt-2">Đã nhận hàng</div>
-                                    </div>
-                                @endif
-                            </div>
+                <div class="grid grid-cols-4 gap-2 relative my-6">
+                    @if($status === 'cancelled')
+                        <div class="col-span-4 bg-rose-50 border border-rose-200 text-rose-700 p-4 rounded-2xl text-center font-bold text-sm flex items-center justify-center gap-2">
+                            <i class="fas fa-circle-xmark text-lg"></i> Đơn hàng đã bị hủy
                         </div>
-
-                        <!-- Order Details -->
-                        <div class="card track-card p-4">
-                            <div class="row border-bottom pb-3 mb-3">
-                                <div class="col-md-6">
-                                    <h5 class="fw-bold mb-1">Thông tin nhận hàng</h5>
-                                    <p class="mb-1"><strong>Khách hàng:</strong> {{ $order->user ? $order->user->fullname : 'Khách vãng lai' }}</p>
-                                    <p class="mb-1"><strong>Chi tiết:</strong> {{ $order->health_notes }}</p>
-                                </div>
-                                <div class="col-md-6 text-md-end">
-                                    <h5 class="fw-bold mb-1">Thanh toán</h5>
-                                    <p class="mb-1"><strong>Phương thức:</strong> 
-                                        @if($order->payment_method === 'cash')
-                                            Tiền mặt (COD)
-                                        @elseif($order->payment_method === 'bank_transfer')
-                                            Chuyển khoản ATM/VietQR
-                                        @else
-                                            Ví điện tử MoMo
-                                        @endif
-                                    </p>
-                                    <p class="mb-1"><strong>Trạng thái:</strong> 
-                                        @if($order->payment_status === 'paid')
-                                            <span class="badge bg-success">Đã thanh toán</span>
-                                        @elseif($order->payment_status === 'refunded')
-                                            <span class="badge bg-danger">Đã hoàn tiền</span>
-                                        @else
-                                            <span class="badge bg-warning text-dark">Chờ thanh toán</span>
-                                        @endif
-                                    </p>
-                                </div>
+                    @else
+                        <!-- Step 1 -->
+                        <div class="text-center">
+                            <div class="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center font-bold text-lg transition-all {{ in_array($status, ['pending', 'preparing', 'cooked', 'shipping', 'completed']) ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30' : 'bg-slate-100 text-slate-400' }}">
+                                <i class="fas fa-file-invoice"></i>
                             </div>
-
-                            <h5 class="fw-bold mb-3">Sản phẩm đã đặt</h5>
-                            <div class="table-responsive">
-                                <table class="table align-middle">
-                                    <thead>
-                                        <tr>
-                                            <th>Món ăn</th>
-                                            <th class="text-center">Số lượng</th>
-                                            <th class="text-end">Đơn giá</th>
-                                            <th class="text-end">Thành tiền</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($order->orderItems as $item)
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    @if($item->dish && $item->dish->image_url)
-                                                        <img src="{{ $item->dish->image_url }}" class="rounded me-2" width="50" height="50" style="object-fit: cover;">
-                                                    @endif
-                                                    <div>
-                                                        <span class="fw-bold">{{ $item->dish ? $item->dish->dish_name : 'Món ăn không tồn tại' }}</span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="text-center">{{ $item->quantity }}</td>
-                                            <td class="text-end">{{ number_format($item->price, 0, ',', '.') }}đ</td>
-                                            <td class="text-end fw-bold">{{ number_format($item->price * $item->quantity, 0, ',', '.') }}đ</td>
-                                        </tr>
-                                        @endforeach
-                                        <tr class="table-light">
-                                            <td colspan="3" class="text-end fw-bold">Tổng thanh toán:</td>
-                                            <td class="text-end fw-bold text-danger fs-5">{{ number_format($order->final_amount, 0, ',', '.') }}đ</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <p class="text-xs font-bold mt-3 {{ $status === 'pending' ? 'text-rose-600' : 'text-slate-700' }}">1. Tiếp nhận</p>
+                        </div>
+                        <!-- Step 2 -->
+                        <div class="text-center">
+                            <div class="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center font-bold text-lg transition-all {{ in_array($status, ['preparing', 'cooked', 'shipping', 'completed']) ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30' : 'bg-slate-100 text-slate-400' }}">
+                                <i class="fas fa-fire-burner"></i>
                             </div>
+                            <p class="text-xs font-bold mt-3 {{ in_array($status, ['preparing', 'cooked']) ? 'text-rose-600' : 'text-slate-700' }}">2. Chế biến</p>
+                        </div>
+                        <!-- Step 3 -->
+                        <div class="text-center">
+                            <div class="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center font-bold text-lg transition-all {{ in_array($status, ['shipping', 'completed']) ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30' : 'bg-slate-100 text-slate-400' }}">
+                                <i class="fas fa-motorcycle"></i>
+                            </div>
+                            <p class="text-xs font-bold mt-3 {{ $status === 'shipping' ? 'text-rose-600' : 'text-slate-700' }}">3. Đang giao</p>
+                        </div>
+                        <!-- Step 4 -->
+                        <div class="text-center">
+                            <div class="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center font-bold text-lg transition-all {{ $status === 'completed' ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30' : 'bg-slate-100 text-slate-400' }}">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <p class="text-xs font-bold mt-3 {{ $status === 'completed' ? 'text-emerald-600' : 'text-slate-700' }}">4. Hoàn tất</p>
                         </div>
                     @endif
                 </div>
             </div>
-        </div>
-    </main>
 
-    <footer class="footer bg-light py-4 border-top mt-auto">
-        <div class="container text-center text-secondary small">
-            <p class="mb-0">© 2026 FOODELICIOUS. Mọi quyền được bảo lưu.</p>
-        </div>
-    </footer>
+            <!-- Details Card -->
+            <div class="bg-white rounded-3xl p-8 shadow-xl border border-slate-100">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-slate-100 mb-6">
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Thông tin nhận hàng</h4>
+                        <p class="text-sm font-bold text-slate-800">{{ $order->user ? $order->user->fullname : 'Khách vãng lai' }}</p>
+                        <p class="text-xs text-slate-500 mt-1">Ghi chú: {{ $order->health_notes ?? 'Không có' }}</p>
+                    </div>
+                    <div class="md:text-right">
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Thanh toán</h4>
+                        <p class="text-sm font-bold text-slate-800">
+                            @if($order->payment_method === 'cash')
+                                Tiền mặt (COD)
+                            @elseif($order->payment_method === 'bank_transfer')
+                                Chuyển khoản VietQR
+                            @else
+                                Ví MoMo
+                            @endif
+                        </p>
+                        <div class="mt-1">
+                            @if($order->payment_status === 'paid')
+                                <span class="px-3 py-1 bg-emerald-100 text-emerald-700 font-extrabold text-xs rounded-full">Đã thanh toán</span>
+                            @elseif($order->payment_status === 'refunded')
+                                <span class="px-3 py-1 bg-rose-100 text-rose-700 font-extrabold text-xs rounded-full">Đã hoàn tiền</span>
+                            @else
+                                <span class="px-3 py-1 bg-amber-100 text-amber-700 font-extrabold text-xs rounded-full">Chờ thanh toán</span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
 
-    <script src="{{ asset('client/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    
-    <!-- Real-time settings and order status polling -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // 1. Settings/Logo Polling
-            let currentLogoUrl = "{{ isset($settings['logo_url']) ? (\Illuminate\Support\Str::startsWith($settings['logo_url'], 'http') ? $settings['logo_url'] : asset($settings['logo_url'])) : asset('logo.jpg') }}";
-            
-            function pollSettings() {
-                fetch("{{ route('api.settings.poll') }}")
-                    .then(response => response.json())
-                    .then(data => {
-                        const newLogo = data.settings.logo_url;
-                        if (newLogo && newLogo !== currentLogoUrl) {
-                            currentLogoUrl = newLogo;
-                            document.querySelectorAll('.setting-logo-img').forEach(img => {
-                                img.src = newLogo;
-                            });
-                        }
-                    })
-                    .catch(err => console.error('Error polling settings:', err));
-            }
-            setInterval(pollSettings, 2000);
+                <h4 class="text-sm font-bold text-slate-800 mb-4">Chi tiết món ăn</h4>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="border-b border-slate-100 text-xs text-slate-400 uppercase font-bold">
+                                <th class="py-3">Món ăn</th>
+                                <th class="py-3 text-center">Số lượng</th>
+                                <th class="py-3 text-right">Đơn giá</th>
+                                <th class="py-3 text-right">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            @foreach($order->orderItems as $item)
+                            <tr>
+                                <td class="py-3 font-semibold text-slate-800">
+                                    {{ $item->dish ? $item->dish->dish_name : 'Món ăn không tồn tại' }}
+                                </td>
+                                <td class="py-3 text-center font-bold">{{ $item->quantity }}</td>
+                                <td class="py-3 text-right text-slate-600">{{ number_format($item->price, 0, ',', '.') }}đ</td>
+                                <td class="py-3 text-right font-bold text-slate-800">{{ number_format($item->price * $item->quantity, 0, ',', '.') }}đ</td>
+                            </tr>
+                            @endforeach
+                            <tr class="bg-slate-50 font-extrabold">
+                                <td colspan="3" class="py-4 px-3 text-right text-slate-700">Tổng thanh toán:</td>
+                                <td class="py-4 px-3 text-right text-rose-600 text-lg">{{ number_format($order->final_amount, 0, ',', '.') }}đ</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        @endif
+    </div>
+</div>
+@endsection
 
-            // 2. Tracked Order Polling (if order is loaded)
-            @if(isset($order) && $order)
-                const orderId = "{{ $order->id }}";
-                const userEmail = "{{ $email ?? '' }}";
-                const userPhone = "{{ $phone ?? '' }}";
-                const lastStatus = "{{ $order->order_status }}";
-                const lastPaymentStatus = "{{ $order->payment_status }}";
+@section('scripts')
+@if(isset($order) && $order)
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const orderId = "{{ $order->id }}";
+        const userEmail = "{{ $email ?? '' }}";
+        const userPhone = "{{ $phone ?? '' }}";
+        const lastStatus = "{{ $order->order_status }}";
+        const lastPaymentStatus = "{{ $order->payment_status }}";
 
-                function pollOrderStatus() {
-                    const queryParams = new URLSearchParams({
-                        order_id: orderId,
-                        last_status: lastStatus,
-                        last_payment_status: lastPaymentStatus
-                    });
-                    if (userEmail) queryParams.append('email', userEmail);
-                    if (userPhone) queryParams.append('phone', userPhone);
+        function pollOrderStatus() {
+            const queryParams = new URLSearchParams({
+                order_id: orderId,
+                last_status: lastStatus,
+                last_payment_status: lastPaymentStatus
+            });
+            if (userEmail) queryParams.append('email', userEmail);
+            if (userPhone) queryParams.append('phone', userPhone);
 
-                    fetch(`{{ route('api.orders.track.poll') }}?${queryParams.toString()}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.changed) {
-                                console.log('Order status updated. Reloading page...');
-                                window.location.reload();
-                            }
-                        })
-                        .catch(err => console.error('Error polling order status:', err));
-                }
-                setInterval(pollOrderStatus, 2000);
-            @endif
-        });
-    </script>
-</body>
-</html>
+            fetch(`{{ route('api.orders.track.poll') }}?${queryParams.toString()}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.changed) {
+                        window.location.reload();
+                    }
+                })
+                .catch(err => console.error('Error polling order status:', err));
+        }
+        setInterval(pollOrderStatus, 2000);
+    });
+</script>
+@endif
+@endsection
+

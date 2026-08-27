@@ -1,384 +1,291 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi" class="h-full bg-slate-900">
 
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>@yield('title', 'Quản lý Hệ thống - FOODELICIOUS')</title>
+    <title>@yield('title', 'FOODDAILY - Admin Portal')</title>
 
-    <!-- Custom fonts for this template-->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
-    <link href="{{ asset('logo.jpg') }}" rel="icon">
-    <!-- Custom styles for this template-->
-    <link href="{{ asset('admin/css/sb-admin-2.min.css') }}" rel="stylesheet">
+    <link rel="icon" href="{{ asset('logo.jpg') }}">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Vite Assets & Tailwind CDN -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        shopee: {
+                            DEFAULT: '#ee4d2d',
+                            hover: '#d73211',
+                            orange: '#ff4726',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     @yield('styles')
-    @vite(['resources/js/app.js'])
 </head>
 
-<body id="page-top">
-    <div id="wrapper">
+<body id="page-top" class="font-sans antialiased text-slate-800 bg-[#f8fafc] min-h-full selection:bg-[#ee4d2d] selection:text-white">
+    <div id="wrapper" class="flex min-h-screen">
 
-        <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        <!-- REALTIME COUNTS FOR SIDEBAR BADGES -->
+        @php
+            $pendingOrdersCount = \App\Models\Order::where('order_status', 'preparing')->count();
+            $deliveringOrdersCount = \App\Models\Order::where('order_status', 'delivering')->count();
+            $kitchenCount = \App\Models\Order::whereIn('order_status', ['confirmed', 'preparing'])->count();
+            $refundCount = \App\Models\Order::where('health_notes', 'like', '%[Yêu cầu hoàn tiền%')->where('payment_status', '!=', 'refunded')->count();
+        @endphp
 
-            <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ route('quanly') }}">
-                <div class="sidebar-brand-text mx-3 fs-1">FOODELICIOUS</div>
-            </a>
+        <!-- Ultra-Modern Dark Sidebar Navigation -->
+        <aside class="w-64 bg-[#0f172a] text-slate-300 flex-shrink-0 flex flex-col justify-between z-30 border-r border-slate-800/80 shadow-2xl">
+            <div>
+                <!-- Brand Header -->
+                <div class="h-20 flex items-center justify-between px-6 border-b border-slate-800/80">
+                    <a class="flex items-center gap-3 group" href="{{ route('quanly') }}">
+                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#ee4d2d] to-[#ff6b4a] flex items-center justify-center text-white shadow-lg shadow-rose-500/30 group-hover:scale-105 transition-all">
+                            <i class="fas fa-utensils text-lg"></i>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="font-black text-lg text-white tracking-wider">FOODDAILY</span>
+                            <span class="text-[10px] font-extrabold text-[#ee4d2d] uppercase tracking-widest -mt-1">Admin Portal</span>
+                        </div>
+                    </a>
+                </div>
 
-            <!-- Divider -->
-            <hr class="sidebar-divider my-0">
+                <!-- Navigation Links -->
+                <nav class="p-4 space-y-1.5 overflow-y-auto max-h-[calc(100vh-140px)]">
+                    @if(Auth::user()->role === 'admin')
+                    <a href="{{ route('quanly') }}" class="flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all {{ Route::is('quanly') ? 'bg-[#ee4d2d] text-white shadow-lg shadow-rose-500/30' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-chart-pie w-5 text-center text-sm"></i>
+                            <span>Báo cáo doanh thu</span>
+                        </div>
+                    </a>
+                    @endif
 
-            <!-- Nav Item - Dashboard -->
-            @if(Auth::user()->role === 'admin')
-            <li class="nav-item {{ Route::is('quanly') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('quanly') }}">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Báo cáo doanh thu</span>
-                </a>
-            </li>
-            @endif
+                    <a href="{{ route('quanly_banlamviec') }}" class="flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all {{ Route::is('quanly_banlamviec') ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/30' : 'text-slate-400 hover:bg-slate-800/80 hover:text-amber-400' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-desktop w-5 text-center text-sm"></i>
+                            <span>Bàn làm việc Nhân viên</span>
+                        </div>
+                    </a>
 
-            <!-- Nav Item - Bàn làm việc Nhân viên -->
-            <li class="nav-item {{ Route::is('quanly_banlamviec') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('quanly_banlamviec') }}">
-                    <i class="fas fa-fw fa-desktop text-warning"></i>
-                    <span>Bàn làm việc Nhân viên</span>
-                </a>
-            </li>
+                    <div class="pt-4 pb-1">
+                        <p class="px-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Dịch vụ & Thực đơn</p>
+                    </div>
 
-            <!-- Divider -->
-            <hr class="sidebar-divider">
+                    @if(Auth::user()->role === 'admin')
+                    <a href="{{ route('quanly_cauhinh') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_cauhinh') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-sliders w-5 text-center"></i>
+                            <span>Cấu hình trang chủ</span>
+                        </div>
+                    </a>
 
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Dịch vụ
-            </div>
+                    <a href="{{ route('quanly_danhmuc') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_danhmuc') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-list w-5 text-center"></i>
+                            <span>Danh mục món ăn</span>
+                        </div>
+                    </a>
 
-            <!-- Nav Item - Cấu hình trang chủ -->
-            @if(Auth::user()->role === 'admin')
-            <li class="nav-item {{ Route::is('quanly_cauhinh') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('quanly_cauhinh') }}">
-                    <i class="fas fa-fw fa-cogs"></i>
-                    <span>Cấu hình trang chủ</span>
-                </a>
-            </li>
-            @endif
+                    <a href="{{ route('quanly_monandon') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_monandon') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-bowl-rice w-5 text-center"></i>
+                            <span>Món ăn đơn</span>
+                        </div>
+                    </a>
 
-            <!-- Nav Item - Thực đơn Collapse Menu -->
-            @if(Auth::user()->role === 'admin')
-            @php 
-                $inMenu = Route::is('quanly_danhmuc') || Route::is('quanly_monandon') || Route::is('quanly_goidichvu') || Route::is('quanly_khuyenmai') || Route::is('danhmuc_xem') || Route::is('danhmuc_them') || Route::is('danhmuc_chinhsua') || Route::is('monandon_them') || Route::is('monandon_chinhsua') || Route::is('monandon_xem') || Route::is('goidichvu_them') || Route::is('goidichvu_xem') || Route::is('goidichvu_chinhsua') || Route::is('khuyenmai_them') || Route::is('khuyenmai_xem') || Route::is('khuyenmai_chinhsua');
-            @endphp
-            <li class="nav-item {{ $inMenu ? 'active' : '' }}">
-                <a class="nav-link {{ $inMenu ? '' : 'collapsed' }}" href="#" data-toggle="collapse" data-target="#collapseTwo"
-                    aria-expanded="{{ $inMenu ? 'true' : 'false' }}" aria-controls="collapseTwo">
-                    <i class="fas fa-fw fa-book"></i>
-                    <span>Thực đơn</span>
-                </a>
-                <div id="collapseTwo" class="collapse {{ $inMenu ? 'show' : '' }}" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Quản lý thực đơn</h6>
-                        <a class="collapse-item {{ Route::is('quanly_danhmuc') ? 'active' : '' }}" href="{{ route('quanly_danhmuc') }}">Danh mục món ăn</a>
-                        <a class="collapse-item {{ Route::is('quanly_monandon') && request('category_id') == 1 ? 'active' : '' }}" href="{{ route('quanly_monandon', ['category_id' => 1]) }}">Món ăn sáng</a>
-                        <a class="collapse-item {{ Route::is('quanly_monandon') && request('category_id') == 2 ? 'active' : '' }}" href="{{ route('quanly_monandon', ['category_id' => 2]) }}">Món tráng miệng</a>
-                        <a class="collapse-item {{ Route::is('quanly_goidichvu') ? 'active' : '' }}" href="{{ route('quanly_goidichvu') }}">Gói dịch vụ</a>
-                        @if(Auth::user()->role === 'admin')
-                        <a class="collapse-item {{ Route::is('quanly_khuyenmai') ? 'active' : '' }}" href="{{ route('quanly_khuyenmai') }}">Chương trình khuyến mãi</a>
+                    <a href="{{ route('quanly_goidichvu') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_goidichvu') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-box-archive w-5 text-center"></i>
+                            <span>Gói dịch vụ Combo</span>
+                        </div>
+                    </a>
+
+                    <a href="{{ route('quanly_khuyenmai') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_khuyenmai') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-ticket w-5 text-center"></i>
+                            <span>Mã khuyến mãi</span>
+                        </div>
+                    </a>
+                    @endif
+
+                    @if(Auth::user()->role === 'admin')
+                    <div class="pt-4 pb-1">
+                        <p class="px-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Đơn hàng & Khách hàng</p>
+                    </div>
+
+                    <a href="{{ route('quanly_donhang') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_donhang') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-file-invoice-dollar w-5 text-center"></i>
+                            <span>Danh sách đơn hàng</span>
+                        </div>
+                        @if($pendingOrdersCount > 0)
+                            <span class="px-2 py-0.5 rounded-full bg-[#ee4d2d] text-white text-[10px] font-black shadow-xs">
+                                {{ $pendingOrdersCount }}
+                            </span>
                         @endif
-                    </div>
-                </div>
-            </li>
-            @endif
+                    </a>
 
-            <!-- Nav Item - Đơn hàng Collapse Menu -->
-            @if(Auth::user()->role === 'admin')
-            @php 
-                $inOrders = Route::is('quanly_donhang') || Route::is('quanly_goidangky') || Route::is('quanly_yeucauhoan') || Route::is('donhang_xem') || Route::is('donhang_chinhsua') || Route::is('goidangky_xem') || Route::is('goidangky_chinhsua') || Route::is('yeucauhoan_xem');
-            @endphp
-            <li class="nav-item {{ $inOrders ? 'active' : '' }}">
-                <a class="nav-link {{ $inOrders ? '' : 'collapsed' }}" href="#" data-toggle="collapse" data-target="#collapseUtilities"
-                    aria-expanded="{{ $inOrders ? 'true' : 'false' }}" aria-controls="collapseUtilities">
-                    <i class="fas fa-fw fa-list"></i>
-                    <span>Đơn hàng</span>
-                </a>
-                <div id="collapseUtilities" class="collapse {{ $inOrders ? 'show' : '' }}" aria-labelledby="headingUtilities"
-                    data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Quản lý đơn hàng</h6>
-                        <a class="collapse-item {{ Route::is('quanly_donhang') ? 'active' : '' }}" href="{{ route('quanly_donhang') }}">Đơn hàng</a>
-                        <a class="collapse-item {{ Route::is('quanly_goidangky') ? 'active' : '' }}" href="{{ route('quanly_goidangky') }}">Gói dịch vụ</a>
-                        <a class="collapse-item {{ Route::is('quanly_yeucauhoan') ? 'active' : '' }}" href="{{ route('quanly_yeucauhoan') }}">Yêu cầu hoàn tiền</a>
-                    </div>
-                </div>
-            </li>
-            @endif
+                    <a href="{{ route('quanly_goidangky') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_goidangky') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-calendar-check w-5 text-center"></i>
+                            <span>Gói đăng ký tuần/tháng</span>
+                        </div>
+                    </a>
 
-            <!-- Nav Item - Bàn làm việc Nhân viên Collapse Menu -->
-            @php 
-                $inStaffTasks = Route::is('quanly_bep') || (Route::is('quanly_donhang') && request('status')) || Route::is('quanly_yeucauhoan');
-            @endphp
-            <li class="nav-item {{ $inStaffTasks ? 'active' : '' }}">
-                <a class="nav-link {{ $inStaffTasks ? '' : 'collapsed' }}" href="#" data-toggle="collapse" data-target="#collapseStaff"
-                    aria-expanded="{{ $inStaffTasks ? 'true' : 'false' }}" aria-controls="collapseStaff">
-                    <i class="fas fa-fw fa-briefcase"></i>
-                    <span>Nghiệp vụ Nhân viên</span>
-                </a>
-                <div id="collapseStaff" class="collapse {{ $inStaffTasks ? 'show' : '' }}" aria-labelledby="headingStaff" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Bếp chuẩn bị món</h6>
-                        <a class="collapse-item {{ Route::is('quanly_bep') ? 'active' : '' }}" href="{{ route('quanly_bep') }}">Chuẩn bị món (Bếp)</a>
-                        
-                        <h6 class="collapse-header">Dịch vụ khách hàng (CSKH)</h6>
-                        <a class="collapse-item {{ Route::is('quanly_donhang') && request('status') === 'pending' ? 'active' : '' }}" href="{{ route('quanly_donhang', ['status' => 'pending']) }}">Xác nhận đơn mới</a>
-                        <a class="collapse-item {{ Route::is('quanly_yeucauhoan') ? 'active' : '' }}" href="{{ route('quanly_yeucauhoan') }}">Giải quyết hoàn tiền</a>
-                        
-                        <h6 class="collapse-header">Vận chuyển & Giao hàng</h6>
-                        <a class="collapse-item {{ Route::is('quanly_donhang') && request('status') === 'delivering' ? 'active' : '' }}" href="{{ route('quanly_donhang', ['status' => 'delivering']) }}">Shipper đang giao lẻ</a>
-                        <a class="collapse-item {{ Route::is('quanly_goidangky') ? 'active' : '' }}" href="{{ route('quanly_goidangky') }}">Điều phối gói ăn ngày</a>
-                    </div>
-                </div>
-            </li>
-
-            <!-- Divider -->
-            @if(Auth::user()->role === 'admin')
-            <hr class="sidebar-divider">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Tài khoản
-            </div>
-
-            <!-- Nav Item - Khách hàng Collapse Menu -->
-            @php 
-                $inCustomers = Route::is('quanly_khachhang') || Route::is('quanly_guima') || Route::is('khachhang_xem') || Route::is('khachhang_chinhsua') || Route::is('quanly_khachvanglai');
-            @endphp
-            <li class="nav-item {{ $inCustomers ? 'active' : '' }}">
-                <a class="nav-link {{ $inCustomers ? '' : 'collapsed' }}" href="#" data-toggle="collapse" data-target="#collapsePages"
-                    aria-expanded="{{ $inCustomers ? 'true' : 'false' }}" aria-controls="collapsePages">
-                    <i class="fas fa-fw fa-user"></i>
-                    <span>Khách hàng</span>
-                </a>
-                <div id="collapsePages" class="collapse {{ $inCustomers ? 'show' : '' }}" aria-labelledby="headingPages" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Quản lý khách hàng</h6>
-                        <a class="collapse-item {{ Route::is('quanly_khachhang') ? 'active' : '' }}" href="{{ route('quanly_khachhang') }}">Danh sách thành viên</a>
-                        <a class="collapse-item {{ Route::is('quanly_khachvanglai') ? 'active' : '' }}" href="{{ route('quanly_khachvanglai') }}">Khách vãng lai</a>
-                        @if(Auth::user()->role === 'admin')
-                        <a class="collapse-item {{ Route::is('quanly_guima') ? 'active' : '' }}" href="{{ route('quanly_guima') }}">Gửi mã khuyến mãi</a>
-                        <a class="collapse-item {{ Route::is('backup_khachhang_index') ? 'active' : '' }}" href="{{ route('backup_khachhang_index') }}">Sao lưu khách hàng</a>
+                    <a href="{{ route('quanly_yeucauhoan') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_yeucauhoan') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-rotate-left w-5 text-center"></i>
+                            <span>Yêu cầu hoàn tiền</span>
+                        </div>
+                        @if($refundCount > 0)
+                            <span class="px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black">
+                                {{ $refundCount }}
+                            </span>
                         @endif
+                    </a>
+
+                    <a href="{{ route('quanly_reviews') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_reviews') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-star w-5 text-center"></i>
+                            <span>Đánh giá khách hàng</span>
+                        </div>
+                    </a>
+                    @endif
+
+                    <div class="pt-4 pb-1">
+                        <p class="px-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Nghiệp vụ Vận hành</p>
                     </div>
-                </div>
-            </li>
-            @endif
 
-            <!-- Nav Item - Nhân viên -->
-            @if(Auth::user()->role === 'admin')
-            @php 
-                $inEmployees = Route::is('quanly_nhanvien') || Route::is('nhanvien_them') || Route::is('nhanvien_xem') || Route::is('nhanvien_chinhsua');
-            @endphp
-            <li class="nav-item {{ $inEmployees ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('quanly_nhanvien') }}">
-                    <i class="fas fa-fw fa-address-book"></i>
-                    <span>Nhân viên</span>
-                </a>
-            </li>
-            @endif
+                    <a href="{{ route('quanly_bep') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_bep') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-fire-burner w-5 text-center text-amber-400"></i>
+                            <span>Màn hình Bếp nấu</span>
+                        </div>
+                        @if($kitchenCount > 0)
+                            <span class="px-2 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-black">
+                                {{ $kitchenCount }}
+                            </span>
+                        @endif
+                    </a>
 
-            <!-- Divider -->
-            <hr class="sidebar-divider d-none d-md-block">
+                    @if(Auth::user()->role === 'admin')
+                    <div class="pt-4 pb-1">
+                        <p class="px-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Tài khoản & Hệ thống</p>
+                    </div>
 
-            <!-- Sidebar Toggler (Sidebar) -->
-            <div class="text-center d-none d-md-inline">
-                <button class="rounded-circle border-0" id="sidebarToggle"></button>
-            </div>
+                    <a href="{{ route('quanly_khachhang') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_khachhang') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-users w-5 text-center"></i>
+                            <span>Quản lý Khách hàng</span>
+                        </div>
+                    </a>
 
-        </ul>
-        <!-- End of Sidebar -->
-
-        <!-- Content Wrapper -->
-        <div id="content-wrapper" class="d-flex flex-column">
-
-            <!-- Main Content -->
-            <div id="content">
-
-                <!-- Topbar -->
-                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-
-                    <!-- Sidebar Toggle (Topbar) -->
-                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                        <i class="fa fa-bars"></i>
-                    </button>
-
-                    <!-- Topbar Navbar -->
-                    <ul class="navbar-nav ml-auto">
-
-                        <!-- Nav Item - User Information -->
-                        <li class="nav-item dropdown no-arrow">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ Auth::user()->fullname }}</span>
-                                <img class="img-profile rounded-circle setting-logo-img" src="{{ isset($settings['logo_url']) ? (\Illuminate\Support\Str::startsWith($settings['logo_url'], 'http') ? $settings['logo_url'] : asset($settings['logo_url'])) : asset('logo.jpg') }}">
-                            </a>
-                            <!-- Dropdown - User Information -->
-                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                aria-labelledby="userDropdown">
-                                <a class="dropdown-item py-2" href="#" data-toggle="modal"
-                                    data-target="#userProfileModal">
-                                    <i class="fas fa-user-badge fa-sm fa-fw mr-2 text-primary"></i>Hồ sơ thông tin
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#" data-toggle="modal"
-                                    data-target="#logoutModal">
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Đăng xuất
-                                </a>
-                            </div>
-                        </li>
-
-                    </ul>
-
+                    <a href="{{ route('quanly_nhanvien') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_nhanvien') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-id-card w-5 text-center"></i>
+                            <span>Quản lý Nhân viên</span>
+                        </div>
+                    </a>
+                    @endif
                 </nav>
-                <!-- End of Topbar -->
-
-                <!-- Begin Page Content -->
-                <div class="container-fluid">
-                    @yield('content')
-                </div>
-                <!-- /.container-fluid -->
-
             </div>
-            <!-- End of Main Content -->
+
+            <!-- Footer Sidebar Account Quick Action -->
+            <div class="p-4 border-t border-slate-800">
+                <a href="{{ route('trangchu') }}" class="flex items-center justify-center gap-2 w-full py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 transition-colors">
+                    <i class="fas fa-globe text-[#ee4d2d]"></i>
+                    <span>Xem Trang Web</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="flex-grow flex flex-col min-w-0 bg-[#f8fafc]">
+
+            <!-- Topbar Header -->
+            <header class="h-20 bg-white border-b border-slate-200/80 px-8 flex items-center justify-between shadow-xs sticky top-0 z-20">
+                <div class="flex items-center gap-6">
+                    <h1 class="text-lg font-extrabold text-slate-900 tracking-tight">
+                        @yield('title', 'Bảng điều khiển Quản trị')
+                    </h1>
+
+                    <span class="hidden md:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-bold">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Hệ thống Vận hành Tốt
+                    </span>
+                </div>
+
+                <!-- User Profile & Quick Actions -->
+                <div class="flex items-center gap-4">
+                    <div class="relative group">
+                        <button class="flex items-center gap-3 p-1.5 pr-3 rounded-full hover:bg-slate-100 transition-colors">
+                            <div class="w-9 h-9 rounded-full bg-[#ee4d2d] text-white flex items-center justify-center font-black text-sm shadow-md shadow-rose-500/20">
+                                {{ strtoupper(substr(Auth::user()->fullname ?? Auth::user()->name ?? 'A', 0, 1)) }}
+                            </div>
+                            <div class="text-left hidden sm:block">
+                                <p class="text-xs font-bold text-slate-900">{{ Auth::user()->fullname ?? Auth::user()->name }}</p>
+                                <p class="text-[10px] font-extrabold text-[#ee4d2d] uppercase tracking-wider">{{ Auth::user()->role === 'admin' ? 'Quản trị viên' : 'Nhân viên' }}</p>
+                            </div>
+                            <i class="fas fa-chevron-down text-xs text-slate-400"></i>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                            <a class="flex items-center px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50" href="{{ route('trangchu') }}">
+                                <i class="fas fa-globe mr-2.5 text-[#ee4d2d] text-sm"></i>Xem trang web
+                            </a>
+                            <hr class="my-1 border-slate-100">
+                            <a class="flex items-center px-4 py-2.5 text-xs font-semibold text-rose-600 hover:bg-rose-50" href="{{ route('dangxuat') }}">
+                                <i class="fas fa-right-from-bracket mr-2.5 text-sm"></i>Đăng xuất
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content Body -->
+            <main class="p-8 flex-grow">
+                @yield('content')
+            </main>
 
             <!-- Footer -->
-            <footer class="sticky-footer bg-white mt-auto">
-                <div class="container my-auto">
-                    <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; FOODELICIOUS 2026</span>
-                    </div>
-                </div>
+            <footer class="bg-white border-t border-slate-200 py-4 px-8 text-center text-xs text-slate-500 font-medium">
+                <span>© 2026 <strong>FOODDAILY Admin System</strong>. All rights reserved.</span>
             </footer>
-            <!-- End of Footer -->
 
-        </div>
-        <!-- End of Content Wrapper -->
-
-    </div>
-    <!-- End of Wrapper -->
-
-    <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
-    </a>
-
-    <!-- Modals -->
-    <!-- User Profile Modal -->
-    <div class="modal fade" id="userProfileModal" tabindex="-1" role="dialog"
-        aria-labelledby="userProfileModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header text-white text-center d-block position-relative"
-                    style="background-color: #ce1126; border-top-left-radius: 8px; border-top-right-radius: 8px;">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <h5 class="modal-title fw-bold" id="userProfileModalLabel">
-                        <i class="fas fa-user-circle mr-2"></i>Hồ sơ tài khoản
-                    </h5>
-                </div>
-                <div class="modal-body text-dark p-4">
-                    <div class="text-center mb-4">
-                        <div class="display-5 text-muted mb-2"><i class="fas fa-user-circle"></i></div>
-                        <h4 class="fw-bold text-dark mb-1">{{ Auth::user()->fullname }}</h4>
-                        <span class="badge badge-danger px-3 py-2 fw-bold"><i class="fas fa-crown mr-1"></i>{{ ucfirst(Auth::user()->role) }}</span>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table table-striped table-borderless mb-0">
-                            <tbody>
-                                <tr>
-                                    <td class="text-muted py-2">Chức vụ</td>
-                                    <td class="fw-bold py-2">{{ Auth::user()->role === 'admin' ? 'Quản trị viên' : 'Nhân viên' }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-muted py-2" style="width: 40%;">Số điện thoại:</td>
-                                    <td class="fw-bold py-2">{{ Auth::user()->phone ?? 'Chưa cập nhật' }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-muted py-2">Địa chỉ Email:</td>
-                                    <td class="fw-bold py-2">{{ Auth::user()->email }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="modal-footer bg-light border-0">
-                    <button type="button" class="btn btn-secondary w-100" data-dismiss="modal">Đóng cửa sổ</button>
-                </div>
-            </div>
         </div>
     </div>
 
-    <!-- Logout Modal -->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog"
-        aria-labelledby="logoutModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content text-dark">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="logoutModalLabel">Bạn có muốn đăng xuất?</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">Chọn "Đăng xuất" bên dưới nếu bạn đã sẵn sàng kết thúc phiên làm việc của mình.</div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Hủy</button>
-                    <a class="btn btn-primary" href="{{ route('dangxuat') }}">Đăng xuất</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bootstrap core JavaScript-->
+    <!-- JavaScript Dependencies -->
     <script src="{{ asset('admin/vendor/jquery/jquery.min.js') }}"></script>
     <script src="{{ asset('admin/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('admin/vendor/jquery-easing/jquery.easing.min.js') }}"></script>
-    <script src="{{ asset('admin/js/sb-admin-2.min.js') }}"></script>
+
     @yield('scripts')
-    <!-- Realtime Echo Listener for Kitchen / Admin (Disabled in favor of AJAX Polling) -->
-    <!--
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            if (window.Echo) {
-                window.Echo.channel('kitchen-channel')
-                    .listen('OrderUpdated', (e) => {
-                        console.log('Realtime Order Event received:', e);
-                        if (e.action === 'created') {
-                            alert(`🔔 [Realtime] Có đơn hàng mới #${e.order.id}! Tổng tiền: ${new Intl.NumberFormat('vi-VN').format(e.order.total_amount)} đ. Vui lòng kiểm tra và chế biến!`);
-                            if (window.location.href.indexOf('quanly_donhang') > -1 || window.location.href.indexOf('quanly_bep') > -1) {
-                                window.location.reload();
-                            }
-                        }
-                    });
-            }
-        });
-    </script>
-    -->
-    <!-- Realtime AJAX Polling for Kitchen / Admin -->
+
+    <!-- Realtime Polling Script -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             let lastCheckedTime = null;
 
-            // Get initial server time
             fetch("{{ route('api.orders.poll') }}")
                 .then(response => response.json())
                 .then(data => {
                     lastCheckedTime = data.timestamp;
-                    console.log('Admin Polling initialized at:', lastCheckedTime);
-                    setInterval(pollUpdates, 2000);
+                    setInterval(pollUpdates, 3000);
                 })
                 .catch(err => console.error('Error initializing admin polling:', err));
 
@@ -391,15 +298,15 @@
                         lastCheckedTime = data.timestamp;
                         if (data.updates && data.updates.length > 0) {
                             data.updates.forEach(e => {
-                                console.log('Polling Order Event received:', e);
                                 const path = window.location.pathname;
                                 const isManagerPage = path.includes('quanly') || path.includes('donhang') || path.includes('yeucauhoan') || path.includes('goidangky') || path.includes('bep');
                                 
                                 if (e.action === 'created') {
-                                    alert(`🔔 [Realtime] Có đơn hàng mới #${e.order.id}! Vui lòng kiểm tra!`);
-                                    if (isManagerPage) {
-                                        window.location.reload();
-                                    }
+                                    alert(`🔔 [Realtime Notification] Có đơn hàng mới #${e.order.id}! Vui lòng kiểm tra!`);
+                                    if (isManagerPage) window.location.reload();
+                                } else if (e.action === 'reviewed') {
+                                    alert(`🔔 [Realtime Notification] Đơn hàng #FDL-${e.order.id} vừa được đánh giá!`);
+                                    if (isManagerPage) window.location.reload();
                                 } else if (isManagerPage) {
                                     window.location.reload();
                                 }
@@ -408,25 +315,6 @@
                     })
                     .catch(err => console.error('Error during admin polling:', err));
             }
-
-            // Real-time Settings/Logo polling for Admin panel
-            let currentLogoUrl = "{{ isset($settings['logo_url']) ? (\Illuminate\Support\Str::startsWith($settings['logo_url'], 'http') ? $settings['logo_url'] : asset($settings['logo_url'])) : asset('logo.jpg') }}";
-            
-            function pollAdminSettings() {
-                fetch("{{ route('api.settings.poll') }}")
-                    .then(response => response.json())
-                    .then(data => {
-                        const newLogo = data.settings.logo_url;
-                        if (newLogo && newLogo !== currentLogoUrl) {
-                            currentLogoUrl = newLogo;
-                            document.querySelectorAll('.setting-logo-img').forEach(img => {
-                                img.src = newLogo;
-                            });
-                        }
-                    })
-                    .catch(err => console.error('Error polling settings in Admin layout:', err));
-            }
-            setInterval(pollAdminSettings, 2000);
         });
     </script>
 </body>

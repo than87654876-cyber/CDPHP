@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Thêm nhân viên mới - FOODELICIOUS')
+@section('title', 'Thêm nhân viên mới - FOODDAILY')
 
 @section('content')
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
@@ -40,7 +40,7 @@
                 <div class="row">
                     <div class="form-group col-md-6">
                         <label for="email" class="font-weight-bold">Địa chỉ Email <span class="text-danger">*</span></label>
-                        <input type="email" class="form-control" id="email" name="email" value="{{ old('email') }}" required placeholder="Ví dụ: name@foodelicious.com">
+                        <input type="email" class="form-control" id="email" name="email" value="{{ old('email') }}" required placeholder="Ví dụ: name@FOODDAILY.com">
                     </div>
                     <div class="form-group col-md-6">
                         <label for="password" class="font-weight-bold">Mật khẩu khởi tạo <span class="text-danger">*</span></label>

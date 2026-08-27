@@ -1,104 +1,107 @@
 @extends('layouts.admin')
 
-@section('title', 'Quản lý Gói dịch vụ')
-
-@section('styles')
-    <link href="{{ asset('admin/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
-@endsection
+@section('title', 'Quản lý Gói dịch vụ Combo - FOODDAILY Admin')
 
 @section('content')
-    <!-- Page Heading -->
-    <div class="row justify-content-between px-2 py-3">
-        <h1 class="h3 mb-2 text-gray-800">Gói dịch vụ</h1>
-        <a class="btn btn-primary me-auto" href="{{ route('goidichvu_them') }}">
-            <i class="fas fa-plus"></i> Thêm gói
+<div class="space-y-6">
+    
+    <!-- Top Action Bar -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Gói Dịch Vụ Combo Tuần / Tháng</h1>
+            <p class="text-xs text-slate-500 font-medium mt-1">Quản lý các gói combo dinh dưỡng định kỳ cho khách hàng đăng ký</p>
+        </div>
+
+        <a href="{{ route('goidichvu_them') }}" class="px-5 py-3 rounded-2xl bg-[#ee4d2d] hover:bg-red-600 text-white text-xs font-extrabold shadow-lg shadow-rose-500/20 transition-all flex items-center justify-center gap-2">
+            <i class="fas fa-plus"></i> Thêm gói combo mới
         </a>
     </div>
 
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show text-dark mx-2" role="alert">
-            <strong><i class="fas fa-check-circle mr-1"></i> Thành công:</strong> {{ session('success') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+    <!-- Alerts -->
+    @if(session('success'))
+        <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 rounded-2xl text-xs font-semibold flex items-center justify-between shadow-xs">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-circle-check text-emerald-600 text-sm"></i>
+                <span>{{ session('success') }}</span>
+            </div>
+            <button onclick="this.parentElement.remove()" class="text-emerald-600 hover:text-emerald-800">&times;</button>
         </div>
     @endif
 
-    @if (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show text-dark mx-2" role="alert">
-            <strong><i class="fas fa-exclamation-triangle mr-1"></i> Lỗi:</strong> {{ session('error') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+    @if(session('error'))
+        <div class="bg-rose-50 border border-rose-200 text-rose-700 p-4 rounded-2xl text-xs font-semibold flex items-center justify-between shadow-xs">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-circle-exclamation text-rose-500 text-sm"></i>
+                <span>{{ session('error') }}</span>
+            </div>
+            <button onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-700">&times;</button>
         </div>
     @endif
 
-    <!-- DataTales Example -->
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Danh sách Gói Dịch Vụ</h6>
+    <!-- Data Table Card -->
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden">
+        <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                <i class="fas fa-box-archive text-[#ee4d2d]"></i> Danh sách các gói combo dịch vụ
+            </h3>
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                    <thead>
-                        <tr>
-                            <th>Số thứ tự</th>
-                            <th>Tên gói</th>
-                            <th>Các món ăn</th>
-                            <th>Ngày</th>
-                            <th>Giá tiền</th>
-                            <th>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tfoot>
-                        <tr>
-                            <th>Số thứ tự</th>
-                            <th>Tên gói</th>
-                            <th>Các món ăn</th>
-                            <th>Ngày</th>
-                            <th>Giá tiền</th>
-                            <th>Thao tác</th>
-                        </tr>
-                    </tfoot>
-                    <tbody>
-                        @forelse($packages as $index => $package)
-                        <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td class="font-weight-bold text-primary">{{ $package->package_name }}</td>
-                            <td>
-                                {{ $package->dishes->pluck('dish_name')->implode(', ') ?: 'Chưa cấu hình món ăn' }}
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-100 text-[11px] text-slate-400 uppercase font-extrabold tracking-wider">
+                        <th class="py-4 px-6">STT</th>
+                        <th class="py-4 px-6">Tên gói Combo</th>
+                        <th class="py-4 px-6">Danh sách món thuộc gói</th>
+                        <th class="py-4 px-6">Thời hạn</th>
+                        <th class="py-4 px-6">Giá trọn gói</th>
+                        <th class="py-4 px-6 text-right">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @forelse($packages as $index => $package)
+                        <tr class="hover:bg-slate-50/80 transition-colors">
+                            <td class="py-4 px-6 font-bold text-slate-400">#{{ $index + 1 }}</td>
+                            <td class="py-4 px-6 font-extrabold text-slate-900">
+                                {{ $package->package_name }}
                             </td>
-                            <td>{{ $package->duration_days }} ngày</td>
-                            <td class="text-danger font-weight-bold">{{ number_format($package->price, 0, ',', '.') }} đ</td>
-                            <td>
-                                <a href="{{ route('goidichvu_xem', $package->id) }}"
-                                    class="btn btn-info btn-sm" title="Xem"><i
-                                        class="fas fa-eye"></i> Xem</a>
-                                <a href="{{ route('goidichvu_chinhsua', $package->id) }}"
-                                    class="btn btn-warning btn-sm" title="Sửa"><i
-                                        class="fas fa-edit"></i> Sửa</a>
-                                <form action="{{ route('goidichvu_xoa', $package->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa gói dịch vụ này?');">
+                            <td class="py-4 px-6 max-w-md">
+                                <p class="text-slate-700 font-medium line-clamp-2">
+                                    {{ $package->dishes->pluck('dish_name')->implode(', ') ?: 'Chưa cấu hình món ăn' }}
+                                </p>
+                            </td>
+                            <td class="py-4 px-6">
+                                <span class="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-[11px] font-extrabold border border-blue-200">
+                                    {{ $package->duration_days }} ngày
+                                </span>
+                            </td>
+                            <td class="py-4 px-6 font-black text-slate-900">
+                                {{ number_format($package->price) }}đ
+                            </td>
+                            <td class="py-4 px-6 text-right space-x-2">
+                                <a href="{{ route('goidichvu_xem', $package->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors">
+                                    <i class="fas fa-eye text-xs"></i>
+                                </a>
+                                <a href="{{ route('goidichvu_chinhsua', $package->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 transition-colors">
+                                    <i class="fas fa-pen text-xs"></i>
+                                </a>
+                                <form action="{{ route('goidichvu_xoa', $package->id) }}" method="POST" class="inline" onsubmit="return confirm('Bạn có chắc muốn xóa gói dịch vụ này?');">
                                     @csrf
-                                    <button type="submit" class="btn btn-danger btn-sm" title="Xóa"><i
-                                        class="fas fa-trash"></i> Xóa</button>
+                                    <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 transition-colors">
+                                        <i class="fas fa-trash-can text-xs"></i>
+                                    </button>
                                 </form>
                             </td>
                         </tr>
-                        @empty
+                    @empty
                         <tr>
-                            <td colspan="6" class="text-center text-muted">Không có gói dịch vụ nào trong hệ thống.</td>
+                            <td colspan="6" class="py-10 text-center text-slate-400 font-medium">Chưa có gói dịch vụ combo nào.</td>
                         </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
-@endsection
 
-@section('scripts')
-    <script src="{{ asset('admin/vendor/datatables/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('admin/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
-    <script src="{{ asset('admin/js/demo/datatables-demo.js') }}"></script>
+</div>
 @endsection

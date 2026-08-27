@@ -1,96 +1,104 @@
 @extends('layouts.admin')
 
-@section('title', 'Quản lý Khách hàng - FOODELICIOUS')
-
-@section('styles')
-    <link href="{{ asset('admin/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
-@endsection
+@section('title', 'Quản lý Khách hàng - FOODDAILY Admin')
 
 @section('content')
-    <!-- Filters Row -->
-    <div class="mb-4 d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-2">
-        <div class="btn-group shadow-sm" role="group" aria-label="Customer Filters">
-            <a href="{{ route('quanly_khachhang') }}" class="btn btn-sm btn-{{ !isset($filter) || !$filter ? 'primary font-weight-bold' : 'light text-dark' }}">
-                Tất cả khách hàng
-            </a>
-            <a href="{{ route('quanly_khachhang', ['filter' => 'first_order']) }}" class="btn btn-sm btn-{{ isset($filter) && $filter === 'first_order' ? 'primary font-weight-bold' : 'light text-dark' }}">
-                Đã đặt hàng
-            </a>
-            <a href="{{ route('quanly_khachhang', ['filter' => 'active_package']) }}" class="btn btn-sm btn-{{ isset($filter) && $filter === 'active_package' ? 'primary font-weight-bold' : 'light text-dark' }}">
-                Đang dùng gói
-            </a>
-            <a href="{{ route('quanly_khachhang', ['filter' => 'refunded']) }}" class="btn btn-sm btn-{{ isset($filter) && $filter === 'refunded' ? 'primary font-weight-bold' : 'light text-dark' }}">
-                Đã hoàn tiền
-            </a>
-            <a href="{{ route('quanly_khachhang', ['filter' => 'inactive_3m']) }}" class="btn btn-sm btn-{{ isset($filter) && $filter === 'inactive_3m' ? 'primary font-weight-bold' : 'light text-dark' }}">
-                Không hoạt động >3 tháng
-            </a>
+<div class="space-y-6">
+    
+    <!-- Top Action Bar -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Danh Sách Khách Hàng</h1>
+            <p class="text-xs text-slate-500 font-medium mt-1">Quản lý tài khoản, lịch sử mua hàng và xuất báo cáo khách hàng</p>
         </div>
-        <a href="{{ route('baocao_xuat_customers', request()->query()) }}" class="btn btn-sm btn-success shadow-sm">
-            <i class="fas fa-file-excel mr-2"></i> Xuất Excel
+
+        <a href="{{ route('baocao_xuat_customers', request()->query()) }}" class="px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
+            <i class="fas fa-file-excel"></i> Xuất Báo Cáo Excel
         </a>
     </div>
 
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Danh sách tài khoản khách hàng hệ thống</h6>
+    <!-- Filter Buttons Pill Bar -->
+    <div class="flex flex-wrap items-center gap-2 overflow-x-auto pb-1 text-xs font-bold">
+        <a href="{{ route('quanly_khachhang') }}" class="px-4 py-2 rounded-xl border transition-all {{ !isset($filter) || !$filter ? 'bg-[#ee4d2d] text-white border-[#ee4d2d]' : 'bg-white text-slate-700 hover:bg-slate-100 border-slate-200' }}">
+            Tất cả khách hàng
+        </a>
+        <a href="{{ route('quanly_khachhang', ['filter' => 'first_order']) }}" class="px-4 py-2 rounded-xl border transition-all {{ isset($filter) && $filter === 'first_order' ? 'bg-[#ee4d2d] text-white border-[#ee4d2d]' : 'bg-white text-slate-700 hover:bg-slate-100 border-slate-200' }}">
+            Đã từng đặt hàng
+        </a>
+        <a href="{{ route('quanly_khachhang', ['filter' => 'active_package']) }}" class="px-4 py-2 rounded-xl border transition-all {{ isset($filter) && $filter === 'active_package' ? 'bg-[#ee4d2d] text-white border-[#ee4d2d]' : 'bg-white text-slate-700 hover:bg-slate-100 border-slate-200' }}">
+            Đang dùng gói combo
+        </a>
+        <a href="{{ route('quanly_khachhang', ['filter' => 'refunded']) }}" class="px-4 py-2 rounded-xl border transition-all {{ isset($filter) && $filter === 'refunded' ? 'bg-[#ee4d2d] text-white border-[#ee4d2d]' : 'bg-white text-slate-700 hover:bg-slate-100 border-slate-200' }}">
+            Đã từng hoàn tiền
+        </a>
+    </div>
+
+    <!-- Data Table Card -->
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden">
+        <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                <i class="fas fa-users text-[#ee4d2d]"></i> Khách hàng đã đăng ký tài khoản
+            </h3>
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered text-dark" id="dataTable" width="100%" cellspacing="0">
-                    <thead>
-                        <tr>
-                            <th>Mã KH</th>
-                            <th>Họ và Tên</th>
-                            <th>Số điện thoại</th>
-                            <th>Email</th>
-                            <th>Hạng thành viên</th>
-                            <th>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($customers as $customer)
-                        <tr>
-                            <td>KH-{{ sprintf('%03d', $customer->id) }}</td>
-                            <td class="font-weight-bold">{{ $customer->fullname }}</td>
-                            <td>{{ $customer->phone ?? 'Chưa cập nhật' }}</td>
-                            <td>{{ $customer->email }}</td>
-                            <td>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-100 text-[11px] text-slate-400 uppercase font-extrabold tracking-wider">
+                        <th class="py-4 px-6">Mã KH</th>
+                        <th class="py-4 px-6">Họ và Tên</th>
+                        <th class="py-4 px-6">Số điện thoại</th>
+                        <th class="py-4 px-6">Email</th>
+                        <th class="py-4 px-6">Hạng thành viên</th>
+                        <th class="py-4 px-6 text-right">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @forelse($customers as $customer)
+                        <tr class="hover:bg-slate-50/80 transition-colors">
+                            <td class="py-4 px-6 font-bold text-slate-400">KH-{{ sprintf('%03d', $customer->id) }}</td>
+                            <td class="py-4 px-6 font-extrabold text-slate-900">
+                                {{ $customer->fullname ?? $customer->name }}
+                            </td>
+                            <td class="py-4 px-6 font-semibold text-slate-700">
+                                {{ $customer->phone ?? 'Chưa cập nhật' }}
+                            </td>
+                            <td class="py-4 px-6 text-slate-500">
+                                {{ $customer->email }}
+                            </td>
+                            <td class="py-4 px-6">
                                 @if($customer->membership === 'diamond')
-                                <span class="badge badge-danger p-2 font-weight-bold">Kim cương</span>
+                                    <span class="px-2.5 py-1 rounded-full bg-rose-50 text-rose-600 text-[10px] font-black border border-rose-200">💎 Kim cương</span>
                                 @elseif($customer->membership === 'gold')
-                                <span class="badge badge-warning p-2 text-dark font-weight-bold">Vàng</span>
-                                @elseif($customer->membership === 'silver')
-                                <span class="badge badge-secondary p-2 font-weight-bold">Bạc</span>
+                                    <span class="px-2.5 py-1 rounded-full bg-amber-50 text-amber-600 text-[10px] font-black border border-amber-200">🥇 Vàng</span>
                                 @else
-                                <span class="badge badge-light border p-2 text-dark">Đồng</span>
+                                    <span class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold">Thường</span>
                                 @endif
                             </td>
-                            <td>
-                                <a href="{{ route('khachhang_xem', $customer->id) }}" class="btn btn-info btn-sm">
-                                    <i class="fas fa-eye"></i> Xem
+                            <td class="py-4 px-6 text-right space-x-2">
+                                <a href="{{ route('khachhang_xem', $customer->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors">
+                                    <i class="fas fa-eye text-xs"></i>
                                 </a>
-                                <a href="{{ route('khachhang_chinhsua', $customer->id) }}" class="btn btn-warning btn-sm">
-                                    <i class="fas fa-edit"></i> Sửa
+                                <a href="{{ route('khachhang_chinhsua', $customer->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 transition-colors">
+                                    <i class="fas fa-pen text-xs"></i>
                                 </a>
-                                <form action="{{ route('khachhang_xoa', $customer->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa khách hàng này? Hành động này không thể hoàn tác.');">
+                                <form action="{{ route('khachhang_xoa', $customer->id) }}" method="POST" class="inline" onsubmit="return confirm('Bạn có chắc muốn xóa tài khoản khách hàng này?');">
                                     @csrf
-                                    <button type="submit" class="btn btn-danger btn-sm" title="Xóa tài khoản">
-                                        <i class="fas fa-trash"></i> Xóa
+                                    <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 transition-colors">
+                                        <i class="fas fa-trash-can text-xs"></i>
                                     </button>
                                 </form>
                             </td>
                         </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="py-10 text-center text-slate-400 font-medium">Chưa có khách hàng nào.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
-@endsection
 
-@section('scripts')
-    <script src="{{ asset('admin/vendor/datatables/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('admin/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
-    <script src="{{ asset('admin/js/demo/datatables-demo.js') }}"></script>
+</div>
 @endsection

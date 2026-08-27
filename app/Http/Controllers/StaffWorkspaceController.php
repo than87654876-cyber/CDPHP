@@ -35,9 +35,11 @@ class StaffWorkspaceController extends Controller
             ->count();
 
         // 3. Thống kê Vận chuyển (Shipper)
-        $shipperDeliveringOrders = Order::where('order_status', 'delivering')->count();
+        $shipDeliveringOrders = Order::where('order_status', 'delivering')->count();
+        $shipTodaySubscriptions = DailySchedule::where('delivery_date', $todayStr)->count();
 
-        $shipperSubDispatches = DailySchedule::where('delivery_date', $todayStr)->count();
+        $shipperDeliveringOrders = $shipDeliveringOrders;
+        $shipperSubDispatches = $shipTodaySubscriptions;
 
         return view('admin.staff_workspace', compact(
             'kitchenSingleQty',
@@ -45,6 +47,8 @@ class StaffWorkspaceController extends Controller
             'kitchenTotal',
             'cskhPendingOrders',
             'cskhPendingRefunds',
+            'shipDeliveringOrders',
+            'shipTodaySubscriptions',
             'shipperDeliveringOrders',
             'shipperSubDispatches',
             'todayStr'

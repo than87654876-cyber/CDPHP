@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Cấu hình gửi mã nâng cao - FOODELICIOUS')
+@section('title', 'Cấu hình gửi mã nâng cao - FOODDAILY')
 
 @section('content')
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
@@ -268,13 +268,13 @@
                         Email</label>
                     <input type="text" class="form-control" id="email_subject"
                         name="email_subject"
-                        value="Món quà bất ngờ dành tặng riêng bạn từ FOODELICIOUS!" required>
+                        value="Món quà bất ngờ dành tặng riêng bạn từ FOODDAILY!" required>
                 </div>
                 <div class="form-group">
                     <label for="message_body" class="font-weight-bold">Nội dung chi tiết</label>
                     <textarea class="form-control" id="message_body" name="message_body"
                         rows="4"
-                        required>Chào bạn thân mến, FOODELICIOUS gửi tặng riêng bạn mã ưu đãi giảm giá độc quyền tự sinh: [MÃ_TỰ_SINH]. Mã áp dụng cho mọi đơn hàng trong vòng [SỐ_NGÀY] ngày tới. Đừng bỏ lỡ nhé!</textarea>
+                        required>Chào bạn thân mến, FOODDAILY gửi tặng riêng bạn mã ưu đãi giảm giá độc quyền tự sinh: [MÃ_TỰ_SINH]. Mã áp dụng cho mọi đơn hàng trong vòng [SỐ_NGÀY] ngày tới. Đừng bỏ lỡ nhé!</textarea>
                 </div>
 
                 <hr>

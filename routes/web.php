@@ -13,6 +13,7 @@ use App\Http\Controllers\ShopController;
 use App\Http\Controllers\StaffWorkspaceController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\CustomerBackupController;
+use App\Http\Controllers\GroupOrderController;
 use Illuminate\Support\Facades\Route;
 
 // --- Giao diện khách vãng lai & Trang chủ ---
@@ -21,6 +22,16 @@ Route::get('/', function () {
 });
 Route::get('/trangchu', [ShopController::class, 'index'])->name('trangchu');
 Route::get('/tracuu', [ShopController::class, 'trackOrder'])->name('tracuu');
+
+// --- Phân hệ Đặt Đơn Theo Nhóm ---
+Route::post('/nhom/tao', [GroupOrderController::class, 'create'])->name('nhom.create');
+Route::get('/nhom/{code}', [GroupOrderController::class, 'show'])->name('nhom.show');
+Route::post('/nhom/{code}/them-mon', [GroupOrderController::class, 'addItem'])->name('nhom.add_item');
+Route::post('/nhom/{code}/xoa-mon/{itemId}', [GroupOrderController::class, 'removeItem'])->name('nhom.remove_item');
+Route::get('/api/nhom/{code}/poll', [GroupOrderController::class, 'pollItems'])->name('nhom.poll');
+Route::post('/nhom/{code}/chot-don', [GroupOrderController::class, 'checkout'])->name('nhom.checkout');
+Route::get('/api/client/orders/poll', [CartController::class, 'pollUserOrders'])->name('api.client.orders.poll');
+
 
 // --- Phân hệ Xác thực (Authentication) ---
 // Unified Login Route (Dùng chung cho cả Admin, Staff và Khách hàng)
@@ -182,6 +193,10 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/donhang_chinhsua/{id}', [AdminOrderController::class, 'update'])->name('donhang_chinhsua.post');
     Route::post('/donhang_refund/{id}', [AdminOrderController::class, 'processRefund'])->name('donhang_refund');
     Route::post('/donhang_xoa/{id}', [AdminOrderController::class, 'destroy'])->name('donhang_xoa');
+
+    // Quản lý Đánh giá
+    Route::get('/quanly_reviews', [AdminOrderController::class, 'reviewsList'])->name('quanly_reviews');
+    Route::post('/quanly_reviews/xoa/{id}', [AdminOrderController::class, 'destroyReview'])->name('quanly_reviews.xoa');
 
     // Bếp chuẩn bị món
     Route::get('/quanly_bep', [AdminOrderController::class, 'kitchenReport'])->name('quanly_bep');

@@ -10,13 +10,13 @@
         <div id="gemini-chat-header">
             <span class="d-flex align-items-center gap-2">
                 <img src="{{ asset('logo.jpg') }}" class="rounded-circle" style="width: 24px; height: 24px;">
-                Trợ lý FOODELICIOUS AI
+                Trợ lý FOODDAILY AI
             </span>
             <button type="button" class="btn-close btn-close-white btn-sm" id="close-chat" aria-label="Close"></button>
         </div>
         <div id="gemini-chat-messages">
             <div class="chat-msg bot">
-                Xin chào! Tôi là Trợ lý ảo FOODELICIOUS AI. Tôi có thể giúp gì cho bạn hôm nay?
+                Xin chào! Tôi là Trợ lý ảo FOODDAILY AI. Tôi có thể giúp gì cho bạn hôm nay?
             </div>
         </div>
         <div id="gemini-chat-input-area">

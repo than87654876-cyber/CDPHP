@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Yêu cầu hoàn tiền - FOODELICIOUS</title>
+    <title>Yêu cầu hoàn tiền - FOODDAILY</title>
     <meta name="description" content="">
     <meta name="keywords" content="">
 
@@ -116,7 +116,7 @@
         <div class="container position-relative d-flex align-items-center justify-content-between">
             <a href="{{ route('trangchu') }}" class="logo d-flex align-items-center me-auto me-xl-0">
                 <img src="{{ isset($settings['logo_url']) ? (\Illuminate\Support\Str::startsWith($settings['logo_url'], 'http') ? $settings['logo_url'] : asset($settings['logo_url'])) : asset('logo.jpg') }}" alt="" class="setting-logo-img">
-                <h1 class="sitename">FOODELICIOUS</h1><span>.</span>
+                <h1 class="sitename">FOODDAILY</h1><span>.</span>
             </a>
     </header>
 
@@ -255,7 +255,7 @@
     <!-- Footer -->
     <footer id="footer" class="footer dark-background">
         <div class="container copyright text-center mt-4">
-            <p>© <span>2026</span> <strong class="px-1">FOODELICIOUS</strong>. Tất cả quyền được bảo lưu.</p>
+            <p>© <span>2026</span> <strong class="px-1">FOODDAILY</strong>. Tất cả quyền được bảo lưu.</p>
         </div>
     </footer>
 

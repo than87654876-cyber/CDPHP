@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Chi tiết đơn hàng - FOODELICIOUS')
+@section('title', 'Chi tiết đơn hàng - FOODDAILY')
 
 @section('content')
     @php

@@ -2,13 +2,13 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Xác nhận đơn hàng FDL-{{ $order->id }} - FOODELICIOUS</title>
+    <title>Xác nhận đơn hàng FDL-{{ $order->id }} - FOODDAILY</title>
 </head>
 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; background-color: #f8f9fa;">
     <div style="max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 12px; overflow: hidden; background-color: #ffffff; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
         <div style="background: linear-gradient(135deg, #ce1126, #a00d20); color: white; padding: 25px; text-align: center;">
             <h1 style="margin: 0; font-size: 28px; letter-spacing: 1px;">XÁC NHẬN ĐƠN HÀNG</h1>
-            <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">Cảm ơn bạn đã đặt món ăn tại FOODELICIOUS!</p>
+            <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">Cảm ơn bạn đã đặt món ăn tại FOODDAILY!</p>
         </div>
         <div style="padding: 25px;">
             <h2 style="color: #ce1126; margin-top: 0; font-size: 20px; border-bottom: 2px solid #f8f9fa; padding-bottom: 10px;">
@@ -96,7 +96,7 @@
             <hr style="border: 0; border-top: 1px solid #eee; margin: 25px 0;">
             <p style="font-size: 12px; color: #777; text-align: center; margin-bottom: 0;">
                 Cảm ơn bạn đã lựa chọn dịch vụ của chúng tôi!<br>
-                Hệ thống đặt món ăn trực tuyến FOODELICIOUS.
+                Hệ thống đặt món ăn trực tuyến FOODDAILY.
             </p>
         </div>
     </div>

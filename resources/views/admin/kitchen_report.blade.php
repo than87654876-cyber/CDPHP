@@ -1,50 +1,78 @@
 @extends('layouts.admin')
 
-@section('title', 'Nhà bếp - Chuẩn bị món ăn')
+@section('title', 'Màn Hình Bếp Nấu - FOODDAILY Admin')
 
 @section('content')
-<div class="container-fluid">
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800 font-weight-bold">Bảng chuẩn bị món ăn</h1>
-        <div class="text-secondary small font-weight-bold">
-            <i class="fas fa-calendar-alt mr-1"></i> Ngày giao: {{ \Carbon\Carbon::parse($todayStr)->format('d/m/Y') }}
+<div class="space-y-6">
+    
+    <!-- Top Action Bar -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                <i class="fas fa-fire-burner text-amber-500"></i> Bảng Chuẩn Bị Món Ăn Bếp Nấu
+            </h1>
+            <p class="text-xs text-slate-500 font-medium mt-1">Tổng hợp số lượng suất ăn lẻ & gói combo cần chế biến trong ngày</p>
+        </div>
+
+        <div class="flex items-center gap-2 px-4 py-2 bg-white rounded-2xl border border-slate-200 text-xs font-bold text-slate-700 shadow-xs">
+            <i class="far fa-calendar-alt text-[#ee4d2d]"></i> Ngày giao: {{ \Carbon\Carbon::parse($todayStr)->format('d/m/Y') }}
         </div>
     </div>
 
+    <!-- Alerts -->
     @if(session('success'))
-        <div class="alert alert-success shadow-sm py-2">
-            {{ session('success') }}
+        <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 rounded-2xl text-xs font-semibold flex items-center justify-between shadow-xs">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-circle-check text-emerald-600 text-sm"></i>
+                <span>{{ session('success') }}</span>
+            </div>
+            <button onclick="this.parentElement.remove()" class="text-emerald-600 hover:text-emerald-800">&times;</button>
         </div>
     @endif
 
-    <div class="row">
-        <!-- Đơn hàng lẻ cần chuẩn bị -->
-        <div class="col-lg-6 mb-4">
-            <div class="card shadow">
-                <div class="card-header py-3 bg-gradient-danger d-flex align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-white"><i class="fas fa-utensils mr-2"></i>Món ăn cho Đơn hàng lẻ</h6>
-                    <span class="badge badge-light text-danger font-weight-bold">{{ $singleDishes->sum('total_qty') }} Phần</span>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- Panel 1: Single Dishes -->
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden flex flex-col justify-between">
+            <div>
+                <div class="p-5 bg-rose-50 border-b border-rose-100 flex items-center justify-between">
+                    <h3 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fas fa-utensils text-[#ee4d2d]"></i> Món Ăn Cho Đơn Hàng Lẻ
+                    </h3>
+                    <span class="px-3 py-1 rounded-full bg-[#ee4d2d] text-white text-xs font-black">
+                        {{ $singleDishes->sum('total_qty') }} Suất
+                    </span>
                 </div>
-                <div class="card-body">
+
+                <div class="p-6">
                     @if($singleDishes->isEmpty())
-                        <div class="text-center py-4 text-muted">
-                            <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
-                            <p class="mb-0">Đã chuẩn bị xong hoặc không có đơn hàng lẻ nào cần làm hôm nay.</p>
+                        <div class="text-center py-10 space-y-2">
+                            <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold mx-auto">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <p class="text-xs font-bold text-slate-700">Đã chế biến hoàn tất!</p>
+                            <p class="text-[11px] text-slate-400">Không có đơn lẻ nào cần làm lúc này.</p>
                         </div>
                     @else
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped" width="100%" cellspacing="0">
-                                <thead class="thead-light">
-                                    <tr>
-                                        <th>Món ăn</th>
-                                        <th class="text-center" style="width: 150px;">Số lượng cần làm</th>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-100 text-[11px] text-slate-400 uppercase font-extrabold tracking-wider">
+                                        <th class="py-3.5 px-4">Tên Món Ăn</th>
+                                        <th class="py-3.5 px-4 text-center">Số Lượng Cần Làm</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody class="divide-y divide-slate-100">
                                     @foreach($singleDishes as $item)
-                                        <tr>
-                                            <td class="font-weight-bold text-dark">{{ $item->dish->dish_name ?? 'Không rõ' }}</td>
-                                            <td class="text-center font-weight-bold text-danger">{{ $item->total_qty }}</td>
+                                        <tr class="hover:bg-slate-50/80 transition-colors">
+                                            <td class="py-3.5 px-4 font-extrabold text-slate-900">
+                                                {{ $item->dish->dish_name ?? 'Món ăn không tồn tại' }}
+                                            </td>
+                                            <td class="py-3.5 px-4 text-center">
+                                                <span class="px-3 py-1 rounded-xl bg-rose-50 text-[#ee4d2d] text-xs font-black border border-rose-200">
+                                                    {{ $item->total_qty }} suất
+                                                </span>
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -55,33 +83,47 @@
             </div>
         </div>
 
-        <!-- Gói dịch vụ cần chuẩn bị -->
-        <div class="col-lg-6 mb-4">
-            <div class="card shadow">
-                <div class="card-header py-3 bg-gradient-warning d-flex align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-white"><i class="fas fa-box-seam mr-2"></i>Món ăn cho Gói dịch vụ dài hạn</h6>
-                    <span class="badge badge-light text-warning font-weight-bold">{{ $subscriptionDishes->sum('total_qty') }} Phần</span>
+        <!-- Panel 2: Subscriptions -->
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden flex flex-col justify-between">
+            <div>
+                <div class="p-5 bg-amber-50 border-b border-amber-100 flex items-center justify-between">
+                    <h3 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fas fa-box-archive text-amber-600"></i> Món Ăn Cho Gói Combo Định Kỳ
+                    </h3>
+                    <span class="px-3 py-1 rounded-full bg-amber-500 text-white text-xs font-black">
+                        {{ $subscriptionDishes->sum('total_qty') }} Suất
+                    </span>
                 </div>
-                <div class="card-body">
+
+                <div class="p-6">
                     @if($subscriptionDishes->isEmpty())
-                        <div class="text-center py-4 text-muted">
-                            <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
-                            <p class="mb-0">Không có món ăn thuộc gói dịch vụ nào cần chuẩn bị cho hôm nay.</p>
+                        <div class="text-center py-10 space-y-2">
+                            <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold mx-auto">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <p class="text-xs font-bold text-slate-700">Đã nấu xong gói định kỳ!</p>
+                            <p class="text-[11px] text-slate-400">Không có lịch giao gói combo nào hôm nay.</p>
                         </div>
                     @else
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped" width="100%" cellspacing="0">
-                                <thead class="thead-light">
-                                    <tr>
-                                        <th>Món ăn</th>
-                                        <th class="text-center" style="width: 150px;">Số lượng cần làm</th>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-100 text-[11px] text-slate-400 uppercase font-extrabold tracking-wider">
+                                        <th class="py-3.5 px-4">Tên Món Ăn</th>
+                                        <th class="py-3.5 px-4 text-center">Số Lượng Cần Làm</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody class="divide-y divide-slate-100">
                                     @foreach($subscriptionDishes as $item)
-                                        <tr>
-                                            <td class="font-weight-bold text-dark">{{ $item->dish->dish_name ?? 'Không rõ' }}</td>
-                                            <td class="text-center font-weight-bold text-warning">{{ $item->total_qty }}</td>
+                                        <tr class="hover:bg-slate-50/80 transition-colors">
+                                            <td class="py-3.5 px-4 font-extrabold text-slate-900">
+                                                {{ $item->dish->dish_name ?? 'Món ăn không tồn tại' }}
+                                            </td>
+                                            <td class="py-3.5 px-4 text-center">
+                                                <span class="px-3 py-1 rounded-xl bg-amber-50 text-amber-700 text-xs font-black border border-amber-200">
+                                                    {{ $item->total_qty }} suất
+                                                </span>
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -91,82 +133,26 @@
                 </div>
             </div>
         </div>
+
     </div>
+
 </div>
 @endsection
 
 @section('scripts')
-<!-- Realtime Echo Listener for Kitchen (Disabled in favor of AJAX Polling) -->
-<!--
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        if (window.Echo) {
-            window.Echo.channel('kitchen-channel')
-                .listen('OrderUpdated', (e) => {
-                    console.log('Order update received in Kitchen:', e);
-                    
-                    if (e.action === 'created' || e.action === 'status_updated' || e.action === 'daily_dispatch') {
-                        try {
-                            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                            
-                            // Beep 1
-                            const osc1 = audioCtx.createOscillator();
-                            osc1.type = 'sawtooth';
-                            osc1.frequency.setValueAtTime(880, audioCtx.currentTime); // A5 note
-                            osc1.connect(audioCtx.destination);
-                            osc1.start();
-                            osc1.stop(audioCtx.currentTime + 0.15);
-                            
-                            // Beep 2
-                            setTimeout(() => {
-                                const osc2 = audioCtx.createOscillator();
-                                osc2.type = 'sawtooth';
-                                osc2.frequency.setValueAtTime(1046.50, audioCtx.currentTime); // C6 note
-                                osc2.connect(audioCtx.destination);
-                                osc2.start();
-                                osc2.stop(audioCtx.currentTime + 0.2);
-                            }, 200);
-                        } catch (err) {
-                            console.log('Audio error:', err);
-                        }
-
-                        const alertDiv = document.createElement('div');
-                        alertDiv.className = 'alert alert-warning alert-dismissible fade show shadow-sm mb-4';
-                        alertDiv.role = 'alert';
-                        alertDiv.innerHTML = `
-                            <i class="fas fa-bell mr-2 text-danger"></i>
-                            <strong>Có cập nhật đơn hàng mới hoặc điều phối!</strong> Bảng chuẩn bị món ăn của bếp đang tự động tải lại...
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        `;
-                        document.querySelector('.container-fluid').prepend(alertDiv);
-
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1200);
-                    }
-                });
-        }
-    });
-</script>
--->
-<!-- Realtime AJAX Polling for Kitchen -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         let lastCheckedTime = null;
 
-        // Get initial server time
         fetch("{{ route('api.orders.poll') }}")
             .then(response => response.json())
             .then(data => {
                 lastCheckedTime = data.timestamp;
-                console.log('Kitchen Polling initialized at:', lastCheckedTime);
-                setInterval(pollUpdates, 2000);
+                setInterval(pollKitchenUpdates, 2500);
             })
             .catch(err => console.error('Error initializing kitchen polling:', err));
 
-        function pollUpdates() {
+        function pollKitchenUpdates() {
             if (!lastCheckedTime) return;
 
             fetch(`{{ route('api.orders.poll') }}?since=${encodeURIComponent(lastCheckedTime)}`)
@@ -176,52 +162,13 @@
                     if (data.updates && data.updates.length > 0) {
                         let shouldReload = false;
                         data.updates.forEach(e => {
-                            console.log('Polling Kitchen Event received:', e);
                             if (e.action === 'created' || e.action === 'status_updated' || e.action === 'daily_dispatch') {
                                 shouldReload = true;
                             }
                         });
 
                         if (shouldReload) {
-                            try {
-                                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                                
-                                // Beep 1
-                                const osc1 = audioCtx.createOscillator();
-                                osc1.type = 'sawtooth';
-                                osc1.frequency.setValueAtTime(880, audioCtx.currentTime); // A5 note
-                                osc1.connect(audioCtx.destination);
-                                osc1.start();
-                                osc1.stop(audioCtx.currentTime + 0.15);
-                                
-                                // Beep 2
-                                setTimeout(() => {
-                                    const osc2 = audioCtx.createOscillator();
-                                    osc2.type = 'sawtooth';
-                                    osc2.frequency.setValueAtTime(1046.50, audioCtx.currentTime); // C6 note
-                                    osc2.connect(audioCtx.destination);
-                                    osc2.start();
-                                    osc2.stop(audioCtx.currentTime + 0.2);
-                                }, 200);
-                            } catch (err) {
-                                console.log('Audio error:', err);
-                            }
-
-                            const alertDiv = document.createElement('div');
-                            alertDiv.className = 'alert alert-warning alert-dismissible fade show shadow-sm mb-4';
-                            alertDiv.role = 'alert';
-                            alertDiv.innerHTML = `
-                                <i class="fas fa-bell mr-2 text-danger"></i>
-                                <strong>Có cập nhật đơn hàng mới hoặc điều phối!</strong> Bảng chuẩn bị món ăn của bếp đang tự động tải lại...
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            `;
-                            document.querySelector('.container-fluid').prepend(alertDiv);
-
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 1200);
+                            window.location.reload();
                         }
                     }
                 })

@@ -23,6 +23,16 @@ class ShopController extends Controller
         }
 
         $query = $request->input('search');
+        if ($query) {
+            session(['last_search_query' => $query]);
+        }
+
+        // Lấy tất cả các món ăn cho Tab "Tất cả"
+        $allDishesQuery = \App\Models\Dish::where('is_available', true);
+        if ($query) {
+            $allDishesQuery->where('dish_name', 'like', '%'.$query.'%');
+        }
+        $allDishes = $allDishesQuery->get();
 
         // Lấy các danh mục và các món ăn thuộc danh mục đó
         $categories = Category::with(['dishes' => function ($q) use ($query) {
@@ -32,11 +42,78 @@ class ShopController extends Controller
             }
         }])->get();
 
+        // 1. THUẬT TOÁN: Món hay mua (Mua >= 2 lần)
+        $frequentDishes = collect();
         if (auth()->check()) {
-            return view('client.shop_logged', compact('categories', 'query'));
+            $frequentDishIds = \App\Models\OrderItem::whereHas('order', function($q) {
+                    $q->where('user_id', auth()->id());
+                })
+                ->select('dish_id', \Illuminate\Support\Facades\DB::raw('SUM(quantity) as total_qty'))
+                ->groupBy('dish_id')
+                ->having('total_qty', '>=', 2)
+                ->orderByDesc('total_qty')
+                ->pluck('dish_id');
+
+            $frequentDishes = \App\Models\Dish::whereIn('id', $frequentDishIds)->where('is_available', true)->get();
         }
 
-        return view('client.shop', compact('categories', 'query'));
+        // 2. THUẬT TOÁN: Đề xuất theo khung giờ trong ngày
+        $hour = now()->hour;
+        $timeRecommendation = [
+            'period' => 'Sáng',
+            'title' => '🌅 Bữa Sáng Dinh Dưỡng Năng Lượng',
+            'dishes' => collect()
+        ];
+
+        if ($hour >= 5 && $hour < 11) {
+            $timeRecommendation['period'] = 'Sáng';
+            $timeRecommendation['title'] = '🌅 Bữa Sáng Dinh Dưỡng Cân Bằng';
+            $timeRecommendation['dishes'] = \App\Models\Dish::where('is_available', true)
+                ->where(function($q) {
+                    $q->where('dish_name', 'like', '%cháo%')
+                      ->orWhere('dish_name', 'like', '%bánh mì%')
+                      ->orWhere('dish_name', 'like', '%sữa%')
+                      ->orWhere('dish_name', 'like', '%sinh tố%')
+                      ->orWhere('category_id', 1);
+                })->take(4)->get();
+        } elseif ($hour >= 11 && $hour < 14) {
+            $timeRecommendation['period'] = 'Trưa';
+            $timeRecommendation['title'] = '☀️ Bữa Trưa Đậm Đà Năng Lượng';
+            $timeRecommendation['dishes'] = \App\Models\Dish::where('is_available', true)
+                ->where(function($q) {
+                    $q->where('dish_name', 'like', '%cơm%')
+                      ->orWhere('dish_name', 'like', '%bún%')
+                      ->orWhere('dish_name', 'like', '%ức gà%');
+                })->take(4)->get();
+        } elseif ($hour >= 14 && $hour < 17) {
+            $timeRecommendation['period'] = 'Chiều';
+            $timeRecommendation['title'] = '🍰 Thức Uống & Món Nhẹ Tráng Miệng Chiều';
+            $timeRecommendation['dishes'] = \App\Models\Dish::where('is_available', true)
+                ->where(function($q) {
+                    $q->where('dish_name', 'like', '%bánh%')
+                      ->orWhere('dish_name', 'like', '%thạch%')
+                      ->orWhere('dish_name', 'like', '%chè%')
+                      ->orWhere('category_id', 2);
+                })->take(4)->get();
+        } else {
+            $timeRecommendation['period'] = 'Tối';
+            $timeRecommendation['title'] = '🌙 Bữa Tối Thưởng Thức Ấm Cúng';
+            $timeRecommendation['dishes'] = \App\Models\Dish::where('is_available', true)->take(4)->get();
+        }
+
+        // 3. Đề xuất từ lịch sử tìm kiếm gần nhất
+        $lastSearchQuery = session('last_search_query');
+        $lastSearchDishes = collect();
+        if ($lastSearchQuery && !$query) {
+            $lastSearchDishes = \App\Models\Dish::where('is_available', true)
+                ->where('dish_name', 'like', '%'.$lastSearchQuery.'%')
+                ->take(4)->get();
+        }
+
+        // 4. Lấy cấu hình trang chủ từ bảng settings
+        $settings = \App\Models\Setting::pluck('value', 'key')->all();
+
+        return view('client.shop', compact('categories', 'allDishes', 'query', 'frequentDishes', 'timeRecommendation', 'lastSearchQuery', 'lastSearchDishes', 'settings'));
     }
 
     public function shopLogged(Request $request)

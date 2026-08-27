@@ -1,173 +1,99 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.app')
 
-<head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Đăng ký thành viên - FOODELICIOUS</title>
+@section('title', 'Đăng ký tài khoản - FOODDAILY')
 
-    <meta name="description" content="">
-    <meta name="keywords" content="">
-
-    <link href="{{ asset('logo.jpg') }}" rel="icon">
-    <link href="{{ asset('client/assets/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
-
-    <link href="https://fonts.googleapis.com" rel="preconnect">
-    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Amatic+SC:wght@400;700&display=swap"
-        rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" type="text/css">
-
-    <link href="{{ asset('client/assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('client/assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
-    <link href="{{ asset('client/assets/vendor/aos/aos.css') }}" rel="stylesheet">
-    <link href="{{ asset('client/assets/vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('client/assets/vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
-
-    <link href="{{ asset('client/assets/css/main.css') }}" rel="stylesheet">
-    <style>
-        .auth-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #f8f9fa;
-            padding: 30px 20px;
-        }
-
-        .auth-card {
-            max-width: 550px;
-            width: 100%;
-            border-radius: 12px;
-            border: none;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-            background-color: #fff;
-        }
-
-        .auth-header {
-            text-align: center;
-            border-bottom: 1px solid #f4f4f4;
-            padding-bottom: 15px;
-        }
-
-        .btn-auth {
-            background-color: #ce1126;
-            color: white;
-            font-weight: 600;
-            padding: 10px;
-        }
-
-        .btn-auth:hover {
-            background-color: #a00d20;
-            color: white;
-        }
-
-        .form-control:focus,
-        .form-select:focus {
-            border-color: #ce1126;
-            box-shadow: 0 0 0 0.25rem rgba(206, 17, 38, 0.15);
-        }
-
-        .auth-link {
-            color: #ce1126;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .auth-link:hover {
-            color: #a00d20;
-            text-decoration: underline;
-        }
-    </style>
-</head>
-
-<body>
-
-    <div class="auth-container">
-        <div class="card auth-card p-4 text-dark">
-            <div class="auth-header mb-4">
-                <h3 class="fw-bold mb-1" style="color: #ce1126;">TẠO TÀI KHOẢN MỚI</h3>
-                <p class="text-muted small mb-0">Trở thành thành viên hệ thống để nhận nhiều ưu đãi tích điểm</p>
+@section('content')
+<div class="py-20 bg-[#f5f5f5] min-h-[calc(100vh-160px)] flex items-center justify-center px-4 sm:px-6">
+    <div class="max-w-xl w-full">
+        <!-- Clean Card Wrapper -->
+        <div class="bg-white rounded-3xl p-8 sm:p-10 shadow-xl shadow-slate-200/50 border border-slate-200/80 space-y-6">
+            
+            <!-- Form Header -->
+            <div class="text-center space-y-2 border-b border-slate-100 pb-6">
+                <div class="w-14 h-14 rounded-2xl bg-rose-50 text-[#ee4d2d] flex items-center justify-center text-xl font-bold mx-auto border border-rose-100 shadow-xs">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Tạo Tài Khoản Mới</h2>
+                <p class="text-xs text-slate-500 font-medium">Đăng ký thành viên để bắt đầu trải nghiệm món ăn tươi ngon</p>
             </div>
 
+            <!-- Error Alerts -->
             @if ($errors->any())
-                <div class="alert alert-danger py-2 small">
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
+                <div class="bg-rose-50 border border-rose-200 text-rose-700 p-4 rounded-2xl text-xs space-y-1">
+                    @foreach ($errors->all() as $error)
+                        <p class="flex items-center gap-2 font-medium"><i class="fas fa-circle-exclamation text-rose-500"></i> {{ $error }}</p>
+                    @endforeach
                 </div>
             @endif
 
-            <form action="{{ route('trangchu/dangky.post') }}" method="POST">
+            <!-- Registration Form -->
+            <form action="{{ route('trangchu/dangky.post') }}" method="POST" class="space-y-4">
                 @csrf
-                <div class="mb-3">
-                    <label for="fullname" class="form-label small fw-bold">Họ và Tên <span
-                            class="text-danger">*</span></label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light text-muted"><i class="bi bi-person"></i></span>
-                        <input type="text" class="form-control" id="fullname" name="fullname" value="{{ old('fullname') }}" placeholder="Ví dụ: Dương Bá Tùng"
-                            required>
+                
+                <div>
+                    <label for="fullname" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Họ và Tên <span class="text-emerald-600">*</span></label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm pointer-events-none">
+                            <i class="fas fa-user"></i>
+                        </span>
+                        <input type="text" id="fullname" name="fullname" value="{{ old('fullname') }}" placeholder="Ví dụ: Nguyễn Văn A" class="w-full pl-10 pr-4 py-3 rounded-2xl border border-slate-200 text-sm font-semibold text-slate-800 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none" required>
                     </div>
                 </div>
 
-
-
-                <div class="row">
-                    <div class="form-group col-md-6 mb-3">
-                        <label for="phone" class="form-label small fw-bold">Số điện thoại <span
-                                class="text-danger">*</span></label>
-                        <input type="tel" class="form-control" id="phone" name="phone" value="{{ old('phone') }}" placeholder="09xxxxxxxx"
-                            required>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="phone" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Số điện thoại <span class="text-emerald-600">*</span></label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm pointer-events-none">
+                                <i class="fas fa-phone"></i>
+                            </span>
+                            <input type="tel" id="phone" name="phone" value="{{ old('phone') }}" placeholder="0912345678" class="w-full pl-10 pr-4 py-3 rounded-2xl border border-slate-200 text-sm font-semibold text-slate-800 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none" required>
+                        </div>
                     </div>
-                    <div class="form-group col-md-6 mb-3">
-                        <label for="email" class="form-label small fw-bold">Địa chỉ Email <span
-                                class="text-danger">*</span></label>
-                        <input type="email" class="form-control" id="email" name="email" value="{{ old('email') }}" placeholder="name@example.com"
-                            required>
-                    </div>
-                </div>
 
-                <div class="mb-3">
-                    <label for="address" class="form-label small fw-bold">Địa chỉ giao hàng mặc định <span
-                            class="text-danger">*</span></label>
-                    <textarea class="form-control" id="address" name="address" rows="2"
-                        placeholder="Số nhà, tên đường, phường/xã, quận/huyện..." required>{{ old('address') }}</textarea>
-                </div>
-
-                <div class="row">
-                    <div class="form-group col-md-6 mb-3">
-                        <label for="password" class="form-label small fw-bold">Mật khẩu khóa <span
-                                class="text-danger">*</span></label>
-                        <input type="password" class="form-control" id="password" name="password"
-                            placeholder="Tối thiểu 6 ký tự" required>
-                    </div>
-                    <div class="form-group col-md-6 mb-3">
-                        <label for="password_confirmation" class="form-label small fw-bold">Xác nhận mật khẩu <span
-                                class="text-danger">*</span></label>
-                        <input type="password" class="form-control" id="password_confirmation"
-                            name="password_confirmation" placeholder="Nhập lại mật khẩu" required>
+                    <div>
+                        <label for="email" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Địa chỉ Email <span class="text-emerald-600">*</span></label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm pointer-events-none">
+                                <i class="fas fa-envelope"></i>
+                            </span>
+                            <input type="email" id="email" name="email" value="{{ old('email') }}" placeholder="name@example.com" class="w-full pl-10 pr-4 py-3 rounded-2xl border border-slate-200 text-sm font-semibold text-slate-800 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none" required>
+                        </div>
                     </div>
                 </div>
 
-                <div class="mb-4 form-check">
-                    <input type="checkbox" class="form-check-input" id="terms" name="terms" required>
-                    <label class="form-check-label small text-secondary" for="terms">Tôi đồng ý với các điều khoản sử
-                        dụng và chính sách bảo mật hệ thống</label>
+                <div>
+                    <label for="address" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Địa chỉ giao hàng mặc định <span class="text-emerald-600">*</span></label>
+                    <textarea id="address" name="address" rows="2" placeholder="Số nhà, tên đường, phường/xã, quận/huyện..." class="w-full p-3.5 rounded-2xl border border-slate-200 text-sm font-semibold text-slate-800 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none" required>{{ old('address') }}</textarea>
                 </div>
 
-                <button type="submit" class="btn btn-auth w-100 rounded shadow-sm mb-3">ĐĂNG KÝ THÀNH VIÊN</button>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="password" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Mật khẩu <span class="text-emerald-600">*</span></label>
+                        <input type="password" id="password" name="password" placeholder="Tối thiểu 6 ký tự" class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-sm font-semibold text-slate-800 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none" required>
+                    </div>
 
-                <div class="text-center small mt-1">
-                    <span class="text-muted">Bạn đã có tài khoản sẵn?</span>
-                    <a href="{{ route('trangchu/dangnhap') }}" class="auth-link ms-1">Quay lại Đăng nhập</a>
+                    <div>
+                        <label for="password_confirmation" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Xác nhận mật khẩu <span class="text-emerald-600">*</span></label>
+                        <input type="password" id="password_confirmation" name="password_confirmation" placeholder="Nhập lại mật khẩu" class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-sm font-semibold text-slate-800 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none" required>
+                    </div>
                 </div>
+
+                <div class="flex items-center gap-2 pt-2 select-none">
+                    <input type="checkbox" id="terms" name="terms" class="w-4 h-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500/20" required>
+                    <label for="terms" class="text-xs text-slate-600 font-medium">Tôi đồng ý với các <a href="#" class="text-emerald-600 font-bold hover:underline">Điều khoản dịch vụ & Chính sách bảo mật</a></label>
+                </div>
+
+                <button type="submit" class="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm shadow-lg shadow-emerald-500/25 hover:scale-[1.01] active:scale-[0.99] transition-all">
+                    TẠO TÀI KHOẢN NGAY
+                </button>
             </form>
+
+            <div class="text-center text-xs text-slate-500 font-medium pt-2 border-t border-slate-100">
+                <span>Đã có tài khoản?</span>
+                <a href="{{ route('dangnhap') }}" class="font-extrabold text-emerald-600 hover:underline ml-1">Đăng nhập tại đây</a>
+            </div>
         </div>
     </div>
-
-</body>
-
-</html>
+</div>
+@endsection

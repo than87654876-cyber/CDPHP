@@ -1,1369 +1,399 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Trang chủ</title>
-    <meta name="description" content="">
-    <meta name="keywords" content="">
-
-    <link href="{{ asset('logo.jpg') }}" rel="icon">
-    <link href="{{ asset('client/assets/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
-
-    <link href="https://fonts.googleapis.com" rel="preconnect">
-    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Amatic+SC:wght@400;700&display=swap"
-        rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" type="text/css">
-
-    <link href="{{ asset('client/assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('client/assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
-    <link href="{{ asset('client/assets/vendor/aos/aos.css') }}" rel="stylesheet">
-    <link href="{{ asset('client/assets/vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('client/assets/vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
-
-    <link href="{{ asset('client/assets/css/main.css') }}" rel="stylesheet">
-
-    <style>
-        /* Tùy chỉnh con trỏ hiển thị dạng click cho danh sách món ăn */
-        .search-box {
-            margin-bottom: 30px;
-        }
-
-        .search-box input {
-            border-radius: 5px;
-            border: 2px solid #ce1126;
-            padding: 10px 15px;
-        }
-
-        .search-box button {
-            background-color: #ce1126;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 20px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .search-box button:hover {
-            background-color: #a00d20;
-        }
-
-        .menu-item {
-            cursor: pointer;
-            transition: transform 0.2s ease-in-out;
-        }
-
-        .menu-item:hover {
-            transform: scale(1.02);
-        }
-
-        /* Đồng bộ kích thước hình ảnh món ăn */
-        .menu-item .menu-img {
-            width: 100% !important;
-            height: 250px !important;
-            object-fit: cover !important;
-            border-radius: 8px;
-        }
-
-        /* Thêm CSS cho giao diện người dùng ở Header */
-        .profile-dropdown .dropdown-toggle::after {
-            display: none;
-        }
-
-        .profile-dropdown .dropdown-menu {
-            border: none;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            border-radius: 8px;
-        }
-
-        .badge-diamond {
-            background-color: #e6f7ff;
-            color: #0050b3;
-            border: 1px solid #91d5ff;
-        }
-
-        .badge-gold {
-            background-color: #fffbe6;
-            color: #d46b08;
-            border: 1px solid #ffe58f;
-        }
-
-        .badge-silver {
-            background-color: #f5f5f5;
-            color: #595959;
-            border: 1px solid #d9d9d9;
-        }
-
-        .badge-bronze {
-            background-color: #f5f5f5;
-            color: #613400;
-            border: 1px solid #ffd8bf;
-        }
-    </style>
-    @vite(['resources/js/app.js'])
-</head>
-
-<body class="index-page">
-
-    <header id="header" class="header d-flex align-items-center sticky-top">
-        <div class="container position-relative d-flex align-items-center justify-content-between">
-
-            <a href="{{ route('trangchu') }}" class="logo d-flex align-items-center me-auto me-xl-0">
-                <img src="{{ isset($settings['logo_url']) ? (Str::startsWith($settings['logo_url'], 'http') ? $settings['logo_url'] : asset($settings['logo_url'])) : asset('logo.jpg') }}" alt="" class="setting-logo-img">
-                <h1 class="sitename">FOODELICIOUS</h1>
-                <span>.</span>
-            </a>
-
-            <nav id="navmenu" class="navmenu">
-                <ul>
-                    <li><a href="#hero" class="active">Trang chủ<br></a></li>
-                    <li><a href="#about">Thông tin</a></li>
-                    <li class="dropdown"><a href="#menu"><span>Thực đơn</span> <i
-                                class="bi bi-chevron-down toggle-dropdown"></i></a>
-                        <ul>
-                            <li><a href="#menu">Ăn sáng</a></li>
-                            <li><a href="#menu">Tráng miệng</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#events">Chương trình</a></li>
-                    <li><a href="#contact">Liên hệ</a></li>
-                    <li><a href="{{ route('tracuu') }}">Tra cứu đơn hàng</a></li>
-                </ul>
-                <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
-            </nav>
-
-            <div class="d-flex align-items-center gap-3">
-                <a href="#" class="btn-cart" title="Giỏ hàng" data-bs-toggle="modal" data-bs-target="#cartModal">
-                    <i class="bi bi-cart-fill fs-5"></i>
-                </a>
-                <a href="{{ route('trangchu/dangnhap') }}" class="btn-get-started">Đăng nhập</a>
-            </div>
-        </div>
-
-    </header>
-    <div class="modal fade" id="subscribePackageModal" tabindex="-1" aria-labelledby="subscribePackageModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header text-white"
-                    style="background-color: #ce1126; border-top-left-radius: 8px; border-top-right-radius: 8px;">
-                    <h5 class="modal-title fw-bold" id="subscribePackageModalLabel">
-                        <i class="bi bi-box-seam-fill me-2"></i>Đăng ký gói dịch vụ ăn uống dài hạn
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-
-                <form action="#" method="POST">
-                    <div class="modal-body text-dark text-start p-4" style="font-family: 'Roboto', sans-serif;">
-
-                        <div class="alert alert-warning py-2 small border-0 mb-3">
-                            <i class="bi bi-info-circle-fill me-1"></i> **Lưu ý:** Gói dịch vụ cho phép bạn thay đổi món
-                            ăn linh hoạt hàng ngày trước 21h tối hôm trước thông qua mục quản lý tài khoản.
-                        </div>
-
-                        <div class="row">
-                            <div class="form-group col-md-6 mb-3">
-                                <label for="package_type" class="form-label fw-bold">1. Chọn gói dịch vụ phù hợp <span
-                                        class="text-danger">*</span></label>
-                                <select class="form-select font-weight-bold text-primary" id="package_type"
-                                    name="package_type" required>
-                                    <option value="" selected disabled>-- Chọn gói dịch vụ tích hợp --</option>
-                                    <option value="family">Gói Gia Đình Hàng Ngày (Phở, Bánh mì, Cơm tấm...)</option>
-                                    <option value="company">Gói Văn Phòng / Công Ty Tuần (Cơm gà, Hủ tiếu, Mì...)
-                                    </option>
-                                    <option value="dinner">Gói Ăn Chiều Tối Dinh Dưỡng (Cháo gà, Bánh bao, Cơm lươn...)
-                                    </option>
-                                </select>
-                            </div>
-
-                            <div class="form-group col-md-6 mb-3">
-                                <label for="package_duration" class="form-label fw-bold">2. Thời gian đăng ký gói <span
-                                        class="text-danger">*</span></label>
-                                <select class="form-select" id="package_duration" name="package_duration" required>
-                                    <option value="7">Gói trải nghiệm ngắn hạn (7 ngày)</option>
-                                    <option value="14">Gói bán thời gian tích hợp (14 ngày)</option>
-                                    <option value="30" selected>Gói dài hạn tiết kiệm (30 ngày - Tối ưu nhất)</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="form-group col-md-6 mb-3">
-                                <label for="start_date" class="form-label fw-bold">Ngày bắt đầu kích hoạt nhận món <span
-                                        class="text-danger">*</span></label>
-                                <input type="date" class="form-control font-weight-bold text-secondary" id="start_date"
-                                    name="start_date" value="2026-06-18" min="2026-06-17" required>
-                            </div>
-                            <div class="form-group col-md-6 mb-3">
-                                <label for="delivery_slot" class="form-label fw-bold">Khung giờ giao hàng cố
-                                    định</label>
-                                <select class="form-select" id="delivery_slot" name="delivery_slot">
-                                    <option value="morning">Buổi sáng giao sớm (07:00 - 08:30)</option>
-                                    <option value="noon" selected>Buổi trưa văn phòng (11:00 - 12:30)</option>
-                                    <option value="evening">Buổi chiều tối muộn (17:30 - 19:00)</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="form-group col-md-6 mb-3">
-                                <label for="sub_phone" class="form-label fw-bold">Số điện thoại nhận hàng <span
-                                        class="text-danger">*</span></label>
-                                <input type="tel" class="form-control" id="sub_phone" name="sub_phone"
-                                    value="0901234567" required>
-                            </div>
-                            <div class="form-group col-md-6 mb-3">
-                                <label for="sub_email" class="form-label fw-bold">Email nhận hóa đơn & lịch trình <span
-                                        class="text-danger">*</span></label>
-                                <input type="email" class="form-control" id="sub_email" name="sub_email"
-                                    value="tung.db@gmail.com" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label for="sub_address" class="form-label fw-bold">Địa chỉ giao hàng cố định toàn gói <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="sub_address" name="sub_address"
-                                value="Trường Cao đẳng Công nghệ Thông tin TP.HCM (ITC), Quận Tân Phú, Ho Chi Minh City"
-                                required>
-                            <small class="text-muted">* Bạn có thể cập nhật tạm thời địa chỉ giao hàng của từng ngày
-                                riêng biệt trong bảng quản trị lịch trình sau.</small>
-                        </div>
-
-                        <div class="form-group mb-2">
-                            <label class="form-label fw-bold d-block">Phương thức thanh toán trả trước gói dịch
-                                vụ</label>
-                            <div class="form-check form-check-inline me-4">
-                                <input class="form-check-input" type="radio" name="sub_payment_method" id="sub_pay_cash"
-                                    value="cash" checked>
-                                <label class="form-check-label" for="sub_pay_cash"><i class="bi bi-cash-stack text-primary me-1"></i> Tiền mặt (COD)</label>
-                            </div>
-                            <div class="form-check form-check-inline me-4">
-                                <input class="form-check-input" type="radio" name="sub_payment_method" id="sub_pay_bank"
-                                    value="bank_transfer">
-                                <label class="form-check-label" for="sub_pay_bank"><i class="bi bi-bank text-primary me-1"></i> Chuyển khoản</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="modal-footer bg-light border-0">
-                        <button type="button" class="btn btn-secondary shadow-sm" data-bs-dismiss="modal">Đóng cửa
-                            sổ</button>
-                        <button type="submit" class="btn text-white shadow-sm px-4"
-                            style="background-color: #ce1126;">Xác nhận kích hoạt gói</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <main class="main">
-        <div class="modal fade" id="userProfileModal" tabindex="-1" aria-labelledby="userProfileModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow">
-                    <div class="modal-header text-white text-center d-block position-relative"
-                        style="background-color: #ce1126; border-top-left-radius: 8px; border-top-right-radius: 8px;">
-                        <h5 class="modal-title fw-bold" id="userProfileModalLabel"><i
-                                class="bi bi-person-circle me-2"></i>Hồ sơ
-                            tài khoản thành viên</h5>
-                        <button type="button" class="btn-close btn-close-white position-absolute end-0 top-0 m-3"
-                            data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body text-dark p-4">
-                        <div class="text-center mb-4">
-                            <div class="display-5 text-muted mb-2"><i class="bi bi-user-circle"></i></div>
-                            <h4 class="fw-bold text-dark mb-1">Dương Bá Tùng</h4>
-                            <span class="badge badge-diamond px-3 py-2 fw-bold"><i class="bi bi-crown-fill me-1"></i>Hội
-                                viên
-                                Kim Cương</span>
-                        </div>
-
-                        <div class="table-responsive">
-                            <table class="table table-striped table-borderless mb-0">
-                                <tbody>
-                                    <tr>
-                                        <td class="text-muted py-2" style="width: 40%;">Số điện thoại:</td>
-                                        <td class="fw-bold py-2">0901234567</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-muted py-2">Địa chỉ Email:</td>
-                                        <td class="fw-bold py-2">tung.db@gmail.com</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-muted py-2">Địa chỉ:</td>
-                                        <td class="fw-bold py-2">123 Đường ABC, Quận XYZ, TP. HCM</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-muted py-2">Ngày đăng ký:</td>
-                                        <td class="fw-bold py-2 text-secondary">24/09/2025</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-muted py-2">Điểm tích lũy:</td>
-                                        <td class="fw-bold py-2 text-success">2.450 Điểm</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="modal-footer bg-light border-0">
-                        <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">Đóng cửa
-                            sổ</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- MODAL 2: MUA THỰC PHẨM NHANH (Giữ nguyên từ code cũ) -->
-        <div class="modal fade" id="quickBuyModal" tabindex="-1" aria-labelledby="quickBuyModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header text-white" style="background-color: #ce1126;">
-                        <h5 class="modal-title fw-bold" id="quickBuyModalLabel"><i
-                                class="bi bi-bag-plus-fill me-2"></i>Thêm món
-                            ăn vào giỏ hàng</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                    </div>
-                    <form id="quickBuyModalForm" method="POST">
-                        <input type="hidden" id="modal-product-id" name="product_id">
-                        <div class="modal-body text-dark text-start" style="font-family: 'Roboto', sans-serif;">
-                            <div
-                                class="alert alert-secondary d-flex justify-content-between align-items-center py-2 mb-3">
-                                <div>Món ăn chọn: <strong id="modal-product-name" class="text-danger">N/A</strong></div>
-                                <div>Đơn giá: <strong id="modal-product-price" class="text-dark">0 đ</strong></div>
-                            </div>
-                            <div class="form-group mb-3">
-                                <label for="quantity" class="form-label fw-bold">Số lượng phần đặt <span
-                                        class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="quantity" name="quantity" value="1"
-                                    min="1" required>
-                            </div>
-                            <div class="form-group mb-2">
-                                <label for="order_notes" class="form-label fw-bold">Yêu cầu/Ghi chú món ăn</label>
-                                <textarea class="form-control" id="order_notes" name="order_notes" rows="2"
-                                    placeholder="Ví dụ: Ít cay, không lấy hành lá, thêm đá..."></textarea>
-                            </div>
-                        </div>
-                        <div class="modal-footer bg-light">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                            <button type="submit" class="btn text-white px-4" style="background-color: #ce1126;"><i
-                                    class="bi bi-cart-plus"></i> Thêm vào giỏ</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content text-dark">
-                    <div class="modal-header text-white" style="background-color: #ce1126;">
-                        <h5 class="modal-title fw-bold" id="cartModalLabel"><i
-                                class="bi bi-cart-check-fill me-2"></i>Giỏ hàng &
-                            Xác nhận đặt hàng</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                    </div>
-                    <form action="{{ route('muahang.process') }}" method="POST" id="cartForm">
-                        @csrf
-                        <input type="hidden" name="cart_items" id="cartItemsInput">
-                        <div class="modal-body text-start" style="font-family: 'Roboto', sans-serif;">
-                            <h6 class="fw-bold border-bottom pb-2 text-danger"><i class="bi bi-list-stars"></i> 1. Danh
-                                sách món
-                                ăn trong giỏ</h6>
-                            <div class="p-2 mb-3 bg-light rounded text-dark">
-                                <div id="cart-items-container">
-                                    <!-- Sẽ được tải động bằng JS -->
-                                </div>
-                                <div class="pt-2 px-2 border-top">
-                                    <div class="d-flex justify-content-between small mb-1">
-                                        <span class="text-muted">Tổng tiền hàng tạm tính:</span>
-                                        <span class="fw-bold text-dark" id="cart-subtotal-price">0 đ</span>
-                                    </div>
-                                    <div id="cart-discount-row" class="d-flex justify-content-between small mb-1 d-none text-success">
-                                        <span>Khuyến mãi giảm giá:</span>
-                                        <span class="fw-bold" id="cart-discount-price">-0 đ</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="fw-bold">Tổng tiền thanh toán:</span>
-                                        <span class="fw-bold text-danger fs-5" id="cart-total-price">0 đ</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Mã giảm giá (Coupon) Section -->
-                            <h6 class="fw-bold border-bottom pb-2 text-danger mt-4"><i class="bi bi-tag-fill text-danger"></i> 3. Mã giảm giá (Coupon)</h6>
-                            <div class="row align-items-center mb-2">
-                                <div class="col-md-8 mb-2 mb-md-0">
-                                    <div class="input-group input-group-sm">
-                                        <input type="text" class="form-control text-uppercase font-weight-bold text-danger" id="coupon_code" name="coupon_code" placeholder="Nhập mã giảm giá (ví dụ: FOODELICIOUS2026)...">
-                                        <button class="btn btn-dark fw-bold px-3" type="button" onclick="applyCoupon()">Áp dụng</button>
-                                    </div>
-                                    <div id="coupon-message" class="small mt-1 d-none"></div>
-                                </div>
-                            </div>
- 
-                            <h6 class="fw-bold border-bottom pb-2 text-danger mt-4"><i class="bi bi-geo-alt-fill"></i>
-                                2. Thông
-                                tin giao nhận hàng</h6>
-                            <div class="row">
-                                <div class="form-group col-md-6 mb-3">
-                                    <label for="cart_fullname" class="form-label small fw-bold">Họ và tên <span
-                                            class="text-danger">*</span></label>
-                                    <input type="text" class="form-control form-control-sm" id="cart_fullname" name="cart_fullname"
-                                        placeholder="Nhập họ và tên" required>
-                                </div>
-                                <div class="form-group col-md-6 mb-3">
-                                    <label for="cart_email" class="form-label small fw-bold">Địa chỉ Email <span
-                                            class="text-danger">*</span></label>
-                                    <input type="email" class="form-control form-control-sm" id="cart_email" name="cart_email"
-                                        placeholder="name@example.com" required>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="form-group col-md-4 mb-3">
-                                    <label for="cart_phone" class="form-label small fw-bold">Số điện thoại <span
-                                            class="text-danger">*</span></label>
-                                    <input type="tel" class="form-control form-control-sm" id="cart_phone" name="cart_phone"
-                                        value="" required>
-                                </div>
-                                <div class="form-group col-md-8 mb-3">
-                                    <label for="cart_time" class="form-label small fw-bold">Thời gian nhận hàng <span
-                                            class="text-danger">*</span></label>
-                                    <select class="form-select form-select-sm" id="cart_time" name="cart_time" required>
-                                        <option value="now" selected>Ngay bây giờ (Giao hàng hỏa tốc)</option>
-                                        <option value="tomorrow_morning">Ngày mai - Buổi sáng (07:00 - 11:00)</option>
-                                        <option value="tomorrow_afternoon">Ngày mai - Buổi chiều (13:00 - 18:00)
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group mb-3">
-                                <label for="cart_address" class="form-label small fw-bold">Địa chỉ nhận hàng cụ thể
-                                    <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control form-control-sm" id="cart_address" name="cart_address"
-                                    value="Trường Cao đẳng Công nghệ Thông tin TP.HCM (ITC), Quận Tân Phú" required>
-                            </div>
- 
-                            <h6 class="fw-bold border-bottom pb-2 text-danger mt-4"><i
-                                    class="bi bi-credit-card-2-front-fill"></i> 3. Chọn phương thức thanh toán</h6>
-                            <div class="form-group mb-2 py-1">
-                                <div class="form-check form-check-inline me-4">
-                                    <input class="form-check-input" type="radio" name="cart_payment" id="cart_pay_cash"
-                                        value="cash" checked>
-                                    <label class="form-check-label small" for="cart_pay_cash"><i
-                                            class="bi bi-cash-stack text-success"></i> Tiền mặt khi nhận (COD)</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="cart_payment" id="cart_pay_atm"
-                                        value="bank_transfer">
-                                    <label class="form-check-label small" for="cart_pay_atm"><i
-                                            class="bi bi-credit-card"></i> Chuyển khoản / QR Code</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer bg-light">
-                            <button type="button" class="btn btn-secondary shadow-sm" data-bs-dismiss="modal">Tiếp tục
-                                mua</button>
-                            <button type="submit" class="btn text-white px-4 shadow-sm"
-                                style="background-color: #ce1126;"><i class="bi bi-bag-check"></i> Xác nhận gửi đơn
-                                hàng</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <section id="hero" class="hero section light-background">
-            <div class="container">
-                <div class="row gy-4 justify-content-center justify-content-lg-between">
-                    <div class="col-lg-5 order-2 order-lg-1 d-flex flex-column justify-content-center">
-                        <h1 data-aos="fade-up" class="setting-banner-title">{!! $settings['banner_title'] ?? 'Bạn đã sẵn sàng<br>Để tận hưởng những bữa sáng ngon lành' !!}</h1>
-                        <p data-aos="fade-up" data-aos-delay="100" class="setting-banner-subtitle">{{ $settings['banner_subtitle'] ?? 'Đồng hành cùng bạn trên hành trình khám phá những ẩm thực' }}</p>
-                        <div class="d-flex" data-aos="fade-up" data-aos-delay="200">
-                            <a href="{{ route('trangchu/dangnhap') }}" class="btn-get-started">Đăng nhập</a>
-                        </div>
-                    </div>
-                    <div class="col-lg-5 order-1 order-lg-2 hero-img" data-aos="zoom-out">
-                        <img src="{{ isset($settings['banner_image']) ? (Str::startsWith($settings['banner_image'], 'http') ? $settings['banner_image'] : asset($settings['banner_image'])) : asset('client/assets/img/hero-img.png') }}" class="img-fluid animated setting-banner-image" alt="">
-                    </div>
-                </div>
-            </div>
-        </section>
-        <section id="about" class="about section">
-            <div class="container section-title" data-aos="fade-up">
-                <h2>Về chúng tôi<br></h2>
-                <p><span>Tìm hiểu thêm</span> <span class="description-title">Về chúng tôi</span></p>
-            </div>
-
-            <div class="container">
-                <div class="row gy-4">
-                    <div class="col-lg-7" data-aos="fade-up" data-aos-delay="100">
-                        <img src="{{ asset('client/assets/img/about.jpg') }}" class="img-fluid mb-4" alt="">
-                        <div class="book-a-table">
-                            <h3>Số điện thoại tư vấn:</h3>
-                            <p>{{ $settings['contact_phone'] ?? '+1 5589 55488 55' }}</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-5" data-aos="fade-up" data-aos-delay="250">
-                        <div class="content ps-0 ps-lg-5">
-                            <p class="fst-italic">Chào mừng bạn đến với Foodelicious – nơi kết hợp hoàn hảo giữa hương vị ẩm thực tinh tế và không gian ấm cúng.</p>
-                            <ul>
-                                <li><i class="bi bi-check-circle-fill"></i> <span>Nguyên liệu tươi sạch 100% – Tuyển chọn nghiêm ngặt từ các trang trại hữu cơ mỗi ngày.</span></li>
-                                <li><i class="bi bi-check-circle-fill"></i> <span>Đầu bếp chuyên nghiệp – Đội ngũ nghệ nhân ẩm thực giàu kinh nghiệm, gửi gắm tâm huyết vào từng món ăn.</span></li>
-                                <li><i class="bi bi-check-circle-fill"></i> <span>Đặt món dễ dàng, giao hàng nhanh chóng – Giải pháp hoàn hảo cho những bữa tiệc gia đình ấm cúng hay buổi hẹn hò xem phim tại gia đầy lãng mạn.</span></li>
-                            </ul>
-                            <p>Dù bạn đang bận rộn với công việc tại văn phòng, muốn quây quần bên người thân, hay đơn giản là tự thưởng cho mình một bữa tối lười biếng, chúng tôi luôn sẵn sàng phục vụ. Không cần đi xa, chỉ cần một cú click, món ngon đã sẵn sàng trên bàn ăn của bạn!</p>
-                            <div class="position-relative mt-4">
-                                <img src="{{ asset('client/assets/img/about-2.jpg') }}" class="img-fluid" alt="">
-                                <a href="https://www.youtube.com/watch?v=Y7f98aduVJ8"
-                                    class="glightbox pulsating-play-btn"></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <section id="why-us" class="why-us section light-background">
-            <div class="container">
-                <div class="row gy-4">
-                    <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
-                        <div class="why-box">
-                            <h3>Tại sao lại chọn Foodelicious?</h3>
-                            <p>Chúng tôi mang đến giải pháp ẩm thực hoàn hảo cho cuộc sống bận rộn của bạn. Không chỉ là giao đồ ăn, Foodelicious cam kết gửi gắm sự chăm chút trong từng hương vị, quy trình an toàn và tốc độ phục vụ vượt trội để mỗi bữa ăn tại gia đều là một trải nghiệm tuyệt vời.</p>
-                            <div class="text-center">
-                                <a href="#" class="more-btn"><span>Learn More</span> <i
-                                        class="bi bi-chevron-right"></i></a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-8 d-flex align-items-stretch">
-                        <div class="row gy-4" data-aos="fade-up" data-aos-delay="200">
-                            <div class="col-xl-4">
-                                <div class="icon-box d-flex flex-column justify-content-center align-items-center">
-                                    <i class="bi bi-gem"></i>
-                                    <h4>Chất lượng cao</h4>
-                                    <p>Món ăn được chế biến từ nguồn nguyên liệu tươi sạch mỗi ngày bởi đội ngũ đầu bếp tâm huyết. Hương vị chuẩn vị, nóng sốt và trọn vẹn dinh dưỡng khi giao đến tay bạn.</p>
-                                </div>
-                            </div>
-                            <div class="col-xl-4" data-aos="fade-up" data-aos-delay="300">
-                                <div class="icon-box d-flex flex-column justify-content-center align-items-center">
-                                    <i class="bi bi-heart"></i>
-                                    <h4>An toàn</h4>
-                                    <p>Quy trình chế biến và đóng gói khép kín, nghiêm ngặt, đảm bảo tuyệt đối các tiêu chuẩn vệ sinh an toàn thực phẩm. Hộp đựng thân thiện, bảo vệ sức khỏe người dùng.</p>
-                                </div>
-                            </div>
-                            <div class="col-xl-4" data-aos="fade-up" data-aos-delay="400">
-                                <div class="icon-box d-flex flex-column justify-content-center align-items-center">
-                                    <i class="bi bi-inboxes"></i>
-                                    <h4>Giao hàng tận nơi</h4>
-                                    <p>Đội ngũ giao hàng nhanh chóng, chuyên nghiệp. Đồ ăn được bảo quản trong túi giữ nhiệt chuyên dụng, đảm bảo luôn nóng hổi và giữ nguyên hình thức đẹp mắt như tại nhà hàng.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <section id="stats" class="stats section dark-background">
-            <img src="{{ asset('client/assets/img/stats-bg.jpg') }}" alt="" data-aos="fade-in">
-            <div class="container position-relative" data-aos="fade-up" data-aos-delay="100">
-                <div class="row gy-4">
-                    <div class="col-lg-3 col-md-6">
-                        <div class="stats-item text-center w-100 h-100">
-                            <span data-purecounter-start="0" data-purecounter-end="232" data-purecounter-duration="1"
-                                class="purecounter"></span>
-                            <p>Clients</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="stats-item text-center w-100 h-100">
-                            <span data-purecounter-start="0" data-purecounter-end="521" data-purecounter-duration="1"
-                                class="purecounter"></span>
-                            <p>Projects</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="stats-item text-center w-100 h-100">
-                            <span data-purecounter-start="0" data-purecounter-end="1453" data-purecounter-duration="1"
-                                class="purecounter"></span>
-                            <p>Hours Of Support</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="stats-item text-center w-100 h-100">
-                            <span data-purecounter-start="0" data-purecounter-end="32" data-purecounter-duration="1"
-                                class="purecounter"></span>
-                            <p>Workers</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <section id="menu" class="menu section">
-            <div class="container section-title" data-aos="fade-up">
-                <h2>Thực đơn</h2>
-                <p><span>Thực đơn</span> <span class="description-title">của chúng tôi</span></p>
-            </div>
-            <div class="row mb-4 d-flex justify-content-center">
-                <div class="col-md-8">
-                    <div class="search-box">
-                        <form action="" method="GET" class="d-flex gap-2">
-                            <input type="text" name="search" class="form-control" value="{{ $query ?? '' }}" placeholder="Tìm kiếm món ăn...">
-                            <button type="submit" class="btn"><i class="bi bi-search"></i> Tìm</button>
-                            @if($query)
-                                <a href="{{ route('trangchu') }}" class="btn btn-secondary d-flex align-items-center justify-content-center" style="border-radius: 5px; color: #fff; background-color: #6c757d; padding: 10px 15px; border: none; text-decoration: none;"><i class="bi bi-x-lg"></i></a>
-                            @endif
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <div class="container">
-                @if($categories->isEmpty() || $categories->pluck('dishes')->flatten()->isEmpty())
-                    <div class="text-center py-5">
-                        <p class="text-muted fs-4">Không tìm thấy món ăn nào phù hợp với từ khóa "{{ $query }}".</p>
-                        <a href="{{ route('trangchu') }}" class="btn text-white px-4 py-2 mt-3" style="background-color: #ce1126; border-radius: 5px; text-decoration: none;">Quay lại thực đơn</a>
-                    </div>
-                @else
-                    @php $firstActive = true; @endphp
-                    <ul class="nav nav-tabs d-flex justify-content-center" data-aos="fade-up" data-aos-delay="100">
-                        @foreach($categories as $category)
-                            @if($category->dishes->isNotEmpty())
-                                <li class="nav-item">
-                                    <a class="nav-link {{ $firstActive ? 'active show' : '' }}" data-bs-toggle="tab" data-bs-target="#menu-{{ $category->id }}">
-                                        <h4>{{ $category->category_name }}</h4>
-                                    </a>
-                                </li>
-                                @php $firstActive = false; @endphp
-                            @endif
-                        @endforeach
-                    </ul>
-
-                    @php $firstActive = true; @endphp
-                    <div class="tab-content" data-aos="fade-up" data-aos-delay="200">
-                        @foreach($categories as $category)
-                            @if($category->dishes->isNotEmpty())
-                                <div class="tab-pane fade {{ $firstActive ? 'active show' : '' }}" id="menu-{{ $category->id }}">
-                                    <div class="tab-header text-center">
-                                        <p>Thực đơn</p>
-                                        <h3>{{ $category->category_name }}</h3>
-                                    </div>
-
-                                    <div class="row gy-5">
-                                        @foreach($category->dishes as $dish)
-                                            <div class="col-lg-4 menu-item" data-bs-toggle="modal" data-bs-target="#quickBuyModal"
-                                                data-product-id="{{ $dish->id }}" data-product-name="{{ $dish->dish_name }}" data-product-price="{{ $dish->price }}">
-                                                <a href="javascript:void(0)">
-                                                    <img src="{{ $dish->image_url ? (Str::startsWith($dish->image_url, 'http') ? $dish->image_url : asset($dish->image_url)) : asset('client/assets/img/menu/menu-item-1.png') }}"
-                                                        class="menu-img img-fluid" alt="{{ $dish->dish_name }}">
-                                                </a>
-                                                <h4>{{ $dish->dish_name }}</h4>
-                                                <p class="ingredients">{{ $dish->description }}</p>
-                                                <p class="price">{{ number_format($dish->price, 0, ',', '.') }} đ</p>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-                                @php $firstActive = false; @endphp
-                            @endif
-                        @endforeach
-                    </div>
-                @endif
-            </div>
-        </section>
-        <!-- Events Section -->
-        <section id="events" class="events section">
-
-            <div class="container section-title" data-aos="fade-up">
-                <h2>Chương trình gói dịch vụ</h2>
-                <p><span>Đăng ký nhận món theo chu kỳ</span> <span class="description-title">Tiết kiệm & Tiện lợi</span>
-                </p>
-            </div>
-
-            <div class="container-fluid" data-aos="fade-up" data-aos-delay="100">
-                <div class="swiper init-swiper">
-                    <script type="application/json" class="swiper-config">
-                            {
-                              "loop": true,
-                              "speed": 600,
-                              "autoplay": {
-                                "delay": 5000
-                              },
-                              "slidesPerView": "auto",
-                              "pagination": {
-                                "el": ".swiper-pagination",
-                                "type": "bullets",
-                                "clickable": true
-                              },
-                              "breakpoints": {
-                                "320": {
-                                  "slidesPerView": 1,
-                                  "spaceBetween": 40
-                                },
-                                "1200": {
-                                  "slidesPerView": 3,
-                                  "spaceBetween": 20
-                                }
-                              }
-                            }
-                            </script>
-                    <div class="swiper-wrapper">
-                        <!-- Gói 1 -->
-                        <div class="swiper-slide event-item d-flex flex-column justify-content-end"
-                            style="background-image: url({{ asset('client/assets/img/events-1.jpg') }});"
-                            data-package-select="family">
-                            <h3>Gói Gia Đình Hàng Ngày</h3>
-                            <div class="price align-self-start">1.500.000 đ / tháng</div>
-                            <p class="description">Thực đơn xoay vòng phong phú hàng ngày gồm Phở Bò, Bánh Mì, Cơm Tấm
-                                chuẩn vị.
-                            </p>
-                        </div>
-                        <!-- Gói 2 -->
-                        <div class="swiper-slide event-item d-flex flex-column justify-content-end"
-                            style="background-image: url({{ asset('client/assets/img/events-2.jpg') }});"
-                            data-package-select="company">
-                            <h3>Gói Văn Phòng / Công Ty</h3>
-                            <div class="price align-self-start">420.000 đ / tuần</div>
-                            <p class="description">Giải pháp ăn trưa công sở tiện lợi, giao tận nơi đúng giờ với các món
-                                ăn dinh
-                                dưỡng.</p>
-                        </div>
-                        <!-- Gói 3 -->
-                        <div class="swiper-slide event-item d-flex flex-column justify-content-end"
-                            style="background-image: url({{ asset('client/assets/img/events-3.jpg') }});"
-                            data-package-select="dinner">
-                            <h3>Gói Ăn Chiều Tối Dinh Dưỡng</h3>
-                            <div class="price align-self-start">600.000 đ / 10 ngày</div>
-                            <p class="description">Thực đơn nhẹ nhàng, dễ tiêu hóa cho buổi tối ấm cúng sau giờ làm việc
-                                căng
-                                thẳng.</p>
-                        </div>
-                    </div>
-                    <div class="swiper-pagination"></div>
-                </div>
-            </div>
-        </section>
-        <section id="contact" class="contact section">
-            <div class="container section-title" data-aos="fade-up">
-                <h2>Liên hệ</h2>
-                <p><span>Bạn có thắc mắc?</span> <span class="description-title">Hãy liên hệ chúng tôi</span></p>
-            </div>
-
-            <div class="container" data-aos="fade-up" data-aos-delay="100">
-                @php
-                    $mapUrl = $settings['map_embed_url'] ?? 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.1415053648486!2d106.6917926!3d10.8004543!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x317528c2576b92dd%3A0x6e9ca9bc8926958b!2zMTIzIEzDqiBI4buTbmcgUGjDuW5nLCBRdeG6rW4gMywgVFAuSENN!5e0!3m2!1svi!2s!4v1539943755621';
-                    $mapSrc = $mapUrl;
-                    if (preg_match('/src="([^"]+)"/', $mapUrl, $match)) {
-                        $mapSrc = $match[1];
-                    } elseif ($mapUrl && !str_contains($mapUrl, 'output=embed')) {
-                        $mapSrc = "https://maps.google.com/maps?q=" . urlencode($mapUrl) . "&output=embed";
-                    }
-                @endphp
-                <div class="mb-5">
-                    <iframe style="width: 100%; height: 400px;"
-                        src="{{ $mapSrc }}"
-                        frameborder="0" allowfullscreen="" class="setting-map-iframe"></iframe>
-                </div>
-
-                <div class="row gy-4 mb-4">
-                    <div class="col-md-4">
-                        <div class="info-item d-flex align-items-center" data-aos="fade-up" data-aos-delay="200" style="height: 100%;">
-                            <i class="icon bi bi-geo-alt flex-shrink-0"></i>
-                            <div>
-                                <h3>Địa chỉ</h3>
-                                <p class="setting-contact-address">{{ $settings['contact_address'] ?? 'Tầng 12, Tòa nhà Saigon Innovation Tower, 154 Nguyễn Thị Minh Khai, Phường Võ Thị Sáu, Quận 3, TP. Hồ Chí Minh.' }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="info-item d-flex align-items-center" data-aos="fade-up" data-aos-delay="300" style="height: 100%;">
-                            <i class="icon bi bi-telephone flex-shrink-0"></i>
-                            <div>
-                                <h3>Điện thoại</h3>
-                                <p class="setting-contact-phone">{{ $settings['contact_phone'] ?? '+1 5589 55488 55' }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="info-item d-flex align-items-center" data-aos="fade-up" data-aos-delay="400" style="height: 100%;">
-                            <i class="icon bi bi-envelope flex-shrink-0"></i>
-                            <div>
-                                <h3>Email</h3>
-                                <p class="setting-contact-email">{{ $settings['contact_email'] ?? 'contact@example.com' }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <form action="forms/contact.php" method="post" class="php-email-form" data-aos="fade-up"
-                    data-aos-delay="600">
-                    <div class="row gy-4">
-                        <div class="col-md-6">
-                            <input type="text" name="name" class="form-control" placeholder="Tên của bạn" required="">
-                        </div>
-                        <div class="col-md-6">
-                            <input type="email" class="form-control" name="email" placeholder="Email của bạn"
-                                required="">
-                        </div>
-                        <div class="col-md-12">
-                            <textarea class="form-control" name="message" rows="6" placeholder="Nội dung"
-                                required=""></textarea>
-                        </div>
-                        <div class="col-md-12 text-center">
-                            <div class="loading">Đang tải</div>
-                            <button type="submit">Gửi phiếu</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </section>
-    </main>
-
-
-    <footer id="footer" class="footer dark-background">
-        <div class="container copyright text-center mt-4">
-            <p>© <span>2026</span> <strong class="px-1">FOODELICIOUS</strong>. Tất cả quyền được bảo lưu.</p>
-        </div>
-    </footer>
-
-    <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i
-            class="bi bi-arrow-up-short"></i></a>
-
-    <div id="preloader"></div>
-
-    <script src="{{ asset('client/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('client/assets/vendor/php-email-form/validate.js') }}"></script>
-    <script src="{{ asset('client/assets/vendor/aos/aos.js') }}"></script>
-    <script src="{{ asset('client/assets/vendor/glightbox/js/glightbox.min.js') }}"></script>
-    <script src="{{ asset('client/assets/vendor/purecounter/purecounter_vanilla.js') }}"></script>
-    <script src="{{ asset('client/assets/vendor/swiper/swiper-bundle.min.js') }}"></script>
-
-    <script src="{{ asset('client/assets/js/main.js') }}"></script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // TÍNH NĂNG MỚI: TỰ ĐỘNG HIỂN THỊ POP-UP KHUYẾN MÃI SAU KHI VÀO TRANG 1 GIÂY
-            const promoModalElement = document.getElementById('promoAutoModal');
-            if (promoModalElement) {
-                const promoModal = new bootstrap.Modal(promoModalElement);
-                setTimeout(() => {
-                    promoModal.show();
-                }, 1000); // 1000ms = 1 giây sau khi load xong DOM
-            }
-        });
-
-        // Hàm bổ trợ: Sao chép nhanh mã giảm giá
-        function copyCouponCode() {
-            const codeText = document.getElementById("couponCode").innerText;
-            navigator.clipboard.writeText(codeText).then(() => {
-                alert("Đã sao chép mã khuyến mãi thành công!");
-            });
-        }
-
-        // Hàm bổ trợ: Cuộn mượt màn hình xuống Section Events khi nhấn nút hành động
-        function scrollToEvents() {
-            const eventsSection = document.getElementById("events");
-            if (eventsSection) {
-                eventsSection.scrollIntoView({ behavior: "smooth" });
-            }
-        }
-        // Phân hệ giỏ hàng dùng localStorage
-        const isLoggedIn = false;
-
-        function getCart() {
-            const cart = localStorage.getItem('fdl_cart');
-            return cart ? JSON.parse(cart) : [];
-        }
-
-        function saveCart(cart) {
-            localStorage.setItem('fdl_cart', JSON.stringify(cart));
-            updateCartCount();
-        }
-
-        function updateCartCount() {
-            const cart = getCart();
-            const count = cart.reduce((total, item) => total + item.quantity, 0);
-            const cartBadges = document.querySelectorAll('.btn-cart .badge-count');
-            cartBadges.forEach(badge => {
-                badge.innerText = count;
-                badge.style.display = count > 0 ? 'inline-block' : 'none';
-            });
-        }
-
-        document.addEventListener("DOMContentLoaded", function () {
-            // Thêm badge đếm số lượng giỏ hàng vào icon giỏ hàng
-            const cartBtns = document.querySelectorAll('.btn-cart');
-            cartBtns.forEach(btn => {
-                if (!btn.querySelector('.badge-count')) {
-                    btn.style.position = 'relative';
-                    const badge = document.createElement('span');
-                    badge.className = 'badge-count position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger';
-                    badge.style.fontSize = '0.65rem';
-                    badge.style.padding = '0.25em 0.5em';
-                    badge.style.display = 'none';
-                    btn.appendChild(badge);
-                }
-            });
-            updateCartCount();
-
-            // 1. Xử lý nạp dữ liệu cho Modal Đặt Mua Nhanh Món Đơn
-            const menuItems = document.querySelectorAll(".menu-item");
-            menuItems.forEach(item => {
-                item.addEventListener("click", function () {
-                    const productId = this.getAttribute("data-product-id");
-                    const productName = this.getAttribute("data-product-name") || "Món ăn";
-                    const productPrice = this.getAttribute("data-product-price") || "0";
-                    
-                    document.getElementById("modal-product-id").value = productId;
-                    document.getElementById("modal-product-name").innerText = productName;
-                    document.getElementById("modal-product-price").innerText = new Intl.NumberFormat('vi-VN').format(productPrice) + " đ";
-                    document.getElementById("quantity").value = 1;
-                    document.getElementById("order_notes").value = "";
-                });
-            });
-
-            // Form submission trong Quick Buy Modal
-            const quickBuyForm = document.getElementById("quickBuyModalForm");
-            if (quickBuyForm) {
-                quickBuyForm.addEventListener("submit", function (e) {
-                    e.preventDefault();
-                    const productId = document.getElementById("modal-product-id").value;
-                    const productName = document.getElementById("modal-product-name").innerText;
-                    const productPrice = parseFloat(document.getElementById("modal-product-price").innerText.replace(/[^0-9]/g, ''));
-                    const quantity = parseInt(document.getElementById("quantity").value) || 1;
-                    const notes = document.getElementById("order_notes").value;
-
-                    let cart = getCart();
-                    const existingIndex = cart.findIndex(item => item.id == productId);
-                    if (existingIndex > -1) {
-                        cart[existingIndex].quantity += quantity;
-                        if (notes) {
-                            cart[existingIndex].notes = cart[existingIndex].notes ? (cart[existingIndex].notes + "; " + notes) : notes;
-                        }
-                    } else {
-                        cart.push({
-                            id: productId,
-                            name: productName,
-                            price: productPrice,
-                            quantity: quantity,
-                            notes: notes
-                        });
-                    }
-
-                    saveCart(cart);
-
-                    const modalEl = document.getElementById('quickBuyModal');
-                    const modal = bootstrap.Modal.getInstance(modalEl);
-                    if (modal) {
-                        modal.hide();
-                    }
-                    alert("Đã thêm món ăn vào giỏ hàng thành công!");
-                });
-            }
-
-            // Khi mở Modal giỏ hàng, hiển thị danh sách sản phẩm
-            const cartModalEl = document.getElementById('cartModal');
-            if (cartModalEl) {
-                cartModalEl.addEventListener('show.bs.modal', function () {
-                    renderCartItems();
-                });
-            }
-
-            // Gửi biểu mẫu đặt hàng
-            const cartForm = document.getElementById('cartForm');
-            if (cartForm) {
-                cartForm.addEventListener('submit', function (e) {
-                    const cart = getCart();
-                    if (cart.length === 0) {
-                        e.preventDefault();
-                        alert("Giỏ hàng của bạn đang trống!");
-                        return;
-                    }
-
-                    // Populate the hidden input with JSON cart items
-                    document.getElementById('cartItemsInput').value = JSON.stringify(cart);
-                    
-                    // Xóa giỏ hàng khi submit thành công
-                    setTimeout(() => {
-                        localStorage.removeItem('fdl_cart');
-                    }, 500);
-                });
-            }
-
-            // Chặn người dùng chưa đăng nhập đăng ký gói dịch vụ
-            const packageForm = document.querySelector('#subscribePackageModal form');
-            if (packageForm) {
-                packageForm.addEventListener('submit', function (e) {
-                    e.preventDefault();
-                    alert("Bạn cần đăng nhập để đăng ký gói dịch vụ. Hệ thống sẽ chuyển hướng bạn đến trang đăng nhập.");
-                    window.location.href = "{{ route('trangchu/dangnhap') }}";
-                });
-            }
-
-            // 2. Xử lý Modal & Click - Gói dịch vụ
-            const packageSelectElement = document.getElementById("package_type");
-            const myModal = new bootstrap.Modal(document.getElementById('subscribePackageModal'));
-
-            const eventItems = document.querySelectorAll(".events .event-item");
-            eventItems.forEach(item => {
-                item.addEventListener("click", function () {
-                    const packageValue = this.getAttribute("data-package-select");
-                    if (packageSelectElement && packageValue) {
-                        packageSelectElement.value = packageValue;
-                    }
-                    myModal.show();
-                });
-                item.style.cursor = "pointer";
-            });
-
-            // --- AJAX Polling for Settings and Database structural updates ---
-            let currentFingerprint = null;
-            let currentTimestamps = null;
+@extends('layouts.app')
+
+@section('title', 'FOODDAILY - Đặt Đồ Ăn, Giao Hàng Siêu Tốc Từ 20 phút')
+
+@section('content')
+<!-- ShopeeFood Hero Section (Matches Image 1 Exactly) -->
+<section class="bg-[#f5f5f5] py-6 border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
             
-            function pollSettings() {
-                fetch("{{ route('api.settings.poll') }}")
-                    .then(response => response.json())
-                    .then(data => {
-                        if (!currentFingerprint) {
-                            currentFingerprint = data.fingerprint;
-                            currentTimestamps = data.timestamps;
-                            console.log('Settings polling initialized with fingerprint:', currentFingerprint);
-                            return;
-                        }
-                        
-                        if (data.fingerprint !== currentFingerprint) {
-                            console.log('Data change detected! Fingerprint:', data.fingerprint);
-                            
-                            // Check if structural tables changed (Dishes, Categories, Coupons, ServicePackages)
-                            let structuralChanged = false;
-                            if (currentTimestamps) {
-                                for (let key in data.timestamps) {
-                                    if (data.timestamps[key] !== currentTimestamps[key]) {
-                                        structuralChanged = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            
-                            if (structuralChanged) {
-                                console.log('Structural data change detected. Reloading page...');
-                                window.location.reload();
-                                return;
-                            }
-                            
-                            // Otherwise, it was just a settings change. Update settings in-place:
-                            currentFingerprint = data.fingerprint;
-                            currentTimestamps = data.timestamps;
-                            const s = data.settings;
-                            
-                            // 1. Logo
-                            if (s.logo_url) {
-                                document.querySelectorAll('.setting-logo-img').forEach(img => {
-                                    if (img.src !== s.logo_url) img.src = s.logo_url;
-                                });
-                            }
-                            
-                            // 2. Banner Title
-                            if (s.banner_title) {
-                                document.querySelectorAll('.setting-banner-title').forEach(el => {
-                                    if (el.innerHTML !== s.banner_title) el.innerHTML = s.banner_title;
-                                });
-                            }
-                            
-                            // 3. Banner Subtitle
-                            if (s.banner_subtitle) {
-                                document.querySelectorAll('.setting-banner-subtitle').forEach(el => {
-                                    if (el.innerText !== s.banner_subtitle) el.innerText = s.banner_subtitle;
-                                });
-                            }
-                            
-                            // 4. Banner Image
-                            if (s.banner_image) {
-                                document.querySelectorAll('.setting-banner-image').forEach(img => {
-                                    if (img.src !== s.banner_image) img.src = s.banner_image;
-                                });
-                            }
-                            
-                            // 5. Contact Phone
-                            if (s.contact_phone) {
-                                document.querySelectorAll('.setting-contact-phone').forEach(el => {
-                                    if (el.innerText !== s.contact_phone) el.innerText = s.contact_phone;
-                                });
-                            }
-                            
-                            // 6. Contact Address
-                            if (s.contact_address) {
-                                document.querySelectorAll('.setting-contact-address').forEach(el => {
-                                    if (el.innerText !== s.contact_address) el.innerText = s.contact_address;
-                                    if (typeof storeAddress !== 'undefined') storeAddress = s.contact_address;
-                                });
-                            }
-                            
-                            // 7. Contact Email
-                            if (s.contact_email) {
-                                document.querySelectorAll('.setting-contact-email').forEach(el => {
-                                    if (el.innerText !== s.contact_email) el.innerText = s.contact_email;
-                                });
-                            }
-                            
-                            // 8. Map
-                            if (s.map_embed_url) {
-                                const mapIframe = document.querySelector('.setting-map-iframe');
-                                if (mapIframe) {
-                                    let newSrc = s.map_embed_url;
-                                    const match = s.map_embed_url.match(/src="([^"]+)"/);
-                                    if (match) {
-                                        newSrc = match[1];
-                                    } else if (s.map_embed_url && !s.map_embed_url.includes('output=embed')) {
-                                        newSrc = "https://maps.google.com/maps?q=" + encodeURIComponent(s.map_embed_url) + "&output=embed";
-                                    }
-                                    if (mapIframe.src !== newSrc) {
-                                        mapIframe.src = newSrc;
-                                    }
-                                }
-                            }
-                        }
-                    })
-                    .catch(err => console.error('Error during settings polling:', err));
-            }
-            
-            setInterval(pollSettings, 2000);
-        });
-
-        let appliedCouponCode = null;
-        let discountValue = 0;
-
-        function applyCoupon() {
-            const codeInput = document.getElementById('coupon_code');
-            if (!codeInput) return;
-            const code = codeInput.value.trim().toUpperCase();
-            if (!code) {
-                alert('Vui lòng nhập mã giảm giá!');
-                return;
-            }
-
-            const cart = getCart();
-            let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            if (total === 0) {
-                alert('Giỏ hàng của bạn đang trống.');
-                return;
-            }
-
-            fetch("{{ route('api.coupon.validate') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ code: code, total_amount: total })
-            })
-            .then(res => res.json())
-            .then(data => {
-                const msgEl = document.getElementById('coupon-message');
-                if (!msgEl) return;
-                msgEl.classList.remove('d-none', 'text-success', 'text-danger');
-                if (data.success) {
-                    appliedCouponCode = code;
-                    discountValue = data.discount_amount;
-                    msgEl.classList.add('text-success');
-                    msgEl.innerText = data.message;
-                    renderCartItems();
-                } else {
-                    appliedCouponCode = null;
-                    discountValue = 0;
-                    msgEl.classList.add('text-danger');
-                    msgEl.innerText = data.message;
-                    renderCartItems();
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                alert('Có lỗi xảy ra khi áp dụng mã giảm giá.');
-            });
-        }
-
-        function revalidateCoupon() {
-            if (!appliedCouponCode) return;
-            const cart = getCart();
-            let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-            fetch("{{ route('api.coupon.validate') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ code: appliedCouponCode, total_amount: total })
-            })
-            .then(res => res.json())
-            .then(data => {
-                const msgEl = document.getElementById('coupon-message');
-                if (data.success) {
-                    discountValue = data.discount_amount;
-                } else {
-                    appliedCouponCode = null;
-                    discountValue = 0;
-                    if (msgEl) {
-                        msgEl.classList.remove('d-none', 'text-success');
-                        msgEl.classList.add('text-danger');
-                        msgEl.innerText = data.message + ' (Đã hủy áp dụng mã)';
-                    }
-                    const inputEl = document.getElementById('coupon_code');
-                    if (inputEl) inputEl.value = '';
-                }
-                renderCartItems();
-            })
-            .catch(err => console.error(err));
-        }
-
-        function renderCartItems() {
-            const container = document.getElementById('cart-items-container');
-            if (!container) return;
-
-            const cart = getCart();
-            if (cart.length === 0) {
-                container.innerHTML = `<div class="p-3 text-center text-muted">Giỏ hàng trống. Hãy chọn món ăn ngon từ thực đơn!</div>`;
-                document.getElementById('cart-total-price').innerText = "0 đ";
-                document.getElementById('cart-subtotal-price').innerText = "0 đ";
-                const discountRow = document.getElementById('cart-discount-row');
-                if (discountRow) discountRow.classList.add('d-none');
-                appliedCouponCode = null;
-                discountValue = 0;
-                return;
-            }
-
-            let html = '';
-            let total = 0;
-
-            cart.forEach((item, index) => {
-                const itemTotal = item.price * item.quantity;
-                total += itemTotal;
-
-                html += `
-                <div class="cart-item-row d-flex justify-content-between align-items-center py-2 px-2 border-bottom text-dark">
-                    <div style="flex: 1;">
-                        <div class="fw-bold">${item.name}</div>
-                        <small class="text-muted">${item.notes ? 'Ghi chú: ' + item.notes : ''}</small>
-                        <div class="small text-secondary">${new Intl.NumberFormat('vi-VN').format(item.price)} đ x ${item.quantity}</div>
-                    </div>
-                    <div class="d-flex align-items-center gap-2">
-                        <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="changeQty(${index}, -1)">-</button>
-                        <span class="fw-bold px-1">${item.quantity}</span>
-                        <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="changeQty(${index}, 1)">+</button>
-                        <button type="button" class="btn btn-sm btn-danger ms-2 py-0 px-2" onclick="removeCartItem(${index})"><i class="bi bi-trash"></i></button>
-                    </div>
-                    <div class="text-end fw-bold text-danger ms-3" style="min-width: 70px;">
-                        ${new Intl.NumberFormat('vi-VN').format(itemTotal)} đ
-                    </div>
-                </div>
-                `;
-            });
-
-            container.innerHTML = html;
-            
-            const subtotalEl = document.getElementById('cart-subtotal-price');
-            if (subtotalEl) {
-                subtotalEl.innerText = new Intl.NumberFormat('vi-VN').format(total) + " đ";
-            }
-            
-            const discountRow = document.getElementById('cart-discount-row');
-            const discountEl = document.getElementById('cart-discount-price');
-            
-            if (appliedCouponCode && discountValue > 0) {
-                if (discountRow) discountRow.classList.remove('d-none');
-                if (discountEl) discountEl.innerText = "-" + new Intl.NumberFormat('vi-VN').format(discountValue) + " đ";
-            } else {
-                if (discountRow) discountRow.classList.add('d-none');
-            }
-
-            const finalTotal = Math.max(0, total - discountValue);
-            document.getElementById('cart-total-price').innerText = new Intl.NumberFormat('vi-VN').format(finalTotal) + " đ";
-        }
-
-        function changeQty(index, delta) {
-            let cart = getCart();
-            if (cart[index]) {
-                cart[index].quantity += delta;
-                if (cart[index].quantity <= 0) {
-                    cart.splice(index, 1);
-                }
-                saveCart(cart);
-                if (appliedCouponCode) {
-                    revalidateCoupon();
-                } else {
-                    renderCartItems();
-                }
-            }
-        }
-
-        function removeCartItem(index) {
-            let cart = getCart();
-            if (cart[index]) {
-                cart.splice(index, 1);
-                saveCart(cart);
-                if (appliedCouponCode) {
-                    revalidateCoupon();
-                } else {
-                    renderCartItems();
-                }
-            }
-        }
-    </script>
-    <div class="modal fade" id="promoAutoModal" tabindex="-1" aria-labelledby="promoAutoModalLabel" aria-hidden="true"
-        data-bs-backdrop="static">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content text-dark border-0 shadow-lg" style="border-radius: 15px; overflow: hidden;">
-                <div class="position-relative"
-                    style="background: linear-gradient(135deg, #ce1126, #a00d20); padding: 40px 20px; text-align: center;">
-                    <button type="button" class="btn-close btn-close-white position-absolute end-0 top-0 m-3"
-                        data-bs-dismiss="modal" aria-label="Close" style="box-shadow: none;"></button>
-                    <div class="display-3 text-white mb-2"><i
-                            class="bi bi-gift-fill animate__animated animate__bounce text-warning"></i></div>
-                    <h3 class="text-white fw-bold mb-0" id="promoAutoModalLabel"
-                        style="font-family: 'Amatic SC', sans-serif; font-size: 45px; letter-spacing: 2px;">ƯU ĐÃI ĐỘC
-                        QUYỀN
-                        HÈ 2026</h3>
-                </div>
-
-                <div class="modal-body text-center p-4" style="font-family: 'Roboto', sans-serif;">
-                    <h5 class="fw-bold text-dark mb-3">Chào mừng bạn đến với FOODELICIOUS!</h5>
-                    <p class="text-secondary mb-4">Hệ thống gửi tặng riêng bạn mã giảm giá đặc biệt khi kích hoạt các
-                        gói
-                        dịch vụ ăn uống dài hạn tuần/tháng.</p>
-
-                    <div class="p-3 mb-3 border border-2 border-dashed rounded d-flex justify-content-between align-items-center bg-light"
-                        style="border-color: #ce1126 !important;">
-                        <div class="text-start">
-                            <small class="text-muted d-block font-weight-bold text-uppercase">Mã giảm giá của
-                                bạn:</small>
-                            <span class="fs-4 fw-bold text-danger letter-spacing-1"
-                                id="couponCode">FOODELICIOUS2026</span>
-                        </div>
-                        <button type="button" class="btn btn-sm btn-dark px-3 fw-bold" onclick="copyCouponCode()">
-                            <i class="bi bi-clipboard-check me-1"></i> Sao chép
+            @php
+                $heroBgUrl = asset('uploads/ve-dep-sai-gon-qua-ong-kinh-cua-nguoi-me-anh-ivivu-2.jpg');
+            @endphp
+            <!-- LEFT PANEL: Dark Cityscape Hero Box (Giống Ảnh 1) -->
+            <div class="lg:col-span-7 shopee-hero-bg rounded-2xl p-6 sm:p-8 text-white flex flex-col justify-between space-y-6 shadow-md" style="background: linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.85)), url('{{ $heroBgUrl }}') center/cover no-repeat;">
+                <div class="space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ee4d2d] text-white text-[11px] font-extrabold uppercase">
+                            <i class="fas fa-bolt"></i> Giao siêu tốc 20'
+                        </span>
+                        <!-- Nút đặt đơn nhóm -->
+                        <button type="button" onclick="openGroupModal()" class="px-3.5 py-1.5 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md text-white text-xs font-bold transition-all">
+                            <i class="fas fa-users text-emerald-400 mr-1"></i> 👥 Đặt đơn theo nhóm (QR/Link)
                         </button>
                     </div>
-                    <small class="text-muted d-block"><i class="bi bi-info-circle"></i> Áp dụng giảm trực tiếp 10% trên
-                        tổng
-                        giá trị hóa đơn.</small>
+
+                    <h1 class="text-2xl sm:text-4xl font-black tracking-tight leading-snug drop-shadow-md">
+                        {{ $settings['banner_title'] ?? "Đặt Đồ ăn, giao hàng từ 20'..." }}
+                    </h1>
+                    <p class="text-xs sm:text-sm text-slate-200 font-medium leading-relaxed">
+                        {{ $settings['banner_subtitle'] ?? "Có 110.625 Địa Điểm Ở TP. HCM Từ 00:00 - 23:59" }}
+                    </p>
+
+                    <!-- Big Search Bar (ShopeeFood Style with Blue Button) -->
+                    <form action="{{ route('trangchu') }}" method="GET" class="flex items-center bg-white rounded-lg overflow-hidden p-1 shadow-lg">
+                        <input type="text" name="search" value="{{ $query }}" placeholder="Tìm địa điểm, món ăn, địa chỉ..." class="w-full px-4 py-2.5 text-xs font-semibold text-slate-800 outline-none">
+                        <button type="submit" class="px-6 py-2.5 bg-[#0099ff] hover:bg-blue-600 text-white font-extrabold text-xs rounded-md transition-colors shrink-0">
+                            <i class="fas fa-magnifying-glass"></i>
+                        </button>
+                    </form>
+
+                    <!-- Category Filter Pills Grid (ShopeeFood Style Tag Buttons) -->
+                    <div class="pt-2 flex flex-wrap gap-2 text-xs font-semibold">
+                        <button type="button" onclick="filterCategory('all')" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-white/20 backdrop-blur-xs border border-white/20 text-white transition-all">All</button>
+                        <button type="button" onclick="filterCategory('all')" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-white/20 backdrop-blur-xs border border-white/20 text-white transition-all">Đồ ăn</button>
+                        <button type="button" onclick="filterCategory('all')" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-white/20 backdrop-blur-xs border border-white/20 text-white transition-all">Đồ uống</button>
+                        <button type="button" onclick="filterCategory('all')" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-white/20 backdrop-blur-xs border border-white/20 text-white transition-all">Đồ chay</button>
+                        <button type="button" onclick="filterCategory('all')" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-white/20 backdrop-blur-xs border border-white/20 text-white transition-all">Bánh kem</button>
+                        <button type="button" onclick="filterCategory('all')" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-white/20 backdrop-blur-xs border border-white/20 text-white transition-all">Tráng miệng</button>
+                        <button type="button" onclick="filterCategory('all')" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-white/20 backdrop-blur-xs border border-white/20 text-white transition-all">Pizza/Burger</button>
+                        <button type="button" onclick="filterCategory('all')" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-white/20 backdrop-blur-xs border border-white/20 text-white transition-all">Món lẩu</button>
+                        <button type="button" onclick="filterCategory('all')" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-white/20 backdrop-blur-xs border border-white/20 text-white transition-all">Mì phở</button>
+                        <button type="button" onclick="filterCategory('all')" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-white/20 backdrop-blur-xs border border-white/20 text-white transition-all">Cơm hộp</button>
+                    </div>
                 </div>
 
-                <div class="modal-footer border-0 p-3 bg-light d-flex gap-2">
-                    <button type="button" class="btn btn-secondary flex-grow-1" data-bs-dismiss="modal">Để sau</button>
-                    <button type="button" class="btn text-white flex-grow-1 fw-bold" style="background-color: #ce1126;"
-                        data-bs-dismiss="modal" onclick="scrollToEvents()">
-                        <i class="bi bi-lightning-charge-fill me-1"></i> Xem các gói ngay
-                    </button>
+                <!-- Bottom Download Badges -->
+                <div class="pt-4 border-t border-white/10 flex items-center gap-3">
+                    <span class="text-[11px] text-slate-300 font-medium">Sử dụng App FOODDAILY để có nhiều giảm giá hơn:</span>
+                    <div class="flex gap-2">
+                        <span class="px-3 py-1 bg-black/60 rounded border border-white/20 text-[10px] font-bold"><i class="fab fa-apple mr-1"></i>App Store</span>
+                        <span class="px-3 py-1 bg-black/60 rounded border border-white/20 text-[10px] font-bold"><i class="fab fa-google-play mr-1"></i>Google Play</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: White Promo Floating Card Widget (Giống 100% Ảnh 1) -->
+            <div class="lg:col-span-5 bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between space-y-4">
+                <!-- Location Address Bar -->
+                <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 flex items-center justify-between cursor-pointer hover:bg-slate-100">
+                    <span class="truncate"><strong class="text-[#ee4d2d]">Đồ ăn</strong> → Chọn địa chỉ giao hàng</span>
+                    <i class="fas fa-chevron-right text-[10px] text-slate-400"></i>
+                </div>
+
+                <!-- Subcard "Ưu đãi" Header -->
+                <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                    <h3 class="font-extrabold text-slate-900 text-sm">Ưu đãi</h3>
+                    <a href="#menu" class="text-xs font-bold text-[#0099ff] hover:underline">≡ Xem tất cả</a>
+                </div>
+
+                <!-- 2x3 Grid of 6 Promo Items (Giống Ảnh 1) -->
+                <div class="grid grid-cols-3 gap-3">
+                    @php
+                        $promoDishes = $allDishes->take(6);
+                    @endphp
+                    @foreach($promoDishes as $pIndex => $pDish)
+                        <div class="bg-white rounded-lg border border-slate-200 p-2 space-y-1.5 hover:border-[#ee4d2d] transition-all cursor-pointer">
+                            <div class="aspect-square rounded-md overflow-hidden bg-slate-100 relative">
+                                @if($pDish->image)
+                                    <img src="{{ asset($pDish->image) }}" alt="{{ $pDish->dish_name }}" class="w-full h-full object-cover">
+                                @else
+                                    <div class="w-full h-full flex items-center justify-center text-slate-300"><i class="fas fa-utensils"></i></div>
+                                @endif
+                            </div>
+                            <h4 class="font-extrabold text-slate-900 text-[11px] line-clamp-1 leading-snug">{{ $pDish->dish_name }}</h4>
+                            <p class="text-[10px] text-slate-400 truncate">FOODDAILY Store</p>
+                            <!-- Red Promo Tag -->
+                            <div class="inline-block px-1.5 py-0.5 rounded bg-rose-50 text-[#ee4d2d] text-[9px] font-extrabold border border-rose-200">
+                                🏷️ Mã giảm {{ ($pIndex % 2 == 0) ? '10%' : '20%' }}
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ShopeeFood Collection Banner Section ("Bộ sưu tập") -->
+<section class="py-4 bg-[#f5f5f5]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
+            <div class="flex items-center justify-between">
+                <h3 class="font-extrabold text-slate-900 text-sm">Bộ sưu tập</h3>
+                <a href="#menu" class="text-xs font-bold text-[#0099ff] hover:underline">≡ Xem tất cả</a>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div class="h-16 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black flex items-center justify-center p-3 text-xs shadow-xs cursor-pointer hover:opacity-95">
+                    🥗 ĂN CHẠY GIẢM 30%
+                </div>
+                <div class="h-16 rounded-xl bg-gradient-to-r from-orange-500 to-rose-600 text-white font-black flex items-center justify-center p-3 text-xs shadow-xs cursor-pointer hover:opacity-95">
+                    🔥 QUÁN RUỘT GIẢM 50K
+                </div>
+                <div class="h-16 rounded-xl bg-gradient-to-r from-rose-500 to-red-600 text-white font-black flex items-center justify-center p-3 text-xs shadow-xs cursor-pointer hover:opacity-95">
+                    🏷️ GIẢM TỚI 70K
+                </div>
+                <div class="h-16 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-black flex items-center justify-center p-3 text-xs shadow-xs cursor-pointer hover:opacity-95">
+                    🚚 FREESHIP XTRA 0Đ
                 </div>
             </div>
         </div>
     </div>
-    @include('client.chatbot')
-</body>
-</html>
+</section>
+
+<!-- THUẬT TOÁN: Món hay mua (người dùng mua >= 2 lần) -->
+@if(auth()->check() && isset($frequentDishes) && $frequentDishes->isNotEmpty())
+<section class="py-4 bg-[#f5f5f5]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-rose-50/80 rounded-2xl p-4 border border-rose-200 space-y-3">
+            <div class="flex items-center gap-2">
+                <span class="text-base">❤️</span>
+                <h3 class="font-extrabold text-slate-900 text-sm">Món Ăn Bạn Hay Mua Nhất</h3>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                @foreach($frequentDishes as $fDish)
+                    <div class="bg-white rounded-xl p-3 border border-rose-100 flex items-center gap-3 shadow-xs">
+                        <div class="w-12 h-12 rounded-lg bg-slate-100 overflow-hidden shrink-0">
+                            @if($fDish->image)
+                                <img src="{{ asset($fDish->image) }}" class="w-full h-full object-cover">
+                            @endif
+                        </div>
+                        <div class="space-y-0.5 flex-1 min-w-0">
+                            <h4 class="font-extrabold text-slate-900 text-xs truncate">{{ $fDish->dish_name }}</h4>
+                            <p class="text-[11px] text-[#ee4d2d] font-bold">{{ number_format($fDish->price) }}đ</p>
+                        </div>
+                        <form action="{{ route('giohang.add') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="dish_id" value="{{ $fDish->id }}">
+                            <button type="submit" class="px-2.5 py-1 bg-[#ee4d2d] text-white rounded text-[10px] font-extrabold hover:bg-red-600">+ Đặt lại</button>
+                        </form>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+</section>
+@endif
+
+<!-- THUẬT TOÁN: Đề xuất theo khung giờ -->
+@if(isset($timeRecommendation) && $timeRecommendation['dishes']->isNotEmpty())
+<section class="py-4 bg-[#f5f5f5]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
+            <div class="flex items-center justify-between">
+                <h3 class="font-extrabold text-slate-900 text-sm">{{ $timeRecommendation['title'] }}</h3>
+                <span class="text-[11px] text-slate-400 font-bold">Khung giờ: {{ $timeRecommendation['period'] }}</span>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                @foreach($timeRecommendation['dishes'] as $tDish)
+                    <div class="bg-slate-50 rounded-xl p-2.5 border border-slate-100 flex items-center justify-between">
+                        <div class="truncate mr-2">
+                            <h4 class="font-extrabold text-slate-900 text-xs truncate">{{ $tDish->dish_name }}</h4>
+                            <span class="text-[11px] font-bold text-slate-700">{{ number_format($tDish->price) }}đ</span>
+                        </div>
+                        <form action="{{ route('giohang.add') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="dish_id" value="{{ $tDish->id }}">
+                            <button type="submit" class="w-6 h-6 rounded bg-[#ee4d2d] text-white text-xs font-bold">+</button>
+                        </form>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+</section>
+@endif
+
+<!-- SHOPEEFOOD PRODUCT GRID SECTION (Matches Image 2 Exactly) -->
+<section class="py-6 bg-[#f5f5f5]" id="menu">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+        
+        <!-- Filter & Sort Bar (Giống 100% Ảnh 2 Header Bar) -->
+        <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-4 text-xs font-bold text-slate-700">
+            <div class="flex items-center gap-4">
+                <div class="cursor-pointer hover:text-[#ee4d2d] flex items-center gap-1">
+                    <span>KHU VỰC</span> <i class="fas fa-chevron-down text-[9px] text-slate-400"></i>
+                </div>
+                <div class="cursor-pointer hover:text-[#ee4d2d] flex items-center gap-1">
+                    <span>PHÂN LOẠI</span> <i class="fas fa-chevron-down text-[9px] text-slate-400"></i>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-slate-400 font-semibold">{{ count($allDishes) }} Kết quả</span>
+                <select class="bg-slate-50 border border-slate-200 rounded px-2.5 py-1 text-xs font-bold text-slate-700 outline-none">
+                    <option>Đúng nhất</option>
+                    <option>Gần tôi</option>
+                    <option>Giá thấp đến cao</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- CATEGORY TABS (Tất cả, Ăn sáng, Tráng miệng...) -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 border-b border-slate-200 text-xs font-bold">
+            <button type="button" onclick="filterCategory('all')" id="tab-btn-all" class="cat-tab-btn px-4 py-2 rounded-lg bg-[#ee4d2d] text-white shrink-0">
+                Tất cả món ăn
+            </button>
+            @foreach($categories as $category)
+                <button type="button" onclick="filterCategory('cat-{{ $category->id }}')" id="tab-btn-cat-{{ $category->id }}" class="cat-tab-btn px-4 py-2 rounded-lg bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 shrink-0">
+                    {{ $category->category_name }}
+                </button>
+            @endforeach
+        </div>
+
+        <!-- TAB CONTENT: ALL DISHES (ShopeeFood 5-Column Card Grid - Giống Ảnh 2) -->
+        <div id="cat-view-all" class="cat-view-pane">
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                @forelse($allDishes as $dIndex => $dish)
+                    <div class="bg-white rounded-xl shadow-xs hover:shadow-md transition-all border border-slate-200 overflow-hidden flex flex-col justify-between group">
+                        <div class="space-y-2">
+                            <!-- Image Thumbnail with "👍 Yêu thích" Red Badge -->
+                            <div class="aspect-square bg-slate-100 relative overflow-hidden">
+                                @if($dish->image)
+                                    <img src="{{ asset($dish->image) }}" alt="{{ $dish->dish_name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                @else
+                                    <div class="w-full h-full flex items-center justify-center text-slate-300 bg-slate-100"><i class="fas fa-utensils text-2xl"></i></div>
+                                @endif
+                                
+                                @if($dIndex % 3 == 0)
+                                    <span class="absolute top-2 left-0 bg-[#ee4d2d] text-white text-[9px] font-extrabold px-2 py-0.5 rounded-r-md shadow-xs flex items-center gap-1">
+                                        <i class="fas fa-thumbs-up text-[8px]"></i> Yêu thích
+                                    </span>
+                                @endif
+                            </div>
+
+                            <!-- Content Details (Checkmark + Title + Address + Red Promo Tag) -->
+                            <div class="p-2.5 space-y-1">
+                                <div class="flex items-start gap-1">
+                                    <span class="text-amber-500 text-xs shrink-0 mt-0.5">✔</span>
+                                    <h4 class="font-extrabold text-slate-900 text-xs line-clamp-1 leading-snug group-hover:text-[#ee4d2d] transition-colors">
+                                        {{ $dish->dish_name }}
+                                    </h4>
+                                </div>
+                                <p class="text-[10px] text-slate-400 line-clamp-1 leading-tight">
+                                    {{ $dish->description ?? 'FOODDAILY Store - TP. HCM' }}
+                                </p>
+                                
+                                <!-- Red Promo Tag Badge (Giống 100% Ảnh 2) -->
+                                <div class="pt-1">
+                                    <span class="inline-block px-1.5 py-0.5 rounded bg-rose-50 text-[#ee4d2d] text-[9px] font-extrabold border border-rose-200">
+                                        🏷️ Mã giảm {{ ($dIndex % 2 == 0) ? '11%' : '20%' }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card Footer Price & Add Button -->
+                        <div class="p-2.5 pt-0 flex items-center justify-between border-t border-slate-100 mt-2">
+                            <span class="text-xs font-black text-slate-900">{{ number_format($dish->price) }}đ</span>
+                            <form action="{{ route('giohang.add') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="dish_id" value="{{ $dish->id }}">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="w-7 h-7 rounded-lg bg-[#ee4d2d] hover:bg-red-600 text-white flex items-center justify-center text-xs font-bold transition-colors">
+                                    +
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                @empty
+                    <div class="col-span-full py-12 text-center text-slate-400 font-medium">Chưa có món ăn nào trong hệ thống</div>
+                @endforelse
+            </div>
+        </div>
+
+        <!-- TAB CONTENT: SPECIFIC CATEGORIES VIEW -->
+        @foreach($categories as $category)
+            <div id="cat-view-cat-{{ $category->id }}" class="cat-view-pane hidden">
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    @forelse($category->dishes as $cIndex => $dish)
+                        <div class="bg-white rounded-xl shadow-xs hover:shadow-md transition-all border border-slate-200 overflow-hidden flex flex-col justify-between group">
+                            <div class="space-y-2">
+                                <div class="aspect-square bg-slate-100 relative overflow-hidden">
+                                    @if($dish->image)
+                                        <img src="{{ asset($dish->image) }}" alt="{{ $dish->dish_name }}" class="w-full h-full object-cover">
+                                    @else
+                                        <div class="w-full h-full flex items-center justify-center text-slate-300"><i class="fas fa-utensils"></i></div>
+                                    @endif
+                                </div>
+                                <div class="p-2.5 space-y-1">
+                                    <div class="flex items-start gap-1">
+                                        <span class="text-amber-500 text-xs shrink-0 mt-0.5">✔</span>
+                                        <h4 class="font-extrabold text-slate-900 text-xs line-clamp-1 leading-snug group-hover:text-[#ee4d2d]">
+                                            {{ $dish->dish_name }}
+                                        </h4>
+                                    </div>
+                                    <p class="text-[10px] text-slate-400 line-clamp-1">{{ $dish->description ?? 'FOODDAILY Store' }}</p>
+                                    <div class="pt-1">
+                                        <span class="inline-block px-1.5 py-0.5 rounded bg-rose-50 text-[#ee4d2d] text-[9px] font-extrabold border border-rose-200">
+                                            🏷️ Mã giảm 11%
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-2.5 pt-0 flex items-center justify-between border-t border-slate-100 mt-2">
+                                <span class="text-xs font-black text-slate-900">{{ number_format($dish->price) }}đ</span>
+                                <form action="{{ route('giohang.add') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="dish_id" value="{{ $dish->id }}">
+                                    <button type="submit" class="w-7 h-7 rounded-lg bg-[#ee4d2d] text-white flex items-center justify-center text-xs font-bold">+</button>
+                                </form>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="col-span-full py-8 text-center text-slate-400">Danh mục này hiện chưa có món ăn.</div>
+                    @endforelse
+                </div>
+            </div>
+        @endforeach
+
+    </div>
+</section>
+
+<!-- MODAL TẠO ĐẶT ĐƠN THEO NHÓM -->
+<div id="groupModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-slate-100 space-y-4">
+        <div class="text-center space-y-1">
+            <div class="w-12 h-12 rounded-xl bg-rose-50 text-[#ee4d2d] flex items-center justify-center text-lg font-bold mx-auto">
+                <i class="fas fa-users"></i>
+            </div>
+            <h3 class="text-lg font-extrabold text-slate-900">Tạo Đặt Đơn Theo Nhóm (FOODDAILY)</h3>
+            <p class="text-xs text-slate-500 font-medium">Nhập tên bạn để tạo phòng và nhận ngay link / mã QR cho cả nhóm cùng đặt món</p>
+        </div>
+
+        <form action="{{ route('nhom.create') }}" method="POST" class="space-y-4">
+            @csrf
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Tên Trưởng Nhóm <span class="text-[#ee4d2d]">*</span></label>
+                <input type="text" name="host_name" value="{{ auth()->check() ? (auth()->user()->fullname ?? auth()->user()->name) : '' }}" required placeholder="Ví dụ: Nguyễn Văn A" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 focus:border-[#ee4d2d] outline-none">
+            </div>
+
+            <div class="flex items-center gap-3 pt-2">
+                <button type="button" onclick="closeGroupModal()" class="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs">Hủy</button>
+                <button type="submit" class="flex-1 py-2.5 rounded-xl bg-[#ee4d2d] hover:bg-red-600 text-white font-extrabold text-xs shadow-md">TẠO PHÒNG NHÓM</button>
+            </div>
+        </form>
+    </div>
+</div>
+@endsection
+
+@section('scripts')
+<script>
+    function filterCategory(targetId) {
+        document.querySelectorAll('.cat-view-pane').forEach(pane => pane.classList.add('hidden'));
+        const targetPane = document.getElementById('cat-view-' + targetId);
+        if (targetPane) {
+            targetPane.classList.remove('hidden');
+        }
+
+        document.querySelectorAll('.cat-tab-btn').forEach(btn => {
+            btn.classList.remove('bg-[#ee4d2d]', 'text-white');
+            btn.classList.add('bg-white', 'text-slate-700', 'hover:bg-slate-100', 'border', 'border-slate-200');
+        });
+
+        const activeBtn = document.getElementById('tab-btn-' + targetId);
+        if (activeBtn) {
+            activeBtn.classList.remove('bg-white', 'text-slate-700', 'hover:bg-slate-100', 'border', 'border-slate-200');
+            activeBtn.classList.add('bg-[#ee4d2d]', 'text-white');
+        }
+    }
+
+    function openGroupModal() {
+        document.getElementById('groupModal').classList.remove('hidden');
+    }
+    function closeGroupModal() {
+        document.getElementById('groupModal').classList.add('hidden');
+    }
+</script>
+@endsection

@@ -214,7 +214,7 @@ class AuthController extends Controller
     public function logout()
     {
         Auth::logout();
-        return redirect()->route('trangchu');
+        return redirect()->route('trangchu')->with('clear_cart', true);
     }
 
     // Hàm phụ chuyển hướng dựa trên vai trò

@@ -1,158 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.app')
 
-<head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Đăng nhập - FOODELICIOUS</title>
-    <meta name="description" content="">
-    <meta name="keywords" content="">
+@section('title', 'Đổi lại mật khẩu - FOODDAILY')
 
-    <link href="{{ asset('logo.jpg') }}" rel="icon">
-    <link href="{{ asset('client/assets/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+@section('content')
+<div class="min-h-screen py-16 bg-slate-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full bg-white rounded-3xl p-8 sm:p-10 shadow-2xl border border-slate-100 space-y-6">
+        
+        <!-- Form Header -->
+        <div class="text-center space-y-2 border-b border-slate-100 pb-6">
+            <span class="inline-flex items-center justify-center w-12 h-12 rounded-2xl food-gradient text-white text-xl shadow-md shadow-rose-500/20 mb-1">
+                <i class="fas fa-lock"></i>
+            </span>
+            <h2 class="text-2xl font-extrabold text-slate-800 tracking-tight">Thiết Lập Mật Khẩu Mới</h2>
+            <p class="text-xs text-slate-500">Nhập mật khẩu mới bảo mật cho tài khoản của bạn</p>
+        </div>
 
-    <link href="https://fonts.googleapis.com" rel="preconnect">
-    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Amatic+SC:wght@400;700&display=swap"
-        rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" type="text/css">
+        @if($errors->any())
+            <div class="bg-rose-50 border border-rose-200 text-rose-700 p-4 rounded-2xl text-xs font-semibold flex items-center gap-2">
+                <i class="fas fa-circle-exclamation text-rose-500 text-sm"></i>
+                <span>{{ $errors->first() }}</span>
+            </div>
+        @endif
 
-    <link href="{{ asset('client/assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('client/assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
-    <link href="{{ asset('client/assets/vendor/aos/aos.css') }}" rel="stylesheet">
-    <link href="{{ asset('client/assets/vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('client/assets/vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
+        <form action="{{ route('trangchu/doimatkhau.post') }}" method="POST" class="space-y-4">
+            @csrf
+            <input type="hidden" name="token" value="{{ $token }}">
+            
+            <div class="space-y-4">
+                <div>
+                    <label for="password" class="block text-xs font-bold text-slate-700 mb-1">Mật khẩu mới <span class="text-rose-500">*</span></label>
+                    <input type="password" id="password" name="password" placeholder="Tối thiểu 6 ký tự" class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs font-semibold text-slate-800 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20" required>
+                </div>
 
-    <link href="{{ asset('client/assets/css/main.css') }}" rel="stylesheet">
-
-    <style>
-        .auth-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #f8f9fa;
-            padding: 20px;
-        }
-
-        .auth-card {
-            max-width: 450px;
-            width: 100%;
-            border-radius: 12px;
-            border: none;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-            background-color: #fff;
-        }
-
-        .auth-header {
-            text-align: center;
-            border-bottom: 1px solid #f4f4f4;
-            padding-bottom: 20px;
-        }
-
-        .auth-logo {
-            height: 60px;
-            margin-bottom: 15px;
-        }
-
-        .btn-auth {
-            background-color: #ce1126;
-            color: white;
-            font-weight: 600;
-            padding: 10px;
-            transition: background-color 0.3s;
-        }
-
-        .btn-auth:hover {
-            background-color: #a00d20;
-            color: white;
-        }
-
-        .form-control:focus {
-            border-color: #ce1126;
-            box-shadow: 0 0 0 0.25rem rgba(206, 17, 38, 0.15);
-        }
-
-        .auth-link {
-            color: #ce1126;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .auth-link:hover {
-            color: #a00d20;
-            text-decoration: underline;
-        }
-    </style>
-</head>
-
-<body>
-
-    <div class="auth-container">
-        <div class="card auth-card p-4 text-dark">
-            <div class="auth-header mb-4">
-                <img src="{{ asset('logo.jpg') }}" alt="FOODELICIOUS" class="auth-logo rounded-circle shadow-sm">
-                <h3 class="fw-bold mb-1" style="color: #ce1126;">FOODELICIOUS</h3>
-                <p class="text-muted small mb-0">ĐỔI LẠI MẬT KHẨU</p>
+                <div>
+                    <label for="password_confirmation" class="block text-xs font-bold text-slate-700 mb-1">Xác nhận mật khẩu <span class="text-rose-500">*</span></label>
+                    <input type="password" id="password_confirmation" name="password_confirmation" placeholder="Nhập lại mật khẩu" class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs font-semibold text-slate-800 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20" required>
+                </div>
             </div>
 
-            @if($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show small" role="alert">
-                    {{ $errors->first() }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
+            <button type="submit" class="w-full py-3.5 rounded-2xl food-gradient text-white font-extrabold text-xs shadow-xl shadow-rose-500/20 hover:scale-[1.01] active:scale-[0.99] transition-all">
+                CẬP NHẬT MẬT KHẨU
+            </button>
+        </form>
 
-            <form action="{{ route('trangchu/doimatkhau.post') }}" method="POST">
-                @csrf
-                <input type="hidden" name="token" value="{{ $token }}">
-                <div class="row">
-                    <div class="form-group col-md-6 mb-3">
-                        <label for="password" class="form-label small fw-bold">Mật khẩu mới <span
-                                class="text-danger">*</span></label>
-                        <input type="password" class="form-control" id="password" name="password"
-                            placeholder="Tối thiểu 6 ký tự" required>
-                    </div>
-                    <div class="form-group col-md-6 mb-3">
-                        <label for="password_confirmation" class="form-label small fw-bold">Xác nhận mật khẩu <span
-                                class="text-danger">*</span></label>
-                        <input type="password" class="form-control" id="password_confirmation"
-                            name="password_confirmation" placeholder="Nhập lại mật khẩu" required>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-auth w-100 rounded shadow-sm mb-3">XÁC NHẬN MẬT KHẨU</button>
-            </form>
+        <div class="text-center text-xs text-slate-500 pt-2 border-t border-slate-100">
+            <a href="{{ route('trangchu/dangnhap') }}" class="font-extrabold text-rose-500 hover:text-rose-600 inline-flex items-center gap-1.5">
+                <i class="fas fa-arrow-left"></i> Quay lại Đăng nhập
+            </a>
         </div>
     </div>
-
-    <script>
-        const toggleBtn = document.getElementById('togglePassword');
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', function () {
-                const passwordInput = document.getElementById('password');
-                const eyeIcon = document.getElementById('eyeIcon');
-                if (passwordInput.type === 'password') {
-                    passwordInput.type = 'text';
-                    eyeIcon.classList.remove('bi-eye');
-                    eyeIcon.classList.add('bi-eye-slash');
-                } else {
-                    passwordInput.type = 'password';
-                    eyeIcon.classList.remove('bi-eye-slash');
-                    eyeIcon.classList.add('bi-eye');
-                }
-            });
-        }
-    </script>
-    <script src="{{ asset('client/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('client/assets/vendor/php-email-form/validate.js') }}"></script>
-    <script src="{{ asset('client/assets/vendor/aos/aos.js') }}"></script>
-    <script src="{{ asset('client/assets/vendor/glightbox/js/glightbox.min.js') }}"></script>
-    <script src="{{ asset('client/assets/vendor/purecounter/purecounter_vanilla.js') }}"></script>
-    <script src="{{ asset('client/assets/vendor/swiper/swiper-bundle.min.js') }}"></script>
-
-    <script src="{{ asset('client/assets/js/main.js') }}"></script>
-
-</body>
-
-</html>
+</div>
+@endsection

@@ -1,97 +1,107 @@
 @extends('layouts.admin')
 
-@section('title', 'Quản lý Tài khoản nhân viên - FOODELICIOUS')
-
-@section('styles')
-    <link href="{{ asset('admin/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
-@endsection
+@section('title', 'Quản lý Tài khoản Nhân viên - FOODDAILY Admin')
 
 @section('content')
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Tài khoản nhân viên</h1>
-        <a class="btn btn-primary shadow-sm" href="{{ route('nhanvien_them') }}">
-            <i class="fas fa-plus fa-sm"></i> Thêm nhân viên mới
+<div class="space-y-6">
+    
+    <!-- Top Action Bar -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Tài Khoản Nhân Viên & Phân Quyền</h1>
+            <p class="text-xs text-slate-500 font-medium mt-1">Quản lý tài khoản truy cập hệ thống của nhân viên và ban quản trị</p>
+        </div>
+
+        <a href="{{ route('nhanvien_them') }}" class="px-5 py-3 rounded-2xl bg-[#ee4d2d] hover:bg-red-600 text-white text-xs font-extrabold shadow-lg shadow-rose-500/20 transition-all flex items-center justify-center gap-2">
+            <i class="fas fa-plus"></i> Thêm nhân viên mới
         </a>
     </div>
 
+    <!-- Alerts -->
     @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show mb-4 text-dark" role="alert">
-        <strong><i class="fas fa-check-circle mr-1"></i> Thành công!</strong> {{ session('success') }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    @endif
-    @if(session('error'))
-    <div class="alert alert-danger alert-dismissible fade show mb-4 text-dark" role="alert">
-        <strong><i class="fas fa-exclamation-triangle mr-1"></i> Lỗi!</strong> {{ session('error') }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    @endif
-
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Danh sách tài khoản nhân viên hệ thống</h6>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered text-dark" id="dataTable" width="100%" cellspacing="0">
-                    <thead>
-                        <tr>
-                            <th>Mã NV</th>
-                            <th>Họ và Tên</th>
-                            <th>Chức vụ / Mô tả</th>
-                            <th>Email</th>
-                            <th>Quyền hạn</th>
-                            <th>Trạng thái</th>
-                            <th>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($employees as $employee)
-                        <tr>
-                            <td>NV-{{ sprintf('%03d', $employee->id) }}</td>
-                            <td class="font-weight-bold">{{ $employee->fullname }}</td>
-                            <td>{{ $employee->notes ?? 'Chưa ghi chú chức vụ' }}</td>
-                            <td>{{ $employee->email }}</td>
-                            <td>
-                                @if($employee->role === 'admin')
-                                <span class="badge badge-danger px-2 py-1 font-weight-bold">Administrator</span>
-                                @else
-                                <span class="badge badge-primary px-2 py-1 font-weight-bold">Staff</span>
-                                @endif
-                            </td>
-                            <td>
-                                @if($employee->status)
-                                <span class="badge badge-success px-2 py-1 font-weight-bold">Đang làm việc</span>
-                                @else
-                                <span class="badge badge-warning px-2 py-1 font-weight-bold text-dark">Tạm đình chỉ</span>
-                                @endif
-                            </td>
-                            <td>
-                                <a href="{{ route('nhanvien_xem', $employee->id) }}" class="btn btn-info btn-sm" title="Xem"><i class="fas fa-eye"></i> Xem</a>
-                                <a href="{{ route('nhanvien_chinhsua', $employee->id) }}" class="btn btn-warning btn-sm" title="Sửa/Phân quyền"><i class="fas fa-edit"></i> Sửa</a>
-                                
-                                @if($employee->id !== auth()->id())
-                                <form action="{{ route('nhanvien_xoa', $employee->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn xóa tài khoản nhân viên này?');">
-                                    @csrf
-                                    <button type="submit" class="btn btn-danger btn-sm" title="Xóa tài khoản"><i class="fas fa-trash"></i> Xóa</button>
-                                </form>
-                                @endif
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+        <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 rounded-2xl text-xs font-semibold flex items-center justify-between shadow-xs">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-circle-check text-emerald-600 text-sm"></i>
+                <span>{{ session('success') }}</span>
             </div>
+            <button onclick="this.parentElement.remove()" class="text-emerald-600 hover:text-emerald-800">&times;</button>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="bg-rose-50 border border-rose-200 text-rose-700 p-4 rounded-2xl text-xs font-semibold flex items-center justify-between shadow-xs">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-circle-exclamation text-rose-500 text-sm"></i>
+                <span>{{ session('error') }}</span>
+            </div>
+            <button onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-700">&times;</button>
+        </div>
+    @endif
+
+    <!-- Data Table Card -->
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden">
+        <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                <i class="fas fa-id-card text-[#ee4d2d]"></i> Danh sách tài khoản nhân viên hệ thống
+            </h3>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-100 text-[11px] text-slate-400 uppercase font-extrabold tracking-wider">
+                        <th class="py-4 px-6">Mã NV</th>
+                        <th class="py-4 px-6">Họ và Tên</th>
+                        <th class="py-4 px-6">Chức vụ / Ghi chú</th>
+                        <th class="py-4 px-6">Email đăng nhập</th>
+                        <th class="py-4 px-6">Quyền hạn</th>
+                        <th class="py-4 px-6 text-right">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @forelse($employees as $employee)
+                        <tr class="hover:bg-slate-50/80 transition-colors">
+                            <td class="py-4 px-6 font-bold text-slate-400">NV-{{ sprintf('%03d', $employee->id) }}</td>
+                            <td class="py-4 px-6 font-extrabold text-slate-900">
+                                {{ $employee->fullname ?? $employee->name }}
+                            </td>
+                            <td class="py-4 px-6 text-slate-700 font-medium">
+                                {{ $employee->notes ?? 'Chưa ghi chú chức vụ' }}
+                            </td>
+                            <td class="py-4 px-6 text-slate-500">
+                                {{ $employee->email }}
+                            </td>
+                            <td class="py-4 px-6">
+                                @if($employee->role === 'admin')
+                                    <span class="px-2.5 py-1 rounded-full bg-rose-50 text-[#ee4d2d] text-[10px] font-black border border-rose-200">Quản trị viên (Admin)</span>
+                                @else
+                                    <span class="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-[10px] font-bold border border-blue-200">Nhân viên (Staff)</span>
+                                @endif
+                            </td>
+                            <td class="py-4 px-6 text-right space-x-2">
+                                <a href="{{ route('nhanvien_xem', $employee->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors">
+                                    <i class="fas fa-eye text-xs"></i>
+                                </a>
+                                <a href="{{ route('nhanvien_chinhsua', $employee->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 transition-colors">
+                                    <i class="fas fa-pen text-xs"></i>
+                                </a>
+                                <form action="{{ route('nhanvien_xoa', $employee->id) }}" method="POST" class="inline" onsubmit="return confirm('Bạn có chắc muốn xóa tài khoản nhân viên này?');">
+                                    @csrf
+                                    <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 transition-colors">
+                                        <i class="fas fa-trash-can text-xs"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="py-10 text-center text-slate-400 font-medium">Chưa có tài khoản nhân viên nào.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
-@endsection
 
-@section('scripts')
-    <script src="{{ asset('admin/vendor/datatables/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('admin/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
-    <script src="{{ asset('admin/js/demo/datatables-demo.js') }}"></script>
+</div>
 @endsection

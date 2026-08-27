@@ -1,203 +1,143 @@
 @extends('layouts.admin')
 
-@section('title', 'Quản lý Báo cáo doanh thu')
+@section('title', 'Báo cáo doanh thu & Thống kê - FOODDAILY Admin')
 
 @section('content')
-    <!-- Page Heading -->
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Bảng số liệu</h1>
-        <div class="dropdown">
-            <button class="btn btn-sm btn-primary shadow-sm dropdown-toggle" type="button" id="dropdownExport" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-download fa-sm text-white-50 mr-1"></i> Xuất báo cáo (Excel/CSV)
+<div class="space-y-8">
+    <!-- Top Action Bar -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h2 class="text-2xl font-extrabold text-slate-800 tracking-tight">Thống Kê & Báo Cáo Doanh Thu FOODDAILY</h2>
+            <p class="text-xs text-slate-500 mt-1">Theo dõi hoạt động kinh doanh, tăng trưởng và nguồn thu nhập</p>
+        </div>
+        <div class="relative group">
+            <button class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-2 shadow-md transition-all">
+                <i class="fas fa-download text-rose-400"></i> Xuất báo cáo (Excel / CSV)
+                <i class="fas fa-chevron-down text-[10px]"></i>
             </button>
-            <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownExport">
-                <a class="dropdown-item" href="{{ route('baocao_xuat_orders') }}"><i class="fas fa-file-invoice mr-2 text-primary"></i>Xuất đơn hàng</a>
-                <a class="dropdown-item" href="{{ route('baocao_xuat_customers') }}"><i class="fas fa-users mr-2 text-success"></i>Xuất khách hàng</a>
-                <a class="dropdown-item" href="{{ route('baocao_xuat_dishes') }}"><i class="fas fa-hamburger mr-2 text-warning"></i>Xuất món ăn chạy</a>
-                <a class="dropdown-item" href="{{ route('baocao_xuat_refunds') }}"><i class="fas fa-undo mr-2 text-danger"></i>Xuất hoàn tiền</a>
+            <div class="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <a class="flex items-center px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-rose-600" href="{{ route('baocao_xuat_orders') }}">
+                    <i class="fas fa-file-invoice mr-2 text-rose-500"></i>Xuất danh sách đơn hàng
+                </a>
+                <a class="flex items-center px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-emerald-600" href="{{ route('baocao_xuat_customers') }}">
+                    <i class="fas fa-users mr-2 text-emerald-500"></i>Xuất thông tin khách hàng
+                </a>
+                <a class="flex items-center px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-amber-600" href="{{ route('baocao_xuat_dishes') }}">
+                    <i class="fas fa-hamburger mr-2 text-amber-500"></i>Xuất báo cáo món chạy
+                </a>
+                <a class="flex items-center px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-rose-600" href="{{ route('baocao_xuat_refunds') }}">
+                    <i class="fas fa-rotate-left mr-2 text-rose-500"></i>Xuất lịch sử hoàn tiền
+                </a>
             </div>
         </div>
     </div>
 
-    <!-- Weather Widget Row -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow py-2 text-white border-0" style="background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);">
-                <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div>
-                            <h5 class="font-weight-bold mb-1"><i class="fas fa-cloud-sun-rain mr-2"></i> DỰ BÁO THỜI TIẾT KINH DOANH</h5>
-                            <p class="mb-0 small text-light" id="weather-text">Đang tải dữ liệu thời tiết...</p>
-                            <p class="mb-0 mt-1 font-weight-bold" id="weather-recommendation" style="color: #ffeb3b;"></p>
-                        </div>
-                        <div class="text-right">
-                            <span class="h2 font-weight-bold mb-0" id="weather-temp">--°C</span>
-                            <div class="small text-light" id="weather-location">Hồ Chí Minh, VN</div>
-                        </div>
-                    </div>
+    <!-- Weather AI Business Widget -->
+    <div class="rounded-3xl food-gradient p-6 text-white shadow-xl shadow-rose-500/15 relative overflow-hidden">
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="space-y-2">
+                <div class="flex items-center gap-2 text-amber-300 font-extrabold text-xs uppercase tracking-wider">
+                    <i class="fas fa-cloud-sun text-base"></i> Dự báo thời tiết kinh doanh AI
                 </div>
+                <p class="text-xs text-rose-100 font-medium" id="weather-text">Đang tải dữ liệu thời tiết khu vực...</p>
+                <p class="text-sm font-bold text-amber-200 bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl inline-block" id="weather-recommendation"></p>
+            </div>
+            <div class="text-left md:text-right flex flex-col justify-center">
+                <span class="text-4xl font-extrabold tracking-tight" id="weather-temp">--°C</span>
+                <span class="text-xs font-semibold text-rose-100" id="weather-location">Hồ Chí Minh, VN</span>
             </div>
         </div>
     </div>
 
-    <!-- Content Row -->
-    <div class="row">
-
-        <!-- Earnings (Monthly) Card Example -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Doanh thu (Tháng {{ now()->format('m/Y') }})</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ number_format($monthlyRevenue, 0, ',', '.') }}đ</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
+    <!-- Metrics Cards Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Monthly Revenue -->
+        <div class="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-slate-100 flex items-center justify-between group hover:border-rose-200 transition-all">
+            <div>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Doanh thu (Tháng {{ now()->format('m/Y') }})</p>
+                <h3 class="text-2xl font-extrabold text-slate-800 mt-2">{{ number_format($monthlyRevenue, 0, ',', '.') }}đ</h3>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center text-xl font-bold group-hover:scale-110 transition-transform">
+                <i class="fas fa-calendar-check"></i>
             </div>
         </div>
 
-        <!-- Earnings (Monthly) Card Example -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Doanh thu (Năm {{ now()->format('Y') }})</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ number_format($yearlyRevenue, 0, ',', '.') }}đ</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
+        <!-- Yearly Revenue -->
+        <div class="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-slate-100 flex items-center justify-between group hover:border-emerald-200 transition-all">
+            <div>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Doanh thu (Năm {{ now()->format('Y') }})</p>
+                <h3 class="text-2xl font-extrabold text-emerald-600 mt-2">{{ number_format($yearlyRevenue, 0, ',', '.') }}đ</h3>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-xl font-bold group-hover:scale-110 transition-transform">
+                <i class="fas fa-sack-dollar"></i>
             </div>
         </div>
 
-        <!-- Earnings (Monthly) Card Example -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Tổng đơn hàng</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $orderCount }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-cart-plus fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
+        <!-- Total Orders -->
+        <div class="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-slate-100 flex items-center justify-between group hover:border-amber-200 transition-all">
+            <div>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Tổng đơn hàng</p>
+                <h3 class="text-2xl font-extrabold text-amber-500 mt-2">{{ number_format($orderCount) }}</h3>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center text-xl font-bold group-hover:scale-110 transition-transform">
+                <i class="fas fa-bag-shopping"></i>
             </div>
         </div>
-        <!-- Pending Requests Card Example -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                Gói dịch vụ đang chạy</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $activeSubscriptionCount }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-star fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
+
+        <!-- Active Packages -->
+        <div class="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-slate-100 flex items-center justify-between group hover:border-blue-200 transition-all">
+            <div>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Gói dịch vụ đang chạy</p>
+                <h3 class="text-2xl font-extrabold text-blue-600 mt-2">{{ number_format($activeSubscriptionCount) }}</h3>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center text-xl font-bold group-hover:scale-110 transition-transform">
+                <i class="fas fa-box-archive"></i>
             </div>
         </div>
     </div>
 
-    <!-- Content Row -->
-
-    <div class="row">
-
-        <!-- Area Chart -->
-        <div class="col-xl-8 col-lg-7">
-            <div class="card shadow mb-4">
-                <!-- Card Header - Dropdown -->
-                <div
-                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Tổng quan doanh thu</h6>
-                    <div class="dropdown no-arrow">
-                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
-                            aria-labelledby="dropdownMenuLink">
-                            <div class="dropdown-header">Tác vụ</div>
-                            <a class="dropdown-item" href="#">Tải lại</a>
-                            <a class="dropdown-item" href="#">Xuất excel</a>
-                            <div class="dropdown-divider"></div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Card Body -->
-                <div class="card-body">
-                    <div class="chart-area">
-                        <canvas id="myAreaChart"></canvas>
-                    </div>
-                </div>
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Area Chart (Revenue Trend) -->
+        <div class="lg:col-span-2 bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-slate-100">
+            <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+                <h3 class="text-base font-extrabold text-slate-800 flex items-center gap-2">
+                    <i class="fas fa-chart-line text-rose-500"></i> Biểu đồ tổng quan doanh thu năm {{ now()->format('Y') }}
+                </h3>
+            </div>
+            <div class="h-80 w-full relative">
+                <canvas id="myAreaChart"></canvas>
             </div>
         </div>
 
-        <!-- Pie Chart -->
-        <div class="col-xl-4 col-lg-5">
-            <div class="card shadow mb-4">
-                <!-- Card Header - Dropdown -->
-                <div
-                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Nguồn doanh thu</h6>
-                    <div class="dropdown no-arrow">
-                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
-                            aria-labelledby="dropdownMenuLink">
-                            <div class="dropdown-header">Tác vụ</div>
-                            <a class="dropdown-item" href="#">Tải lại</a>
-                            <a class="dropdown-item" href="#">Xuất excel</a>
-                            <div class="dropdown-divider"></div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Card Body -->
-                <div class="card-body">
-                    <div class="chart-pie pt-4 pb-2">
-                        <canvas id="myPieChart"></canvas>
-                    </div>
-                    <div class="mt-4 text-center small">
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-primary"></i> Món đơn lẻ ({{ $singlePercent }}%)
-                        </span>
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-success"></i> Gói dịch vụ ({{ $subscriptionPercent }}%)
-                        </span>
-                    </div>
-                </div>
+        <!-- Pie Chart (Revenue Breakdown) -->
+        <div class="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+                <h3 class="text-base font-extrabold text-slate-800 flex items-center gap-2">
+                    <i class="fas fa-chart-pie text-rose-500"></i> Nguồn doanh thu
+                </h3>
+            </div>
+            <div class="h-64 w-full relative my-auto">
+                <canvas id="myPieChart"></canvas>
+            </div>
+            <div class="mt-6 pt-4 border-t border-slate-100 flex justify-around text-xs font-bold">
+                <span class="flex items-center gap-2 text-slate-700">
+                    <span class="w-3 h-3 rounded-full bg-rose-500"></span> Món lẻ ({{ $singlePercent }}%)
+                </span>
+                <span class="flex items-center gap-2 text-slate-700">
+                    <span class="w-3 h-3 rounded-full bg-emerald-500"></span> Gói Combo ({{ $subscriptionPercent }}%)
+                </span>
             </div>
         </div>
     </div>
+</div>
 @endsection
 
 @section('scripts')
-    <!-- Page level plugins -->
     <script src="{{ asset('admin/vendor/chart.js/Chart.min.js') }}"></script>
-
-    <!-- Dynamic Charts Script -->
     <script>
-        // Set new default font family and font color to mimic Bootstrap's default styling
-        Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
-        Chart.defaults.global.defaultFontColor = '#858796';
+        Chart.defaults.global.defaultFontFamily = 'Plus Jakarta Sans', sans-serif;
+        Chart.defaults.global.defaultFontColor = '#64748b';
 
         function formatMoney(num) {
             return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.') + 'đ';
@@ -208,18 +148,18 @@
         var myLineChart = new Chart(ctxArea, {
           type: 'line',
           data: {
-            labels: ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"],
+            labels: ["Thg 1", "Thg 2", "Thg 3", "Thg 4", "Thg 5", "Thg 6", "Thg 7", "Thg 8", "Thg 9", "Thg 10", "Thg 11", "Thg 12"],
             datasets: [{
               label: "Doanh thu",
-              lineTension: 0.3,
-              backgroundColor: "rgba(78, 115, 223, 0.05)",
-              borderColor: "rgba(78, 115, 223, 1)",
-              pointRadius: 3,
-              pointBackgroundColor: "rgba(78, 115, 223, 1)",
-              pointBorderColor: "rgba(78, 115, 223, 1)",
-              pointHoverRadius: 3,
-              pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
-              pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+              lineTension: 0.4,
+              backgroundColor: "rgba(239, 68, 68, 0.08)",
+              borderColor: "rgba(239, 68, 68, 1)",
+              pointRadius: 4,
+              pointBackgroundColor: "rgba(239, 68, 68, 1)",
+              pointBorderColor: "#fff",
+              pointHoverRadius: 6,
+              pointHoverBackgroundColor: "rgba(239, 68, 68, 1)",
+              pointHoverBorderColor: "#fff",
               pointHitRadius: 10,
               pointBorderWidth: 2,
               data: @json($chartAreaValues),
@@ -227,62 +167,29 @@
           },
           options: {
             maintainAspectRatio: false,
-            layout: {
-              padding: {
-                left: 10,
-                right: 25,
-                top: 25,
-                bottom: 0
-              }
-            },
             scales: {
-              xAxes: [{
-                gridLines: {
-                  display: false,
-                  drawBorder: false
-                },
-                ticks: {
-                  maxTicksLimit: 12
-                }
-              }],
+              xAxes: [{ gridLines: { display: false }, ticks: { maxTicksLimit: 12 } }],
               yAxes: [{
                 ticks: {
                   maxTicksLimit: 5,
                   padding: 10,
-                  callback: function(value, index, values) {
-                    return formatMoney(value);
-                  }
+                  callback: function(value) { return formatMoney(value); }
                 },
-                gridLines: {
-                  color: "rgb(234, 236, 244)",
-                  zeroLineColor: "rgb(234, 236, 244)",
-                  drawBorder: false,
-                  borderDash: [2],
-                  zeroLineBorderDash: [2]
-                }
+                gridLines: { color: "#f1f5f9", zeroLineColor: "#f1f5f9", drawBorder: false }
               }],
             },
-            legend: {
-              display: false
-            },
+            legend: { display: false },
             tooltips: {
-              backgroundColor: "rgb(255,255,255)",
-              bodyFontColor: "#858796",
-              titleMarginBottom: 10,
-              titleFontColor: '#6e707e',
-              titleFontSize: 14,
-              borderColor: '#dddfeb',
-              borderWidth: 1,
-              xPadding: 15,
-              yPadding: 15,
+              backgroundColor: "#0f172a",
+              bodyFontColor: "#fff",
+              titleFontColor: '#94a3b8',
+              cornerRadius: 12,
+              xPadding: 12,
+              yPadding: 12,
               displayColors: false,
-              intersect: false,
-              mode: 'index',
-              caretPadding: 10,
               callbacks: {
                 label: function(tooltipItem, chart) {
-                  var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
-                  return datasetLabel + ': ' + formatMoney(tooltipItem.yLabel);
+                  return 'Doanh thu: ' + formatMoney(tooltipItem.yLabel);
                 }
               }
             }
@@ -297,22 +204,20 @@
             labels: ["Món đơn lẻ", "Gói dịch vụ"],
             datasets: [{
               data: [{{ $singleRevenue }}, {{ $subscriptionRevenue }}],
-              backgroundColor: ['#4e73df', '#1cc88a'],
-              hoverBackgroundColor: ['#2e59d9', '#17a673'],
-              hoverBorderColor: "rgba(235, 235, 235, 1)",
+              backgroundColor: ['#ef4444', '#10b981'],
+              hoverBackgroundColor: ['#dc2626', '#059669'],
+              hoverBorderColor: "#ffffff",
             }],
           },
           options: {
             maintainAspectRatio: false,
+            legend: { display: false },
+            cutoutPercentage: 75,
             tooltips: {
-              backgroundColor: "rgb(255,255,255)",
-              bodyFontColor: "#858796",
-              borderColor: '#dddfeb',
-              borderWidth: 1,
-              xPadding: 15,
-              yPadding: 15,
-              displayColors: false,
-              caretPadding: 10,
+              backgroundColor: "#0f172a",
+              cornerRadius: 12,
+              xPadding: 12,
+              yPadding: 12,
               callbacks: {
                 label: function(tooltipItem, data) {
                   var label = data.labels[tooltipItem.index] || '';
@@ -320,11 +225,7 @@
                   return label + ': ' + formatMoney(value);
                 }
               }
-            },
-            legend: {
-              display: false
-            },
-            cutoutPercentage: 80,
+            }
           },
         });
     </script>
@@ -332,7 +233,6 @@
     <!-- Weather Script -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Weather API using Open-Meteo for Ho Chi Minh city (latitude 10.823, longitude 106.6296)
             fetch('https://api.open-meteo.com/v1/forecast?latitude=10.823&longitude=106.6296&current_weather=true')
                 .then(response => response.json())
                 .then(data => {
@@ -341,31 +241,27 @@
                         const code = data.current_weather.weathercode;
                         document.getElementById('weather-temp').innerText = temp + '°C';
                         
-                        // Parse weather description
-                        let desc = 'Bầu trời trong xanh, thời tiết đẹp';
-                        let recommendation = '👉 Khuyến nghị: Thời tiết đẹp, khuyến khích khách ăn tại chỗ hoặc đặt combo trưa!';
+                        let desc = 'Nắng đẹp, trời quang';
+                        let recommendation = '💡 Thời tiết lý tưởng để đề xuất các món tráng miệng giải nhiệt và combo trưa!';
                         
                         if (code >= 1 && code <= 3) {
-                            desc = 'Bầu trời nhiều mây rải rác';
-                            recommendation = '👉 Khuyến nghị: Thời tiết mát mẻ, lý tưởng để đặt giao hàng combo gia đình.';
+                            desc = 'Mây rải rác';
+                            recommendation = '💡 Mát mẻ, phù hợp đẩy mạnh quảng bá đơn hàng giao tận nơi.';
                         } else if (code >= 51 && code <= 67) {
-                            desc = 'Có mưa phùn / mưa nhỏ';
-                            recommendation = '👉 Khuyến nghị: Mưa nhẹ, các đơn hàng online dự kiến sẽ tăng 15%. Bố trí sẵn shipper!';
-                        } else if (code >= 71 && code <= 82) {
-                            desc = 'Có mưa rào / mưa dông lớn';
-                            recommendation = '👉 Cảnh báo: Mưa dông lớn! Nhu cầu đặt món giao tận nơi tăng đột biến. Ưu tiên ship nhanh!';
-                        } else if (code >= 95) {
-                            desc = 'Có dông bão mạnh';
-                            recommendation = '👉 Cảnh báo nguy hiểm: Dông bão lớn. Hạn chế ship xa, đảm bảo an toàn cho shipper!';
+                            desc = 'Mưa nhẹ';
+                            recommendation = '💡 Nhu cầu đặt món giao tận nhà tăng 15-20%. Sẵn sàng đội ngũ shipper!';
+                        } else if (code >= 71) {
+                            desc = 'Mưa dông lớn';
+                            recommendation = '⚠️ Mưa lớn! Đơn hàng online tăng đột biến. Ưu tiên điều phối giao hàng nhanh!';
                         }
 
-                        document.getElementById('weather-text').innerText = 'Hiện tại: ' + desc + ' | Tốc độ gió: ' + data.current_weather.windspeed + ' km/h';
+                        document.getElementById('weather-text').innerText = 'Hiện tại: ' + desc + ' • Gió: ' + data.current_weather.windspeed + ' km/h';
                         document.getElementById('weather-recommendation').innerText = recommendation;
                     }
                 })
                 .catch(err => {
                     console.error('Weather load error:', err);
-                    document.getElementById('weather-text').innerText = 'Không thể tải dữ liệu thời tiết thực tế.';
+                    document.getElementById('weather-text').innerText = 'Dữ liệu thời tiết hiện không khả dụng.';
                 });
         });
     </script>

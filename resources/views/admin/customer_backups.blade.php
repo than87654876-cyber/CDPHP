@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Sao lưu và Khôi phục Khách hàng - FOODELICIOUS')
+@section('title', 'Sao lưu và Khôi phục Khách hàng - FOODDAILY')
 
 @section('content')
     <div class="d-sm-flex align-items-center justify-content-between mb-4">

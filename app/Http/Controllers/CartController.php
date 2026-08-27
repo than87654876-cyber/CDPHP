@@ -138,10 +138,10 @@ class CartController extends Controller
                 if ($coupon) {
                     $now = now()->format('Y-m-d');
                     $isValid = true;
-                    if ($coupon->start_date && $now < $coupon->start_date) {
+                    if ($coupon->start_date && $now < $coupon->start_date->format('Y-m-d')) {
                         $isValid = false;
                     }
-                    if ($coupon->end_date && $now > $coupon->end_date) {
+                    if ($coupon->end_date && $now > $coupon->end_date->format('Y-m-d')) {
                         $isValid = false;
                     }
                     if ($coupon->min_order_value && $totalAmount < $coupon->min_order_value) {
@@ -188,7 +188,7 @@ class CartController extends Controller
             }
             $order->payment_method = $paymentMethod;
             $order->payment_status = 'pending';
-            $order->order_status = 'pending';
+            $order->order_status = 'preparing';
             $order->health_notes = 'Giao hàng: '.$request->cart_time.'. SĐT: '.$request->cart_phone.'. Địa chỉ: '.$request->cart_address;
             $order->save();
 
@@ -285,6 +285,14 @@ class CartController extends Controller
             'rating' => $request->rating_stars,
             'comment' => $request->review_comment,
         ]);
+
+        $order->touch();
+
+        try {
+            event(new \App\Events\OrderUpdated($order, 'reviewed'));
+        } catch (\Exception $broadcastException) {
+            \Illuminate\Support\Facades\Log::warning('Broadcasting failed: ' . $broadcastException->getMessage());
+        }
 
         return redirect()->route('giohang')->with('success', 'Cảm ơn bạn đã gửi đánh giá cho đơn hàng FDL-'.$order->id.'!');
     }
@@ -599,10 +607,14 @@ class CartController extends Controller
         foreach ($orders as $order) {
             $action = 'status_updated';
             
+            $isReviewed = \App\Models\Review::where('order_id', $order->id)->exists();
+
             if ($order->created_at->gt($sinceDate) || $order->created_at->eq($order->updated_at)) {
                 $action = 'created';
             } elseif ($order->order_status === 'cancelled') {
                 $action = 'cancelled';
+            } elseif ($isReviewed && $order->updated_at->gt($sinceDate)) {
+                $action = 'reviewed';
             } elseif ($order->payment_status === 'paid' && $order->updated_at->gt($sinceDate)) {
                 $action = 'paid';
             } elseif ($order->payment_status === 'refunded') {
@@ -656,14 +668,14 @@ class CartController extends Controller
 
         // Check date
         $now = now()->format('Y-m-d');
-        if ($coupon->start_date && $now < $coupon->start_date) {
+        if ($coupon->start_date && $now < $coupon->start_date->format('Y-m-d')) {
             return response()->json([
                 'success' => false,
                 'message' => 'Chương trình khuyến mãi chưa bắt đầu.'
             ]);
         }
 
-        if ($coupon->end_date && $now > $coupon->end_date) {
+        if ($coupon->end_date && $now > $coupon->end_date->format('Y-m-d')) {
             return response()->json([
                 'success' => false,
                 'message' => 'Mã giảm giá đã hết hạn sử dụng.'
@@ -705,5 +717,23 @@ class CartController extends Controller
             'message' => 'Áp dụng mã giảm giá thành công!'
         ]);
     }
+
+    public function pollUserOrders(Request $request)
+    {
+        if (!Auth::check()) {
+            return response()->json(['orders' => []]);
+        }
+
+        $orders = Order::where('user_id', Auth::id())
+            ->orderBy('updated_at', 'desc')
+            ->take(10)
+            ->get(['id', 'order_status', 'payment_status', 'updated_at']);
+
+        return response()->json([
+            'orders' => $orders,
+            'timestamp' => now()->toDateTimeString()
+        ]);
+    }
 }
+
 

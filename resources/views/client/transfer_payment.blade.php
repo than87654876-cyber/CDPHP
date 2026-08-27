@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Thanh toán Đơn hàng - FOODELICIOUS</title>
+    <title>Thanh toán Đơn hàng - FOODDAILY</title>
 
     <link href="{{ asset('logo.jpg') }}" rel="icon">
 
@@ -80,7 +80,7 @@
         <div class="container d-flex align-items-center justify-content-between">
             <a href="{{ route('trangchu') }}" class="logo d-flex align-items-center me-auto" style="text-decoration: none;">
                 <img src="{{ asset('logo.jpg') }}" alt="">
-                <h1 class="sitename text-danger m-0" style="font-size: 28px;">FOODELICIOUS</h1>
+                <h1 class="sitename text-danger m-0" style="font-size: 28px;">FOODDAILY</h1>
             </a>
             <span class="navbar-text fw-bold text-muted"><i class="bi bi-shield-check text-success"></i> Hệ thống thanh toán mã QR giả lập</span>
         </div>
@@ -167,7 +167,7 @@
                     </div>
                     <div class="py-2 d-flex justify-content-between">
                         <span class="text-muted">Nhà cung cấp:</span>
-                        <span class="fw-bold">Hệ thống FOODELICIOUS</span>
+                        <span class="fw-bold">Hệ thống FOODDAILY</span>
                     </div>
                     <div class="py-2 d-flex justify-content-between align-items-center">
                         <span class="text-muted">Số tiền cần thanh toán:</span>

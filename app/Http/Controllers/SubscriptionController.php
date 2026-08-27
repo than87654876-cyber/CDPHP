@@ -271,7 +271,7 @@ class SubscriptionController extends Controller
     public function buyPackage(Request $request)
     {
         $request->validate([
-            'package_type' => 'required|string|in:family,company,dinner',
+            'package_type' => 'required|integer|exists:service_packages,id',
             'package_duration' => 'required|integer|in:7,14,30',
             'start_date' => 'required|date|after_or_equal:today',
             'delivery_slot' => 'required|string|in:morning,noon,evening',
@@ -281,18 +281,10 @@ class SubscriptionController extends Controller
             'sub_payment_method' => 'required|string|in:cash,bank_transfer',
         ]);
 
-        // Ánh xạ tên gói hiển thị sang tên gói lưu trong database
-        $packageNameMap = [
-            'family' => 'Gói Gia Đình Hàng Ngày',
-            'company' => 'Gói Văn Phòng / Công Ty',
-            'dinner' => 'Gói Ăn Chiều Tối Dinh Dưỡng',
-        ];
-
-        $packageName = $packageNameMap[$request->package_type];
-        $servicePackage = ServicePackage::where('package_name', $packageName)->first();
+        $servicePackage = ServicePackage::where('id', $request->package_type)->where('status', true)->first();
 
         if (! $servicePackage) {
-            return back()->withErrors(['error' => 'Gói dịch vụ được chọn không khả dụng trong hệ thống.']);
+            return back()->withErrors(['error' => 'Gói dịch vụ được chọn không khả dụng hoặc đã bị ngừng hoạt động.']);
         }
 
         // Tính giá tiền: giá gốc * (số ngày chọn / số ngày chuẩn của gói)

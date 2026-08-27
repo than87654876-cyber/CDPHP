@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Quản lý Hoàn tiền - FOODELICIOUS')
+@section('title', 'Quản lý Hoàn tiền - FOODDAILY')
 
 @section('styles')
     <link href="{{ asset('admin/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
