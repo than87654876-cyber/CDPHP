@@ -106,14 +106,7 @@
                     <a href="{{ route('quanly_monandon') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_monandon') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
                         <div class="flex items-center gap-3">
                             <i class="fas fa-bowl-rice w-5 text-center"></i>
-                            <span>Món ăn đơn</span>
-                        </div>
-                    </a>
-
-                    <a href="{{ route('quanly_goidichvu') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_goidichvu') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-box-archive w-5 text-center"></i>
-                            <span>Gói dịch vụ Combo</span>
+                            <span>Món ăn</span>
                         </div>
                     </a>
 
@@ -140,13 +133,6 @@
                                 {{ $pendingOrdersCount }}
                             </span>
                         @endif
-                    </a>
-
-                    <a href="{{ route('quanly_goidangky') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_goidangky') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-calendar-check w-5 text-center"></i>
-                            <span>Gói đăng ký tuần/tháng</span>
-                        </div>
                     </a>
 
                     <a href="{{ route('quanly_yeucauhoan') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_yeucauhoan') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">

@@ -1,310 +1,358 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.app')
 
-<head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Trang chủ - FOODDAILY</title>
-    <meta name="description" content="">
-    <meta name="keywords" content="">
+@section('title', 'Giỏ Hàng & Thanh Toán - FOODDAILY')
 
-    <link href="{{ asset('logo.jpg') }}" rel="icon">
-    <link href="{{ asset('client/assets/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
-
-    <link href="https://fonts.googleapis.com" rel="preconnect">
-    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Amatic+SC:wght@400;700&display=swap"
-        rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" type="text/css">
-
-    <link href="{{ asset('client/assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('client/assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
-    <link href="{{ asset('client/assets/vendor/aos/aos.css') }}" rel="stylesheet">
-    <link href="{{ asset('client/assets/vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('client/assets/vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
-
-    <link href="{{ asset('client/assets/css/main.css') }}" rel="stylesheet">
-
-    <style>
-        .menu-item {
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-
-        .menu-item:hover {
-            transform: scale(1.02);
-        }
-
-        /* Đồng bộ kích thước hình ảnh món ăn */
-        .menu-item .menu-img {
-            width: 100% !important;
-            height: 250px !important;
-            object-fit: cover !important;
-            border-radius: 8px;
-        }
-
-        .modal-header-custom {
-            background-color: #ce1126;
-            color: white;
-        }
-
-        .btn-order-submit {
-            background-color: #ce1126;
-            color: white;
-            border: none;
-        }
-
-        .btn-order-submit:hover {
-            background-color: #a00d20;
-            color: white;
-        }
-    </style>
-</head>
-
-<body class="index-page">
-    <header id="header" class="header d-flex align-items-center sticky-top">
-        <div class="container position-relative d-flex align-items-center justify-content-between">
-
-            <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
-                <img src="{{ asset('logo.jpg') }}" alt="">
-                <h1 class="sitename">FOODDAILY</h1>
-                <span>.</span>
+@section('content')
+<div class="py-8 bg-transparent min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Navigation Breadcrumb -->
+        <div class="mb-6 flex items-center justify-between">
+            <div class="flex items-center gap-2 text-xs font-semibold text-slate-500">
+                <a href="{{ route('trangchu') }}" class="hover:text-[#ee4d2d]">Trang chủ</a>
+                <i class="fas fa-chevron-right text-[10px] text-slate-400"></i>
+                <span class="text-[#ee4d2d] font-bold">Giỏ hàng & Thanh toán</span>
+            </div>
+            <a href="{{ route('trangchu') }}#menu" class="text-xs font-bold text-[#ee4d2d] hover:underline flex items-center gap-1">
+                <i class="fas fa-plus-circle"></i> Thêm món ăn khác
             </a>
-
-            <nav id="navmenu" class="navmenu">
-                <ul>
-                    <li><a href="#hero" class="active">Trang chủ<br></a></li>
-                    <li><a href="#about">Thông tin</a></li>
-                    <li class="dropdown"><a href="#menu"><span>Thực đơn</span> <i
-                                class="bi bi-chevron-down toggle-dropdown"></i></a>
-                        <ul>
-                            <li><a href="#menu">Ăn sáng</a></li>
-                            <li><a href="#menu">Tráng miệng</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#events">Chương trình</a></li>
-                    <li><a href="#gallery">Kho ảnh</a></li>
-                    <li><a href="#contact">Liên hệ</a></li>
-                </ul>
-                <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
-            </nav>
-
-            <div class="d-flex align-items-center gap-3">
-                <a href="{{ route('giohang') }}" class="btn-cart" title="Giỏ hàng">
-                    <i class="bi bi-cart-fill fs-5"></i>
-                </a>
-                <a class="btn-getstarted" href="index.html#book-a-table">Đăng nhập</a>
-            </div>
-
         </div>
-    </header>
 
-    <main class="main">
+        <form action="{{ route('muahang.process') }}" method="POST" id="checkoutForm" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            @csrf
+            
+            <!-- Hidden Input JSON for Cart Items -->
+            <input type="hidden" name="cart_items" id="cart_items_input" value="[]">
 
-        <section id="hero" class="hero section light-background">
-            <div class="container">
-                <div class="row gy-4 justify-content-center justify-content-lg-between">
-                    <div class="col-lg-5 order-2 order-lg-1 d-flex flex-column justify-content-center">
-                        <h1 data-aos="fade-up">Enjoy Your Healthy<br>Delicious Food</h1>
-                        <p data-aos="fade-up" data-aos-delay="100">We are team of talented designers making websites
-                            with Bootstrap</p>
-                        <div class="d-flex" data-aos="fade-up" data-aos-delay="200">
-                            <a href="#book-a-table" class="btn-get-started">Đăng nhập</a>
-                            <a href="https://www.youtube.com/watch?v=Y7f98aduVJ8"
-                                class="glightbox btn-watch-video d-flex align-items-center"><i
-                                    class="bi bi-play-circle"></i><span>Watch Video</span></a>
+            <!-- LEFT COLUMN: CART ITEMS LIST (8 Columns) -->
+            <div class="lg:col-span-8 space-y-6">
+                <!-- Cart Items Container -->
+                <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-sm border border-slate-200 space-y-4">
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                        <div class="flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-lg bg-rose-50 text-[#ee4d2d] flex items-center justify-center font-bold text-sm">
+                                <i class="fas fa-shopping-basket"></i>
+                            </span>
+                            <h2 class="text-base font-extrabold text-slate-900">Món Ăn Đã Chọn (<span id="cart-item-count">0</span>)</h2>
+                        </div>
+                        <button type="button" onclick="clearCart()" class="text-xs font-bold text-slate-400 hover:text-rose-600 transition-colors">
+                            <i class="far fa-trash-can mr-1"></i> Xóa tất cả
+                        </button>
+                    </div>
+
+                    <!-- Cart List Render Target -->
+                    <div id="cart-items-list" class="divide-y divide-slate-100 min-h-[160px]">
+                        <!-- Rendered by JavaScript -->
+                    </div>
+
+                    <!-- Coupon Code Input Box -->
+                    <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center gap-3">
+                        <div class="relative flex-1 w-full">
+                            <input type="text" id="coupon_code" name="coupon_code" placeholder="Nhập mã giảm giá (VD: FOODDAILY30)" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-800 focus:border-[#ee4d2d] outline-none uppercase">
+                        </div>
+                        <button type="button" onclick="applyCoupon()" class="w-full sm:w-auto px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-extrabold transition-colors">
+                            Áp dụng
+                        </button>
+                    </div>
+                    <div id="coupon-message" class="text-xs font-bold hidden"></div>
+                </div>
+
+                <!-- ORDER HISTORY (Đơn hàng gần đây) -->
+                @auth
+                    @php
+                        $userOrders = \App\Models\Order::where('user_id', auth()->id())->with('orderItems.dish')->orderBy('created_at', 'desc')->take(5)->get();
+                    @endphp
+                    @if($userOrders->isNotEmpty())
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700">
+                            <h3 class="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                                <i class="fas fa-clock-rotate-left text-[#ee4d2d]"></i> Đơn Hàng Vừa Đặt Gần Đây
+                            </h3>
+                            <a href="{{ route('giohang') }}" class="text-xs font-bold text-[#0099ff] hover:underline">Xem tất cả</a>
+                        </div>
+                        <div class="space-y-3">
+                            @foreach($userOrders as $uOrder)
+                                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-100 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                    <div class="space-y-1">
+                                        <div class="flex items-center gap-2">
+                                            <span class="px-2.5 py-0.5 rounded bg-rose-100 dark:bg-rose-950 text-[#ee4d2d] text-[10px] font-black">#FDL-{{ $uOrder->id }}</span>
+                                            <span class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $uOrder->created_at->format('H:i d/m/Y') }}</span>
+                                        </div>
+                                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                                            {{ $uOrder->orderItems->pluck('dish.dish_name')->filter()->implode(', ') }}
+                                        </p>
+                                    </div>
+                                    <div class="flex items-center justify-between sm:justify-end gap-4">
+                                        <span class="text-xs font-black text-[#ee4d2d]">{{ number_format($uOrder->final_amount) }}đ</span>
+                                        <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase
+                                            @if($uOrder->order_status == 'completed') bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300
+                                            @elseif($uOrder->order_status == 'cancelled') bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300
+                                            @else bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300 @endif">
+                                            {{ $uOrder->order_status == 'preparing' ? 'Đang chế biến' : ($uOrder->order_status == 'delivering' ? 'Đang giao' : $uOrder->order_status) }}
+                                        </span>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
                     </div>
-                    <div class="col-lg-5 order-1 order-lg-2 hero-img" data-aos="zoom-out">
-                        <img src="{{ asset('client/assets/img/hero-img.png') }}" class="img-fluid animated" alt="">
+                    @endif
+                @endauth
+            </div>
+
+            <!-- RIGHT COLUMN: CHECKOUT & PAYMENT FORM (4 Columns) -->
+            <div class="lg:col-span-4 space-y-6">
+                <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 space-y-5 sticky top-20">
+                    <h3 class="text-sm font-extrabold text-slate-900 dark:text-white pb-3 border-b border-slate-100 dark:border-slate-700 flex items-center gap-2">
+                        <i class="fas fa-truck-fast text-[#ee4d2d]"></i> Thông Tin Nhận Hàng
+                    </h3>
+
+                    <!-- Non-logged User Info Fields -->
+                    @guest
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">Họ và tên <span class="text-[#ee4d2d]">*</span></label>
+                                <input type="text" name="cart_fullname" required placeholder="Nguyễn Văn A" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-xs font-semibold text-slate-800 dark:text-white focus:border-[#ee4d2d] outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">Email xác nhận <span class="text-[#ee4d2d]">*</span></label>
+                                <input type="email" name="cart_email" required placeholder="email@example.com" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-xs font-semibold text-slate-800 dark:text-white focus:border-[#ee4d2d] outline-none">
+                            </div>
+                        </div>
+                    @endguest
+
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">Số điện thoại nhận hàng <span class="text-[#ee4d2d]">*</span></label>
+                            <input type="tel" name="cart_phone" value="{{ auth()->check() ? auth()->user()->phone : '' }}" required placeholder="0901234567" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-xs font-semibold text-slate-800 dark:text-white focus:border-[#ee4d2d] outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">Địa chỉ giao hàng <span class="text-[#ee4d2d]">*</span></label>
+                            <textarea name="cart_address" required rows="2" placeholder="Số nhà, tên đường, Phường/Quận, TP. HCM..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-xs font-semibold text-slate-800 dark:text-white focus:border-[#ee4d2d] outline-none">{{ auth()->check() ? auth()->user()->notes : '' }}</textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">Thời gian nhận hàng</label>
+                            <select name="cart_time" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-xs font-semibold text-slate-800 dark:text-white focus:border-[#ee4d2d] outline-none">
+                                <option value="now" selected>⚡ Giao siêu tốc 20 phút</option>
+                                <option value="h1">Hẹn giờ (30 - 45 phút tới)</option>
+                                <option value="h2">Hẹn giờ (Buổi trưa 11:30 - 12:30)</option>
+                                <option value="h3">Hẹn giờ (Buổi chiều 17:30 - 18:30)</option>
+                            </select>
+                        </div>
                     </div>
+
+                    <!-- Payment Method Selector -->
+                    <div class="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-700">
+                        <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">Hình thức thanh toán</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-[#ee4d2d] transition-colors">
+                                <input type="radio" name="cart_payment" value="cod" checked class="text-[#ee4d2d] focus:ring-[#ee4d2d]">
+                                <span class="text-xs font-bold text-slate-800 dark:text-slate-200">💵 Tiền mặt khi nhận (COD)</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-[#ee4d2d] transition-colors">
+                                <input type="radio" name="cart_payment" value="atm" class="text-[#ee4d2d] focus:ring-[#ee4d2d]">
+                                <span class="text-xs font-bold text-slate-800 dark:text-slate-200">💳 Chuyển khoản VietQR Hỏa Tốc</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-[#ee4d2d] transition-colors">
+                                <input type="radio" name="cart_payment" value="momo" class="text-[#ee4d2d] focus:ring-[#ee4d2d]">
+                                <span class="text-xs font-bold text-slate-800 dark:text-slate-200">👛 Ví điện tử MoMo</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Order Price Summary -->
+                    <div class="pt-3 border-t border-slate-100 dark:border-slate-700 space-y-2 text-xs">
+                        <div class="flex justify-between text-slate-500 dark:text-slate-400">
+                            <span>Tạm tính món ăn:</span>
+                            <span id="summary-subtotal" class="font-bold text-slate-800 dark:text-slate-200">0đ</span>
+                        </div>
+                        <div class="flex justify-between text-slate-500 dark:text-slate-400">
+                            <span>Phí giao hàng (Freeship):</span>
+                            <span class="font-bold text-emerald-600">0đ</span>
+                        </div>
+                        <div class="flex justify-between text-slate-500 dark:text-slate-400" id="discount-row" style="display:none;">
+                            <span>Giảm giá voucher:</span>
+                            <span id="summary-discount" class="font-bold text-[#ee4d2d]">-0đ</span>
+                        </div>
+                        <div class="flex justify-between text-sm font-black text-slate-900 dark:text-white pt-2 border-t border-slate-100 dark:border-slate-700">
+                            <span>TỔNG THANH TOÁN:</span>
+                            <span id="summary-total" class="text-base text-[#ee4d2d]">0đ</span>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" id="btn-submit-order" class="w-full py-3.5 rounded-xl bg-[#ee4d2d] hover:bg-red-600 text-white font-extrabold text-xs shadow-lg shadow-rose-500/20 transition-all uppercase tracking-wider">
+                        ĐẶT HÀNG NGAY
+                    </button>
                 </div>
             </div>
-        </section>
+        </form>
 
-        <section id="menu" class="menu section">
-            <div class="container section-title" data-aos="fade-up">
-                <h2>Our Menu</h2>
-                <p><span>Check Our</span> <span class="description-title">Yummy Menu</span></p>
-            </div>
-
-            <div class="container">
-                <ul class="nav nav-tabs d-flex justify-content-center" data-aos="fade-up" data-aos-delay="100">
-                    <li class="nav-item">
-                        <a class="nav-link active show" data-bs-toggle="tab" data-bs-target="#menu-starters">
-                            <h4>Starters</h4>
-                        </a>
-                    </li>
-                </ul>
-
-                <div class="tab-content" data-aos="fade-up" data-aos-delay="200">
-                    <div class="tab-pane fade active show" id="menu-starters">
-                        <div class="tab-header text-center">
-                            <p>Menu</p>
-                            <h3>Starters</h3>
-                        </div>
-
-                        <div class="row gy-5">
-                            <div class="col-lg-4 menu-item" data-bs-toggle="modal" data-bs-target="#orderModal"
-                                data-product-name="Phở Bò Đặc Biệt" data-product-price="45.000 đ">
-                                <a href="javascript:void(0)"><img
-                                        src="{{ asset('client/assets/img/menu/menu-item-1.png') }}"
-                                        class="menu-img img-fluid" alt=""></a>
-                                <h4>Phở Bò Đặc Biệt</h4>
-                                <p class="ingredients">Bánh phở, sườn bò, bò tái nạm, nước dùng phin truyền thống</p>
-                                <p class="price">45.000 đ</p>
-                            </div>
-
-                            <div class="col-lg-4 menu-item" data-bs-toggle="modal" data-bs-target="#orderModal"
-                                data-product-name="Bánh Mì Thịt Nướng" data-product-price="35.000 đ">
-                                <a href="javascript:void(0)"><img
-                                        src="{{ asset('client/assets/img/menu/menu-item-2.png') }}"
-                                        class="menu-img img-fluid" alt=""></a>
-                                <h4>Bánh Mì Thịt Nướng</h4>
-                                <p class="ingredients">Bánh mì giòn, thịt xiên nướng, pa-tê, rau thơm đồ chua</p>
-                                <p class="price">35.000 đ</p>
-                            </div>
-
-                            <div class="col-lg-4 menu-item" data-bs-toggle="modal" data-bs-target="#orderModal"
-                                data-product-name="Cà Phê Sữa Đá" data-product-price="29.000 đ">
-                                <a href="javascript:void(0)"><img
-                                        src="{{ asset('client/assets/img/menu/menu-item-3.png') }}"
-                                        class="menu-img img-fluid" alt=""></a>
-                                <h4>Cà Phê Sữa Đá</h4>
-                                <p class="ingredients">Hạt Robusta xay nguyên chất, sữa đặc đặc sánh, đá viên</p>
-                                <p class="price">29.000 đ</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="orderModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <div class="modal-header modal-header-custom">
-                    <h5 class="modal-title font-weight-bold" id="orderModalLabel"><i
-                            class="bi bi-cart-plus-fill me-2"></i>Xác nhận đặt mua sản phẩm</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-shadow="none"
-                        data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form action="#" method="POST">
-                    <div class="modal-body text-dark">
-                        <div class="alert alert-secondary d-flex justify-content-between align-items-center py-2 mb-3">
-                            <div>Món ăn chọn: <strong id="modal-product-name" class="text-danger">N/A</strong></div>
-                            <div>Đơn giá: <strong id="modal-product-price" class="text-dark">0 đ</strong></div>
-                        </div>
-
-                        <div class="row">
-                            <div class="form-group col-md-4 mb-3">
-                                <label for="quantity" class="form-label font-weight-bold">Số lượng đặt <span
-                                        class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="quantity" name="quantity" value="1"
-                                    min="1" required>
-                            </div>
-                            <div class="form-group col-md-8 mb-3">
-                                <label for="delivery_time" class="form-label font-weight-bold">Thời gian nhận
-                                    hàng</label>
-                                <select class="form-select" id="delivery_time" name="delivery_time">
-                                    <option value="now" selected>Ngay bây giờ (Giao hỏa tốc)</option>
-                                    <option value="tomorrow_morning">Ngày mai - Buổi sáng (07:00 - 11:00)</option>
-                                    <option value="tomorrow_afternoon">Ngày mai - Buổi chiều (13:00 - 18:00)</option>
-                                    <option value="other">Khung giờ khác (Ghi chú phía dưới)</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="form-group col-md-6 mb-3">
-                                <label for="phone" class="form-label font-weight-bold">Số điện thoại nhận hàng <span
-                                        class="text-danger">*</span></label>
-                                <input type="tel" class="form-control" id="phone" name="phone"
-                                    placeholder="Nhập số điện thoại" required>
-                            </div>
-                            <div class="form-group col-md-6 mb-3">
-                                <label for="email" class="form-label font-weight-bold">Địa chỉ Email xác nhận <span
-                                        class="text-danger">*</span></label>
-                                <input type="email" class="form-control" id="email" name="email"
-                                    placeholder="name@example.com" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label for="address" class="form-label font-weight-bold">Địa chỉ giao hàng cụ thể <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="address" name="address"
-                                placeholder="Số nhà, tên đường, tòa nhà, phân hiệu phường/quận..." required>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label class="form-label font-weight-bold d-block">Phương thức thanh toán</label>
-                            <div class="form-check form-check-inline me-4">
-                                <input class="form-check-input" type="radio" name="payment_method" id="pay_cod"
-                                    value="cod" checked>
-                                <label class="form-check-check-label" for="pay_cod"><i
-                                        class="bi bi-cash-stack text-success me-1"></i> Tiền mặt khi nhận (COD)</label>
-                            </div>
-                            <div class="form-check form-check-inline me-4">
-                                <!-- Ví MoMo removed: only bank transfer and COD are supported -->
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="payment_method" id="pay_atm"
-                                    value="atm">
-                                <label class="form-check-check-label" for="pay_atm"><i
-                                        class="bi bi-credit-card me-1"></i> Chuyển khoản ATM</label>
-                            </div>
-                        </div>
-
-                        <div class="form-group mb-2">
-                            <label for="order_notes" class="form-label font-weight-bold">Ghi chú món ăn / Yêu cầu
-                                thêm</label>
-                            <textarea class="form-control" id="order_notes" name="order_notes" rows="2"
-                                placeholder="Ví dụ: Không hành, cay nhiều, giao tới cổng trường phân hiệu gọi trước..."></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer bg-light">
-                        <button type="button" class="btn btn-secondary shadow-sm" data-bs-dismiss="modal">Hủy
-                            bỏ</button>
-                        <button type="submit" class="btn btn-order-submit shadow-sm px-4">Xác nhận đặt hàng</button>
-                    </div>
-                </form>
-            </div>
-        </div>
     </div>
+</div>
+@endsection
 
-    <footer id="footer" class="footer dark-background">
-        <div class="container copyright text-center mt-4">
-            <p>© <span>Copyright</span> <strong class="px-1 sitename">Yummy</strong> <span>All Rights Reserved</span>
-            </p>
-        </div>
-    </footer>
+@section('scripts')
+<script>
+    let appliedDiscount = 0;
 
-    <script src="{{ asset('client/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('client/assets/vendor/aos/aos.js') }}"></script>
-    <script src="{{ asset('client/assets/vendor/glightbox/js/glightbox.min.js') }}"></script>
-    <script src="{{ asset('client/assets/vendor/purecounter/purecounter_vanilla.js') }}"></script>
-    <script src="{{ asset('client/assets/vendor/swiper/swiper-bundle.min.js') }}"></script>
+    function getCart() {
+        return JSON.parse(localStorage.getItem('fooddelicious_cart') || '[]');
+    }
 
-    <script src="{{ asset('client/assets/js/main.js') }}"></script>
+    function saveCart(cart) {
+        localStorage.setItem('fooddelicious_cart', JSON.stringify(cart));
+        if (typeof updateGlobalHeaderCartBadge === 'function') {
+            updateGlobalHeaderCartBadge();
+        }
+        renderCartItems();
+    }
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const menuItems = document.querySelectorAll(".menu-item");
-            menuItems.forEach(item => {
-                item.addEventListener("click", function () {
-                    const name = this.getAttribute("data-product-name");
-                    const price = this.getAttribute("data-product-price");
+    function clearCart() {
+        if (confirm('Bạn có chắc muốn xóa tất cả món ăn khỏi giỏ hàng?')) {
+            localStorage.removeItem('fooddelicious_cart');
+            if (typeof updateGlobalHeaderCartBadge === 'function') {
+                updateGlobalHeaderCartBadge();
+            }
+            renderCartItems();
+        }
+    }
 
-                    document.getElementById("modal-product-name").innerText = name;
-                    document.getElementById("modal-product-price").innerText = price;
-                });
-            });
+    function updateQty(index, delta) {
+        let cart = getCart();
+        if (cart[index]) {
+            cart[index].quantity += delta;
+            if (cart[index].quantity <= 0) {
+                cart.splice(index, 1);
+            }
+            saveCart(cart);
+        }
+    }
+
+    function removeItem(index) {
+        let cart = getCart();
+        if (cart[index]) {
+            cart.splice(index, 1);
+            saveCart(cart);
+        }
+    }
+
+    function formatMoney(num) {
+        return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.') + 'đ';
+    }
+
+    function renderCartItems() {
+        const cart = getCart();
+        const container = document.getElementById('cart-items-list');
+        const countSpan = document.getElementById('cart-item-count');
+        const cartInput = document.getElementById('cart_items_input');
+        const submitBtn = document.getElementById('btn-submit-order');
+
+        countSpan.innerText = cart.length;
+        cartInput.value = JSON.stringify(cart);
+
+        if (cart.length === 0) {
+            container.innerHTML = `
+                <div class="py-12 text-center space-y-3">
+                    <div class="w-16 h-16 rounded-full bg-rose-50 dark:bg-rose-950/50 text-[#ee4d2d] flex items-center justify-center text-2xl mx-auto">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-800 dark:text-slate-200 text-sm">Giỏ hàng của bạn đang trống</h3>
+                    <p class="text-xs text-slate-400">Hãy thêm món ăn tươi ngon từ thực đơn để tiếp tục đặt hàng.</p>
+                    <a href="{{ route('trangchu') }}#menu" class="inline-block px-5 py-2.5 bg-[#ee4d2d] text-white font-extrabold text-xs rounded-xl hover:bg-red-600 transition-colors">
+                        Khám phá thực đơn ngay
+                    </a>
+                </div>
+            `;
+            if (submitBtn) submitBtn.disabled = true;
+            document.getElementById('summary-subtotal').innerText = '0đ';
+            document.getElementById('summary-total').innerText = '0đ';
+            return;
+        }
+
+        if (submitBtn) submitBtn.disabled = false;
+
+        let subtotal = 0;
+        let html = '';
+
+        cart.forEach((item, index) => {
+            const itemTotal = (item.price || 0) * (item.quantity || 1);
+            subtotal += itemTotal;
+
+            html += `
+                <div class="py-4 flex items-center gap-4 group">
+                    <div class="w-16 h-16 rounded-xl bg-slate-100 dark:bg-slate-700 overflow-hidden shrink-0 border border-slate-200 dark:border-slate-600">
+                        ${item.image ? `<img src="${item.image}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-slate-300"><i class="fas fa-utensils"></i></div>`}
+                    </div>
+                    <div class="flex-1 min-w-0 space-y-1">
+                        <h4 class="font-extrabold text-slate-900 dark:text-white text-xs truncate">${item.name}</h4>
+                        <p class="text-xs text-[#ee4d2d] font-black">${formatMoney(item.price)}</p>
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-700 rounded-lg p-1 border border-slate-200 dark:border-slate-600">
+                        <button type="button" onclick="updateQty(${index}, -1)" class="w-6 h-6 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs hover:bg-slate-200 flex items-center justify-center">-</button>
+                        <span class="text-xs font-black text-slate-900 dark:text-white px-2">${item.quantity}</span>
+                        <button type="button" onclick="updateQty(${index}, 1)" class="w-6 h-6 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs hover:bg-slate-200 flex items-center justify-center">+</button>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <span class="text-xs font-black text-slate-900 dark:text-white block">${formatMoney(itemTotal)}</span>
+                        <button type="button" onclick="removeItem(${index})" class="text-[11px] font-bold text-slate-400 hover:text-rose-600 transition-colors">Xóa</button>
+                    </div>
+                </div>
+            `;
         });
-    </script>
-</body>
 
-</html>
+        container.innerHTML = html;
+        document.getElementById('summary-subtotal').innerText = formatMoney(subtotal);
+
+        const finalTotal = Math.max(0, subtotal - appliedDiscount);
+        document.getElementById('summary-total').innerText = formatMoney(finalTotal);
+    }
+
+    function applyCoupon() {
+        const code = document.getElementById('coupon_code').value.trim();
+        const msgDiv = document.getElementById('coupon-message');
+        const cart = getCart();
+        let subtotal = cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+
+        if (!code) {
+            msgDiv.innerText = 'Vui lòng nhập mã giảm giá!';
+            msgDiv.className = 'text-xs font-bold text-rose-500 block';
+            return;
+        }
+
+        fetch("{{ route('api.coupon.validate') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            },
+            body: JSON.stringify({ code: code, total_amount: subtotal })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                appliedDiscount = data.discount_amount;
+                msgDiv.innerText = data.message + ' (-' + formatMoney(appliedDiscount) + ')';
+                msgDiv.className = 'text-xs font-bold text-emerald-600 block';
+                document.getElementById('discount-row').style.display = 'flex';
+                document.getElementById('summary-discount').innerText = '-' + formatMoney(appliedDiscount);
+                renderCartItems();
+            } else {
+                appliedDiscount = 0;
+                msgDiv.innerText = data.message;
+                msgDiv.className = 'text-xs font-bold text-rose-500 block';
+                document.getElementById('discount-row').style.display = 'none';
+                renderCartItems();
+            }
+        })
+        .catch(err => {
+            console.error('Coupon error:', err);
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        renderCartItems();
+    });
+</script>
+@endsection

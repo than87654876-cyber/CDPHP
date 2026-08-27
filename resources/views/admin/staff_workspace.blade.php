@@ -35,11 +35,11 @@
                         </div>
                         <div>
                             <h3 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider">Nhà Bếp Chế Biến</h3>
-                            <p class="text-[11px] text-slate-400 font-medium">Món ăn lẻ & Đơn combo hôm nay</p>
+                            <p class="text-[11px] text-slate-400 font-medium">Món ăn cần chế biến ngay</p>
                         </div>
                     </div>
                     <span class="px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-xs font-extrabold border border-amber-200">
-                        {{ $kitchenTotal }} món
+                        {{ $kitchenSingleQty }} món
                     </span>
                 </div>
 
@@ -50,18 +50,10 @@
                 <div class="space-y-3">
                     <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
                         <div>
-                            <p class="text-xs font-bold text-slate-800">Món đơn lẻ cần chế biến</p>
+                            <p class="text-xs font-bold text-slate-800">Món ăn cần chế biến</p>
                             <p class="text-[10px] text-slate-400">Từ các đơn hàng mới</p>
                         </div>
                         <span class="px-3 py-1 bg-amber-500 text-white rounded-xl text-xs font-black">{{ $kitchenSingleQty }} suất</span>
-                    </div>
-
-                    <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-bold text-slate-800">Khách đăng ký gói Combo</p>
-                            <p class="text-[10px] text-slate-400">Lịch giao hôm nay</p>
-                        </div>
-                        <span class="px-3 py-1 bg-slate-800 text-white rounded-xl text-xs font-black">{{ $kitchenSubQty }} suất</span>
                     </div>
                 </div>
             </div>

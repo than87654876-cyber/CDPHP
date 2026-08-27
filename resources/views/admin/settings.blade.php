@@ -33,7 +33,7 @@
     @endif
 
     <!-- Quick Navigation Shortcuts -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 space-y-3 hover:shadow-md transition-all">
             <div class="w-10 h-10 rounded-2xl bg-rose-50 text-[#ee4d2d] flex items-center justify-center text-lg font-bold">
                 <i class="fas fa-utensils"></i>
@@ -45,20 +45,6 @@
             <div class="pt-2 flex gap-2">
                 <a href="{{ route('quanly_monandon') }}" class="px-3.5 py-1.5 rounded-xl bg-rose-50 hover:bg-[#ee4d2d] text-[#ee4d2d] hover:text-white text-xs font-bold transition-all">Món ăn</a>
                 <a href="{{ route('quanly_danhmuc') }}" class="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all">Danh mục</a>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 space-y-3 hover:shadow-md transition-all">
-            <div class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg font-bold">
-                <i class="fas fa-box-archive"></i>
-            </div>
-            <div>
-                <h4 class="font-extrabold text-slate-900 text-sm">Gói Combo & Đăng Ký</h4>
-                <p class="text-xs text-slate-400 font-medium">Quản lý gói dịch vụ combo tuần/tháng</p>
-            </div>
-            <div class="pt-2 flex gap-2">
-                <a href="{{ route('quanly_goidichvu') }}" class="px-3.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-600 text-amber-700 hover:text-white text-xs font-bold transition-all">Gói dịch vụ</a>
-                <a href="{{ route('quanly_goidangky') }}" class="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all">Khách đăng ký</a>
             </div>
         </div>
 

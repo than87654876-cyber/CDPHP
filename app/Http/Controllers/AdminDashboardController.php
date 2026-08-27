@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
-use App\Models\Subscription;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -15,22 +14,19 @@ class AdminDashboardController extends Controller
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
 
-        $monthlyRevenue = Order::where('payment_status', 'paid')
+        $monthlyRevenue = Order::whereIn('payment_status', ['paid', 'completed'])
             ->whereYear('created_at', $currentYear)
             ->whereMonth('created_at', $currentMonth)
             ->sum('final_amount');
 
-        $yearlyRevenue = Order::where('payment_status', 'paid')
+        $yearlyRevenue = Order::whereIn('payment_status', ['paid', 'completed'])
             ->whereYear('created_at', $currentYear)
             ->sum('final_amount');
 
         $orderCount = Order::where('order_status', '!=', 'cancelled')->count();
 
-        $activeSubscriptionCount = Subscription::where('status', 'active')->count();
-
         // 2. Prepare Area Chart Data (Months 1-12 of the current year)
-        // Group in PHP to support both MySQL and SQLite (testing environment)
-        $paidOrdersThisYear = Order::where('payment_status', 'paid')
+        $paidOrdersThisYear = Order::whereIn('payment_status', ['paid', 'completed'])
             ->whereYear('created_at', $currentYear)
             ->get();
 
@@ -41,30 +37,35 @@ class AdminDashboardController extends Controller
         }
         $chartAreaValues = array_values($monthlyRevenueData);
 
-        // 3. Prepare Pie Chart Data (Single orders vs Subscription packages)
-        $singleRevenue = (float) Order::where('payment_status', 'paid')
-            ->where('order_type', 'single')
+        // 3. Revenue distribution by Payment Methods
+        $codRevenue = (float) Order::whereIn('payment_status', ['paid', 'completed'])
+            ->where('payment_method', 'cod')
             ->sum('final_amount');
 
-        $subscriptionRevenue = (float) Order::where('payment_status', 'paid')
-            ->where('order_type', 'subscription')
+        $bankRevenue = (float) Order::whereIn('payment_status', ['paid', 'completed'])
+            ->where('payment_method', 'bank_transfer')
             ->sum('final_amount');
 
-        // Avoid division by zero if there's no revenue yet
-        $totalRev = $singleRevenue + $subscriptionRevenue;
-        $singlePercent = $totalRev > 0 ? round(($singleRevenue / $totalRev) * 100) : 50;
-        $subscriptionPercent = $totalRev > 0 ? round(($subscriptionRevenue / $totalRev) * 100) : 50;
+        $momoRevenue = (float) Order::whereIn('payment_status', ['paid', 'completed'])
+            ->where('payment_method', 'momo')
+            ->sum('final_amount');
+
+        $totalRev = $codRevenue + $bankRevenue + $momoRevenue;
+        $codPercent = $totalRev > 0 ? round(($codRevenue / $totalRev) * 100) : 40;
+        $bankPercent = $totalRev > 0 ? round(($bankRevenue / $totalRev) * 100) : 40;
+        $momoPercent = $totalRev > 0 ? round(($momoRevenue / $totalRev) * 100) : 20;
 
         return view('admin.revenue_report', compact(
             'monthlyRevenue',
             'yearlyRevenue',
             'orderCount',
-            'activeSubscriptionCount',
             'chartAreaValues',
-            'singleRevenue',
-            'subscriptionRevenue',
-            'singlePercent',
-            'subscriptionPercent'
+            'codRevenue',
+            'bankRevenue',
+            'momoRevenue',
+            'codPercent',
+            'bankPercent',
+            'momoPercent'
         ));
     }
 }

@@ -3,17 +3,17 @@
 @section('title', 'Tra cứu đơn hàng - FOODDAILY')
 
 @section('content')
-<div class="py-12 bg-slate-50 min-h-screen">
+<div class="py-12 bg-transparent min-h-screen">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Search Card -->
-        <div class="bg-white rounded-3xl p-8 shadow-xl border border-slate-100 mb-8">
+        <div class="bg-white/95 backdrop-blur-sm rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200 mb-8">
             <div class="flex items-center gap-3 border-b border-slate-100 pb-5 mb-6">
-                <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center font-bold">
+                <div class="w-10 h-10 rounded-xl bg-rose-50 text-[#ee4d2d] flex items-center justify-center font-bold">
                     <i class="fas fa-search text-lg"></i>
                 </div>
                 <div>
-                    <h2 class="text-xl font-extrabold text-slate-800">Tra cứu tiến độ đơn hàng</h2>
+                    <h2 class="text-xl font-extrabold text-slate-900">Tra cứu tiến độ đơn hàng</h2>
                     <p class="text-xs text-slate-500">Kiểm tra thông tin và vị trí giao hàng theo mã đơn của bạn</p>
                 </div>
             </div>
@@ -28,24 +28,24 @@
             <form action="{{ route('tracuu') }}" method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label for="order_id" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                        Mã đơn hàng <span class="text-rose-500">*</span>
+                        Mã đơn hàng <span class="text-[#ee4d2d]">*</span>
                     </label>
-                    <input type="text" id="order_id" name="order_id" placeholder="Ví dụ: FDL-123" value="{{ $orderIdInput }}" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 text-sm font-semibold transition-all">
+                    <input type="text" id="order_id" name="order_id" placeholder="Ví dụ: FDL-123" value="{{ $orderIdInput }}" required class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-800 focus:border-[#ee4d2d] outline-none text-sm font-semibold">
                 </div>
 
                 <div>
                     <label for="phone" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Số điện thoại</label>
-                    <input type="tel" id="phone" name="phone" placeholder="VD: 0901234567" value="{{ $phone }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 text-sm font-semibold transition-all">
+                    <input type="tel" id="phone" name="phone" placeholder="VD: 0901234567" value="{{ $phone }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-800 focus:border-[#ee4d2d] outline-none text-sm font-semibold">
                 </div>
 
                 <div>
                     <label for="email" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Địa chỉ Email</label>
-                    <input type="email" id="email" name="email" placeholder="VD: name@example.com" value="{{ $email }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 text-sm font-semibold transition-all">
+                    <input type="email" id="email" name="email" placeholder="VD: name@example.com" value="{{ $email }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-800 focus:border-[#ee4d2d] outline-none text-sm font-semibold">
                 </div>
 
-                <div class="md:col-span-3 text-center mt-2">
-                    <button type="submit" class="px-8 py-3.5 rounded-2xl food-gradient text-white font-extrabold text-sm shadow-lg shadow-rose-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 mx-auto">
-                        <i class="fas fa-magnifying-glass"></i> Tra cứu ngay
+                <div class="md:col-span-3 text-center mt-3">
+                    <button type="submit" class="px-8 py-3.5 rounded-xl bg-[#ee4d2d] hover:bg-red-600 text-white font-extrabold text-sm shadow-md shadow-rose-500/20 active:scale-95 transition-all inline-flex items-center justify-center gap-2 mx-auto cursor-pointer">
+                        <i class="fas fa-magnifying-glass text-white"></i> <span class="text-white">Tra cứu ngay</span>
                     </button>
                 </div>
             </form>
@@ -53,9 +53,9 @@
 
         @if($searched && $order)
             <!-- Progress Timeline Card -->
-            <div class="bg-white rounded-3xl p-8 shadow-xl border border-slate-100 mb-8">
-                <h3 class="text-base font-extrabold text-slate-800 mb-6 flex items-center gap-2">
-                    <i class="fas fa-truck-fast text-rose-500"></i> Tiến độ đơn hàng #FDL-{{ $order->id }}
+            <div class="bg-white/95 backdrop-blur-sm rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200 mb-8">
+                <h3 class="text-base font-extrabold text-slate-900 mb-6 flex items-center gap-2">
+                    <i class="fas fa-truck-fast text-[#ee4d2d]"></i> Tiến độ đơn hàng #FDL-{{ $order->id }}
                 </h3>
 
                 @php $status = $order->order_status; @endphp
@@ -68,28 +68,28 @@
                     @else
                         <!-- Step 1 -->
                         <div class="text-center">
-                            <div class="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center font-bold text-lg transition-all {{ in_array($status, ['pending', 'preparing', 'cooked', 'shipping', 'completed']) ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30' : 'bg-slate-100 text-slate-400' }}">
+                            <div class="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center font-bold text-lg transition-all {{ in_array($status, ['pending', 'preparing', 'cooked', 'shipping', 'completed']) ? 'bg-emerald-500 text-white shadow-md' : 'bg-slate-100 text-slate-400' }}">
                                 <i class="fas fa-file-invoice"></i>
                             </div>
-                            <p class="text-xs font-bold mt-3 {{ $status === 'pending' ? 'text-rose-600' : 'text-slate-700' }}">1. Tiếp nhận</p>
+                            <p class="text-xs font-bold mt-3 {{ $status === 'pending' ? 'text-[#ee4d2d]' : 'text-slate-700' }}">1. Tiếp nhận</p>
                         </div>
                         <!-- Step 2 -->
                         <div class="text-center">
-                            <div class="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center font-bold text-lg transition-all {{ in_array($status, ['preparing', 'cooked', 'shipping', 'completed']) ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30' : 'bg-slate-100 text-slate-400' }}">
+                            <div class="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center font-bold text-lg transition-all {{ in_array($status, ['preparing', 'cooked', 'shipping', 'completed']) ? 'bg-emerald-500 text-white shadow-md' : 'bg-slate-100 text-slate-400' }}">
                                 <i class="fas fa-fire-burner"></i>
                             </div>
-                            <p class="text-xs font-bold mt-3 {{ in_array($status, ['preparing', 'cooked']) ? 'text-rose-600' : 'text-slate-700' }}">2. Chế biến</p>
+                            <p class="text-xs font-bold mt-3 {{ in_array($status, ['preparing', 'cooked']) ? 'text-[#ee4d2d]' : 'text-slate-700' }}">2. Chế biến</p>
                         </div>
                         <!-- Step 3 -->
                         <div class="text-center">
-                            <div class="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center font-bold text-lg transition-all {{ in_array($status, ['shipping', 'completed']) ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30' : 'bg-slate-100 text-slate-400' }}">
+                            <div class="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center font-bold text-lg transition-all {{ in_array($status, ['shipping', 'completed']) ? 'bg-emerald-500 text-white shadow-md' : 'bg-slate-100 text-slate-400' }}">
                                 <i class="fas fa-motorcycle"></i>
                             </div>
-                            <p class="text-xs font-bold mt-3 {{ $status === 'shipping' ? 'text-rose-600' : 'text-slate-700' }}">3. Đang giao</p>
+                            <p class="text-xs font-bold mt-3 {{ $status === 'shipping' ? 'text-[#ee4d2d]' : 'text-slate-700' }}">3. Đang giao</p>
                         </div>
                         <!-- Step 4 -->
                         <div class="text-center">
-                            <div class="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center font-bold text-lg transition-all {{ $status === 'completed' ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30' : 'bg-slate-100 text-slate-400' }}">
+                            <div class="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center font-bold text-lg transition-all {{ $status === 'completed' ? 'bg-emerald-500 text-white shadow-md' : 'bg-slate-100 text-slate-400' }}">
                                 <i class="fas fa-check"></i>
                             </div>
                             <p class="text-xs font-bold mt-3 {{ $status === 'completed' ? 'text-emerald-600' : 'text-slate-700' }}">4. Hoàn tất</p>
@@ -99,7 +99,7 @@
             </div>
 
             <!-- Details Card -->
-            <div class="bg-white rounded-3xl p-8 shadow-xl border border-slate-100">
+            <div class="bg-white/95 backdrop-blur-sm rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-slate-100 mb-6">
                     <div>
                         <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Thông tin nhận hàng</h4>
@@ -153,7 +153,7 @@
                             @endforeach
                             <tr class="bg-slate-50 font-extrabold">
                                 <td colspan="3" class="py-4 px-3 text-right text-slate-700">Tổng thanh toán:</td>
-                                <td class="py-4 px-3 text-right text-rose-600 text-lg">{{ number_format($order->final_amount, 0, ',', '.') }}đ</td>
+                                <td class="py-4 px-3 text-right text-[#ee4d2d] text-lg">{{ number_format($order->final_amount, 0, ',', '.') }}đ</td>
                             </tr>
                         </tbody>
                     </table>
@@ -197,4 +197,3 @@
 </script>
 @endif
 @endsection
-

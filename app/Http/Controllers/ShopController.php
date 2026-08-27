@@ -42,7 +42,7 @@ class ShopController extends Controller
             }
         }])->get();
 
-        // 1. THUẬT TOÁN: Món hay mua (Mua >= 2 lần)
+        // 1. THUẬT TOÁN: Món hay mua (Ưu tiên theo lịch sử khách mua >= 2 lần, fallback top món hot bán chạy)
         $frequentDishes = collect();
         if (auth()->check()) {
             $frequentDishIds = \App\Models\OrderItem::whereHas('order', function($q) {
@@ -55,6 +55,20 @@ class ShopController extends Controller
                 ->pluck('dish_id');
 
             $frequentDishes = \App\Models\Dish::whereIn('id', $frequentDishIds)->where('is_available', true)->get();
+        }
+
+        // Nếu chưa có lịch sử mua nhiều lần, tự động đề xuất các món được yêu thích bán chạy nhất
+        if ($frequentDishes->isEmpty()) {
+            $topDishIds = \App\Models\OrderItem::select('dish_id', \Illuminate\Support\Facades\DB::raw('SUM(quantity) as total_qty'))
+                ->groupBy('dish_id')
+                ->orderByDesc('total_qty')
+                ->pluck('dish_id');
+
+            $frequentDishes = \App\Models\Dish::whereIn('id', $topDishIds)->where('is_available', true)->take(4)->get();
+
+            if ($frequentDishes->isEmpty()) {
+                $frequentDishes = \App\Models\Dish::where('is_available', true)->take(4)->get();
+            }
         }
 
         // 2. THUẬT TOÁN: Đề xuất theo khung giờ trong ngày
@@ -302,6 +316,102 @@ class ShopController extends Controller
             'changed' => $changed,
             'order_status' => $order->order_status,
             'payment_status' => $order->payment_status,
+        ]);
+    }
+
+    // API Tìm kiếm món ăn trực tiếp theo tên
+    public function searchDishesApi(Request $request)
+    {
+        $q = trim($request->query('q', ''));
+        if (empty($q)) {
+            return response()->json(['success' => true, 'dishes' => []]);
+        }
+
+        $dishes = \App\Models\Dish::where('is_available', true)
+            ->where('dish_name', 'like', '%' . $q . '%')
+            ->take(8)
+            ->get()
+            ->map(function ($dish) {
+                return [
+                    'id' => $dish->id,
+                    'dish_name' => $dish->dish_name,
+                    'price' => $dish->price,
+                    'formatted_price' => number_format($dish->price, 0, ',', '.') . 'đ',
+                    'image' => $dish->image ? asset($dish->image) : null,
+                    'description' => $dish->description ?? 'FOODDAILY Store'
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'dishes' => $dishes
+        ]);
+    }
+
+    // API Chatbot tư vấn món ăn & hỗ trợ khách hàng
+    public function chatbotAsk(Request $request)
+    {
+        $userMsg = trim($request->input('message', ''));
+        if (empty($userMsg)) {
+            return response()->json([
+                'success' => false,
+                'reply' => 'Xin chào! Bạn muốn tìm món ăn gì hôm nay?'
+            ]);
+        }
+
+        $lowerMsg = mb_strtolower($userMsg, 'UTF-8');
+
+        // Tìm kiếm các món ăn khớp với câu hỏi của khách hàng
+        $matchedDishes = \App\Models\Dish::where('is_available', true)
+            ->where(function ($q) use ($lowerMsg) {
+                $words = explode(' ', $lowerMsg);
+                foreach ($words as $w) {
+                    if (mb_strlen($w, 'UTF-8') >= 2 && !in_array($w, ['tôi', 'muốn', 'ăn', 'tìm', 'món', 'có', 'không', 'cho', 'xin', 'cần'])) {
+                        $q->orWhere('dish_name', 'like', '%' . $w . '%')
+                          ->orWhere('description', 'like', '%' . $w . '%');
+                    }
+                }
+            })
+            ->take(4)
+            ->get();
+
+        if ($matchedDishes->isEmpty()) {
+            // Fallback gợi ý top bán chạy
+            $topDishes = \App\Models\Dish::where('is_available', true)->take(3)->get();
+            $reply = "Dạ, hiện tại em chưa tìm thấy món khớp 100% với yêu cầu \"{$userMsg}\". Tuy nhiên bạn có thể thử các món hot bán chạy nhất của FOODDAILY bên dưới:";
+            $dishesData = $topDishes->map(function($d) {
+                return [
+                    'id' => $d->id,
+                    'dish_name' => $d->dish_name,
+                    'price' => number_format($d->price, 0, ',', '.') . 'đ',
+                    'image' => $d->image ? asset($d->image) : null,
+                ];
+            });
+        } else {
+            $reply = "Dạ, FOODDAILY có những món ăn ngon tuyệt hảo đúng chuẩn yêu cầu của bạn nè:";
+            $dishesData = $matchedDishes->map(function($d) {
+                return [
+                    'id' => $d->id,
+                    'dish_name' => $d->dish_name,
+                    'price' => number_format($d->price, 0, ',', '.') . 'đ',
+                    'image' => $d->image ? asset($d->image) : null,
+                ];
+            });
+        }
+
+        // Trợ lý thông minh trả lời các câu hỏi thường gặp
+        if (str_contains($lowerMsg, 'giao hàng') || str_contains($lowerMsg, 'ship')) {
+            $reply = "🚀 **Giao hàng siêu tốc:** FOODDAILY giao hàng tận nơi chỉ từ 20 - 30 phút trong nội thành TP. Hồ Chí Minh!";
+        } elseif (str_contains($lowerMsg, 'thanh toán') || str_contains($lowerMsg, 'chuyển khoản') || str_contains($lowerMsg, 'momo')) {
+            $reply = "💳 **Phương thức thanh toán:** FOODDAILY hỗ trợ Tiền mặt (COD), Chuyển khoản ngân hàng VietQR và Ví MoMo tiện lợi!";
+        } elseif (str_contains($lowerMsg, 'tra cứu') || str_contains($lowerMsg, 'đơn hàng')) {
+            $reply = "📦 Bạn có thể tra cứu tiến độ đơn hàng cực kỳ dễ dàng tại menu **[Tra cứu đơn]** phía trên header bằng Mã đơn FDL-xxx!";
+        }
+
+        return response()->json([
+            'success' => true,
+            'reply' => $reply,
+            'dishes' => $dishesData ?? []
         ]);
     }
 }

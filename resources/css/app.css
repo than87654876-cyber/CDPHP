@@ -70,3 +70,13 @@
 ::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
 }
+
+/* Full-Page Food Background Image (cf1a02d49dc2b801e809fcb9adefd77e.jpg) */
+.site-bg-overlay {
+    background-image: linear-gradient(rgba(15, 23, 42, 0.25), rgba(15, 23, 42, 0.25)), url('/uploads/cf1a02d49dc2b801e809fcb9adefd77e.jpg') !important;
+    background-attachment: fixed !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: cover !important;
+    min-height: 100vh !important;
+}

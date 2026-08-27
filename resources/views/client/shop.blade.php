@@ -4,7 +4,7 @@
 
 @section('content')
 <!-- ShopeeFood Hero Section (Matches Image 1 Exactly) -->
-<section class="bg-[#f5f5f5] py-6 border-b border-slate-200">
+<section class="bg-transparent py-6 border-b border-slate-200/60">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
             
@@ -33,7 +33,7 @@
 
                     <!-- Big Search Bar (ShopeeFood Style with Blue Button) -->
                     <form action="{{ route('trangchu') }}" method="GET" class="flex items-center bg-white rounded-lg overflow-hidden p-1 shadow-lg">
-                        <input type="text" name="search" value="{{ $query }}" placeholder="Tìm địa điểm, món ăn, địa chỉ..." class="w-full px-4 py-2.5 text-xs font-semibold text-slate-800 outline-none">
+                        <input type="text" name="search" value="{{ $query }}" placeholder="Tìm địa điểm, món ăn, địa chỉ..." class="w-full px-4 py-2.5 text-xs font-semibold text-slate-800 bg-transparent outline-none">
                         <button type="submit" class="px-6 py-2.5 bg-[#0099ff] hover:bg-blue-600 text-white font-extrabold text-xs rounded-md transition-colors shrink-0">
                             <i class="fas fa-magnifying-glass"></i>
                         </button>
@@ -41,16 +41,10 @@
 
                     <!-- Category Filter Pills Grid (ShopeeFood Style Tag Buttons) -->
                     <div class="pt-2 flex flex-wrap gap-2 text-xs font-semibold">
-                        <button type="button" onclick="filterCategory('all')" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-white/20 backdrop-blur-xs border border-white/20 text-white transition-all">All</button>
-                        <button type="button" onclick="filterCategory('all')" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-white/20 backdrop-blur-xs border border-white/20 text-white transition-all">Đồ ăn</button>
-                        <button type="button" onclick="filterCategory('all')" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-white/20 backdrop-blur-xs border border-white/20 text-white transition-all">Đồ uống</button>
-                        <button type="button" onclick="filterCategory('all')" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-white/20 backdrop-blur-xs border border-white/20 text-white transition-all">Đồ chay</button>
-                        <button type="button" onclick="filterCategory('all')" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-white/20 backdrop-blur-xs border border-white/20 text-white transition-all">Bánh kem</button>
-                        <button type="button" onclick="filterCategory('all')" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-white/20 backdrop-blur-xs border border-white/20 text-white transition-all">Tráng miệng</button>
-                        <button type="button" onclick="filterCategory('all')" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-white/20 backdrop-blur-xs border border-white/20 text-white transition-all">Pizza/Burger</button>
-                        <button type="button" onclick="filterCategory('all')" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-white/20 backdrop-blur-xs border border-white/20 text-white transition-all">Món lẩu</button>
-                        <button type="button" onclick="filterCategory('all')" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-white/20 backdrop-blur-xs border border-white/20 text-white transition-all">Mì phở</button>
-                        <button type="button" onclick="filterCategory('all')" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-white/20 backdrop-blur-xs border border-white/20 text-white transition-all">Cơm hộp</button>
+                        <a href="#menu" onclick="filterCategory('all')" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-[#ee4d2d] backdrop-blur-xs border border-white/20 text-white transition-all">Tất cả</a>
+                        @foreach($categories as $cat)
+                            <a href="#menu" onclick="filterCategory('{{ $cat->id }}')" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-[#ee4d2d] backdrop-blur-xs border border-white/20 text-white transition-all">{{ $cat->category_name }}</a>
+                        @endforeach
                     </div>
                 </div>
 
@@ -58,47 +52,59 @@
                 <div class="pt-4 border-t border-white/10 flex items-center gap-3">
                     <span class="text-[11px] text-slate-300 font-medium">Sử dụng App FOODDAILY để có nhiều giảm giá hơn:</span>
                     <div class="flex gap-2">
-                        <span class="px-3 py-1 bg-black/60 rounded border border-white/20 text-[10px] font-bold"><i class="fab fa-apple mr-1"></i>App Store</span>
-                        <span class="px-3 py-1 bg-black/60 rounded border border-white/20 text-[10px] font-bold"><i class="fab fa-google-play mr-1"></i>Google Play</span>
+                        <span class="px-3 py-1 bg-black/60 rounded border border-white/20 text-[10px] font-bold cursor-pointer hover:bg-black"><i class="fab fa-apple mr-1"></i>App Store</span>
+                        <span class="px-3 py-1 bg-black/60 rounded border border-white/20 text-[10px] font-bold cursor-pointer hover:bg-black"><i class="fab fa-google-play mr-1"></i>Google Play</span>
                     </div>
                 </div>
             </div>
 
-            <!-- RIGHT PANEL: White Promo Floating Card Widget (Giống 100% Ảnh 1) -->
-            <div class="lg:col-span-5 bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between space-y-4">
+            <!-- RIGHT PANEL: White Promo Floating Card Widget (Giống 100% ShopeeFood) -->
+            <div class="lg:col-span-5 bg-white/95 backdrop-blur-sm rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between space-y-4">
                 <!-- Location Address Bar -->
-                <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 flex items-center justify-between cursor-pointer hover:bg-slate-100">
-                    <span class="truncate"><strong class="text-[#ee4d2d]">Đồ ăn</strong> → Chọn địa chỉ giao hàng</span>
-                    <i class="fas fa-chevron-right text-[10px] text-slate-400"></i>
+                <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 flex items-center justify-between cursor-pointer hover:bg-slate-100 transition-colors" onclick="alert('Đã tự động xác định vị trí giao hàng: TP. Hồ Chí Minh (Giao hàng siêu tốc 20 phút)')">
+                    <span class="truncate"><strong class="text-[#ee4d2d]">Đồ ăn</strong> → TP. HCM (Giao hàng tận nơi)</span>
+                    <i class="fas fa-location-dot text-xs text-[#ee4d2d]"></i>
                 </div>
 
                 <!-- Subcard "Ưu đãi" Header -->
                 <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-                    <h3 class="font-extrabold text-slate-900 text-sm">Ưu đãi</h3>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-sm">🔥</span>
+                        <h3 class="font-extrabold text-slate-900 text-sm">Món Ưu Đãi HOT</h3>
+                    </div>
                     <a href="#menu" class="text-xs font-bold text-[#0099ff] hover:underline">≡ Xem tất cả</a>
                 </div>
 
-                <!-- 2x3 Grid of 6 Promo Items (Giống Ảnh 1) -->
+                <!-- 2x3 Grid of 6 Promo Items với Logic Thêm Vào Giỏ Hàng -->
                 <div class="grid grid-cols-3 gap-3">
                     @php
                         $promoDishes = $allDishes->take(6);
                     @endphp
                     @foreach($promoDishes as $pIndex => $pDish)
-                        <div class="bg-white rounded-lg border border-slate-200 p-2 space-y-1.5 hover:border-[#ee4d2d] transition-all cursor-pointer">
-                            <div class="aspect-square rounded-md overflow-hidden bg-slate-100 relative">
-                                @if($pDish->image)
-                                    <img src="{{ asset($pDish->image) }}" alt="{{ $pDish->dish_name }}" class="w-full h-full object-cover">
-                                @else
-                                    <div class="w-full h-full flex items-center justify-center text-slate-300"><i class="fas fa-utensils"></i></div>
-                                @endif
+                        <form action="{{ route('giohang.add') }}" method="POST" class="bg-white rounded-lg border border-slate-200 p-2 space-y-1.5 hover:border-[#ee4d2d] hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between" onclick="this.submit()">
+                            @csrf
+                            <input type="hidden" name="dish_id" value="{{ $pDish->id }}">
+                            <div class="space-y-1.5">
+                                <div class="aspect-square rounded-md overflow-hidden bg-slate-100 relative border border-slate-100">
+                                    @if($pDish->image)
+                                        <img src="{{ asset($pDish->image) }}" alt="{{ $pDish->dish_name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
+                                    @else
+                                        <div class="w-full h-full bg-rose-50 flex items-center justify-center text-rose-400 font-bold text-xs"><i class="fas fa-utensils"></i></div>
+                                    @endif
+                                </div>
+                                <h4 class="font-extrabold text-slate-900 text-[11px] line-clamp-1 leading-snug group-hover:text-[#ee4d2d] transition-colors">{{ $pDish->dish_name }}</h4>
+                                <p class="text-[10px] text-[#ee4d2d] font-black">{{ number_format($pDish->price) }}đ</p>
                             </div>
-                            <h4 class="font-extrabold text-slate-900 text-[11px] line-clamp-1 leading-snug">{{ $pDish->dish_name }}</h4>
-                            <p class="text-[10px] text-slate-400 truncate">FOODDAILY Store</p>
-                            <!-- Red Promo Tag -->
-                            <div class="inline-block px-1.5 py-0.5 rounded bg-rose-50 text-[#ee4d2d] text-[9px] font-extrabold border border-rose-200">
-                                🏷️ Mã giảm {{ ($pIndex % 2 == 0) ? '10%' : '20%' }}
+                            <!-- Red Promo Tag & Add Button -->
+                            <div class="flex items-center justify-between pt-1">
+                                <span class="px-1.5 py-0.5 rounded bg-rose-50 text-[#ee4d2d] text-[9px] font-extrabold border border-rose-200">
+                                    🏷️ Giảm {{ ($pIndex % 2 == 0) ? '10%' : '20%' }}
+                                </span>
+                                <span class="w-5 h-5 rounded-full bg-[#ee4d2d] text-white flex items-center justify-center text-[10px] font-black group-hover:bg-red-600 shadow-xs">
+                                    +
+                                </span>
                             </div>
-                        </div>
+                        </form>
                     @endforeach
                 </div>
             </div>
@@ -107,57 +113,48 @@
     </div>
 </section>
 
-<!-- ShopeeFood Collection Banner Section ("Bộ sưu tập") -->
-<section class="py-4 bg-[#f5f5f5]">
+<!-- THUẬT TOÁN ĐỀ XUẤT: Món hay mua nhiều nhất (Tự động phát hiện khi mua >= 2 lần) -->
+@if(isset($frequentDishes) && $frequentDishes->isNotEmpty())
+<section class="py-4 bg-transparent">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-rose-200 space-y-3 relative overflow-hidden">
             <div class="flex items-center justify-between">
-                <h3 class="font-extrabold text-slate-900 text-sm">Bộ sưu tập</h3>
-                <a href="#menu" class="text-xs font-bold text-[#0099ff] hover:underline">≡ Xem tất cả</a>
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-rose-500 text-white text-xs font-black">
+                        <i class="fas fa-robot"></i>
+                    </span>
+                    <div>
+                        <h3 class="font-extrabold text-slate-900 text-sm">
+                            {{ (auth()->check() && auth()->user()->orders()->count() > 0) ? '❤️ Món Ngon Bạn Hay Đặt Nhất' : '🔥 Top Món Ăn Được Đặt Nhiều Nhất' }}
+                        </h3>
+                        <p class="text-[11px] text-slate-400 font-medium">Thuật toán tự động đề xuất dựa trên tần suất mua hàng của bạn</p>
+                    </div>
+                </div>
+                <a href="#menu" class="text-xs font-bold text-[#ee4d2d] hover:underline">≡ Xem thêm món</a>
             </div>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div class="h-16 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black flex items-center justify-center p-3 text-xs shadow-xs cursor-pointer hover:opacity-95">
-                    🥗 ĂN CHẠY GIẢM 30%
-                </div>
-                <div class="h-16 rounded-xl bg-gradient-to-r from-orange-500 to-rose-600 text-white font-black flex items-center justify-center p-3 text-xs shadow-xs cursor-pointer hover:opacity-95">
-                    🔥 QUÁN RUỘT GIẢM 50K
-                </div>
-                <div class="h-16 rounded-xl bg-gradient-to-r from-rose-500 to-red-600 text-white font-black flex items-center justify-center p-3 text-xs shadow-xs cursor-pointer hover:opacity-95">
-                    🏷️ GIẢM TỚI 70K
-                </div>
-                <div class="h-16 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-black flex items-center justify-center p-3 text-xs shadow-xs cursor-pointer hover:opacity-95">
-                    🚚 FREESHIP XTRA 0Đ
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- THUẬT TOÁN: Món hay mua (người dùng mua >= 2 lần) -->
-@if(auth()->check() && isset($frequentDishes) && $frequentDishes->isNotEmpty())
-<section class="py-4 bg-[#f5f5f5]">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-rose-50/80 rounded-2xl p-4 border border-rose-200 space-y-3">
-            <div class="flex items-center gap-2">
-                <span class="text-base">❤️</span>
-                <h3 class="font-extrabold text-slate-900 text-sm">Món Ăn Bạn Hay Mua Nhất</h3>
-            </div>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 @foreach($frequentDishes as $fDish)
-                    <div class="bg-white rounded-xl p-3 border border-rose-100 flex items-center gap-3 shadow-xs">
-                        <div class="w-12 h-12 rounded-lg bg-slate-100 overflow-hidden shrink-0">
+                    <div class="bg-rose-50/50 hover:bg-rose-50 rounded-xl p-3 border border-rose-100 flex items-center gap-3 shadow-xs transition-all">
+                        <div class="w-14 h-14 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-slate-200">
                             @if($fDish->image)
                                 <img src="{{ asset($fDish->image) }}" class="w-full h-full object-cover">
+                            @else
+                                <div class="w-full h-full flex items-center justify-center text-slate-400 font-bold text-xs">Món ăn</div>
                             @endif
                         </div>
                         <div class="space-y-0.5 flex-1 min-w-0">
+                            <span class="inline-block px-1.5 py-0.5 rounded bg-rose-100 text-[#ee4d2d] text-[9px] font-black uppercase">
+                                {{ auth()->check() ? 'Đã mua nhiều lần' : 'Bán chạy' }}
+                            </span>
                             <h4 class="font-extrabold text-slate-900 text-xs truncate">{{ $fDish->dish_name }}</h4>
-                            <p class="text-[11px] text-[#ee4d2d] font-bold">{{ number_format($fDish->price) }}đ</p>
+                            <p class="text-xs text-[#ee4d2d] font-black">{{ number_format($fDish->price) }}đ</p>
                         </div>
-                        <form action="{{ route('giohang.add') }}" method="POST">
+                        <form action="{{ route('giohang.add') }}" method="POST" class="shrink-0">
                             @csrf
                             <input type="hidden" name="dish_id" value="{{ $fDish->id }}">
-                            <button type="submit" class="px-2.5 py-1 bg-[#ee4d2d] text-white rounded text-[10px] font-extrabold hover:bg-red-600">+ Đặt lại</button>
+                            <button type="submit" class="px-3 py-1.5 bg-[#ee4d2d] hover:bg-red-600 text-white rounded-lg text-xs font-extrabold shadow-xs transition-colors flex items-center gap-1">
+                                <i class="fas fa-cart-plus text-[10px]"></i> + Đặt lại
+                            </button>
                         </form>
                     </div>
                 @endforeach
@@ -169,9 +166,9 @@
 
 <!-- THUẬT TOÁN: Đề xuất theo khung giờ -->
 @if(isset($timeRecommendation) && $timeRecommendation['dishes']->isNotEmpty())
-<section class="py-4 bg-[#f5f5f5]">
+<section class="py-4 bg-transparent">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
             <div class="flex items-center justify-between">
                 <h3 class="font-extrabold text-slate-900 text-sm">{{ $timeRecommendation['title'] }}</h3>
                 <span class="text-[11px] text-slate-400 font-bold">Khung giờ: {{ $timeRecommendation['period'] }}</span>
@@ -197,11 +194,11 @@
 @endif
 
 <!-- SHOPEEFOOD PRODUCT GRID SECTION (Matches Image 2 Exactly) -->
-<section class="py-6 bg-[#f5f5f5]" id="menu">
+<section class="py-6 bg-transparent" id="menu">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
         
         <!-- Filter & Sort Bar (Giống 100% Ảnh 2 Header Bar) -->
-        <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-4 text-xs font-bold text-slate-700">
+        <div class="bg-white/95 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-4 text-xs font-bold text-slate-700">
             <div class="flex items-center gap-4">
                 <div class="cursor-pointer hover:text-[#ee4d2d] flex items-center gap-1">
                     <span>KHU VỰC</span> <i class="fas fa-chevron-down text-[9px] text-slate-400"></i>
@@ -236,7 +233,7 @@
         <div id="cat-view-all" class="cat-view-pane">
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 @forelse($allDishes as $dIndex => $dish)
-                    <div class="bg-white rounded-xl shadow-xs hover:shadow-md transition-all border border-slate-200 overflow-hidden flex flex-col justify-between group">
+                    <div class="bg-white/95 backdrop-blur-sm rounded-xl shadow-xs hover:shadow-md transition-all border border-slate-200 overflow-hidden flex flex-col justify-between group">
                         <div class="space-y-2">
                             <!-- Image Thumbnail with "👍 Yêu thích" Red Badge -->
                             <div class="aspect-square bg-slate-100 relative overflow-hidden">
@@ -261,7 +258,7 @@
                                         {{ $dish->dish_name }}
                                     </h4>
                                 </div>
-                                <p class="text-[10px] text-slate-400 line-clamp-1 leading-tight">
+                                <p class="text-[10px] text-slate-500 font-medium line-clamp-1 leading-tight">
                                     {{ $dish->description ?? 'FOODDAILY Store - TP. HCM' }}
                                 </p>
                                 
@@ -298,7 +295,7 @@
             <div id="cat-view-cat-{{ $category->id }}" class="cat-view-pane hidden">
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     @forelse($category->dishes as $cIndex => $dish)
-                        <div class="bg-white rounded-xl shadow-xs hover:shadow-md transition-all border border-slate-200 overflow-hidden flex flex-col justify-between group">
+                        <div class="bg-white/95 backdrop-blur-sm rounded-xl shadow-xs hover:shadow-md transition-all border border-slate-200 overflow-hidden flex flex-col justify-between group">
                             <div class="space-y-2">
                                 <div class="aspect-square bg-slate-100 relative overflow-hidden">
                                     @if($dish->image)

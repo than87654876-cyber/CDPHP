@@ -8,7 +8,7 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <h2 class="text-2xl font-extrabold text-slate-800 tracking-tight">Thống Kê & Báo Cáo Doanh Thu FOODDAILY</h2>
-            <p class="text-xs text-slate-500 mt-1">Theo dõi hoạt động kinh doanh, tăng trưởng và nguồn thu nhập</p>
+            <p class="text-xs text-slate-500 mt-1">Theo dõi hoạt động kinh doanh, tăng trưởng và nguồn thu nhập từ giao đồ ăn</p>
         </div>
         <div class="relative group">
             <button class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-2 shadow-md transition-all">
@@ -50,7 +50,7 @@
     </div>
 
     <!-- Metrics Cards Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Monthly Revenue -->
         <div class="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-slate-100 flex items-center justify-between group hover:border-rose-200 transition-all">
             <div>
@@ -76,22 +76,11 @@
         <!-- Total Orders -->
         <div class="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-slate-100 flex items-center justify-between group hover:border-amber-200 transition-all">
             <div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Tổng đơn hàng</p>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Tổng đơn hàng giao</p>
                 <h3 class="text-2xl font-extrabold text-amber-500 mt-2">{{ number_format($orderCount) }}</h3>
             </div>
             <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center text-xl font-bold group-hover:scale-110 transition-transform">
                 <i class="fas fa-bag-shopping"></i>
-            </div>
-        </div>
-
-        <!-- Active Packages -->
-        <div class="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-slate-100 flex items-center justify-between group hover:border-blue-200 transition-all">
-            <div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Gói dịch vụ đang chạy</p>
-                <h3 class="text-2xl font-extrabold text-blue-600 mt-2">{{ number_format($activeSubscriptionCount) }}</h3>
-            </div>
-            <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center text-xl font-bold group-hover:scale-110 transition-transform">
-                <i class="fas fa-box-archive"></i>
             </div>
         </div>
     </div>
@@ -110,22 +99,25 @@
             </div>
         </div>
 
-        <!-- Pie Chart (Revenue Breakdown) -->
+        <!-- Pie Chart (Revenue Breakdown by Payment Method) -->
         <div class="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col justify-between">
             <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
                 <h3 class="text-base font-extrabold text-slate-800 flex items-center gap-2">
-                    <i class="fas fa-chart-pie text-rose-500"></i> Nguồn doanh thu
+                    <i class="fas fa-chart-pie text-rose-500"></i> Thanh toán
                 </h3>
             </div>
             <div class="h-64 w-full relative my-auto">
                 <canvas id="myPieChart"></canvas>
             </div>
-            <div class="mt-6 pt-4 border-t border-slate-100 flex justify-around text-xs font-bold">
-                <span class="flex items-center gap-2 text-slate-700">
-                    <span class="w-3 h-3 rounded-full bg-rose-500"></span> Món lẻ ({{ $singlePercent }}%)
+            <div class="mt-6 pt-4 border-t border-slate-100 flex justify-around text-[11px] font-bold">
+                <span class="flex items-center gap-1.5 text-slate-700">
+                    <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> COD ({{ $codPercent }}%)
                 </span>
-                <span class="flex items-center gap-2 text-slate-700">
-                    <span class="w-3 h-3 rounded-full bg-emerald-500"></span> Gói Combo ({{ $subscriptionPercent }}%)
+                <span class="flex items-center gap-1.5 text-slate-700">
+                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Chuyển khoản ({{ $bankPercent }}%)
+                </span>
+                <span class="flex items-center gap-1.5 text-slate-700">
+                    <span class="w-2.5 h-2.5 rounded-full bg-pink-500"></span> MoMo ({{ $momoPercent }}%)
                 </span>
             </div>
         </div>
@@ -201,11 +193,11 @@
         var myPieChart = new Chart(ctxPie, {
           type: 'doughnut',
           data: {
-            labels: ["Món đơn lẻ", "Gói dịch vụ"],
+            labels: ["COD", "Chuyển khoản", "MoMo"],
             datasets: [{
-              data: [{{ $singleRevenue }}, {{ $subscriptionRevenue }}],
-              backgroundColor: ['#ef4444', '#10b981'],
-              hoverBackgroundColor: ['#dc2626', '#059669'],
+              data: [{{ $codRevenue }}, {{ $bankRevenue }}, {{ $momoRevenue }}],
+              backgroundColor: ['#ef4444', '#3b82f6', '#ec4899'],
+              hoverBackgroundColor: ['#dc2626', '#2563eb', '#db2777'],
               hoverBorderColor: "#ffffff",
             }],
           },
@@ -242,7 +234,7 @@
                         document.getElementById('weather-temp').innerText = temp + '°C';
                         
                         let desc = 'Nắng đẹp, trời quang';
-                        let recommendation = '💡 Thời tiết lý tưởng để đề xuất các món tráng miệng giải nhiệt và combo trưa!';
+                        let recommendation = '💡 Thời tiết lý tưởng để đề xuất các món tráng miệng giải nhiệt và cơm trưa!';
                         
                         if (code >= 1 && code <= 3) {
                             desc = 'Mây rải rác';

@@ -14,6 +14,55 @@ use App\Mail\OrderPlacedMail;
 
 class CartController extends Controller
 {
+    // Thêm món ăn vào giỏ hàng
+    public function add(Request $request)
+    {
+        $request->validate([
+            'dish_id' => 'required|integer|exists:dishes,id',
+            'quantity' => 'nullable|integer|min:1',
+        ]);
+
+        $dish = Dish::findOrFail($request->dish_id);
+        $quantity = max(1, intval($request->input('quantity', 1)));
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Đã thêm ' . $dish->dish_name . ' vào giỏ hàng!',
+                'dish' => $dish,
+                'quantity' => $quantity,
+            ]);
+        }
+
+        return redirect()->route('muahang')->with('added_dish', [
+            'id' => $dish->id,
+            'name' => $dish->dish_name,
+            'price' => $dish->price,
+            'quantity' => $quantity,
+            'image' => $dish->image ? asset($dish->image) : '',
+        ])->with('success', 'Đã thêm ' . $dish->dish_name . ' vào giỏ hàng!');
+    }
+
+    // Cập nhật số lượng giỏ hàng
+    public function update(Request $request)
+    {
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['success' => true]);
+        }
+
+        return redirect()->back()->with('success', 'Đã cập nhật giỏ hàng.');
+    }
+
+    // Xóa món ăn khỏi giỏ hàng
+    public function remove(Request $request)
+    {
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['success' => true]);
+        }
+
+        return redirect()->back()->with('success', 'Đã xóa món ăn khỏi giỏ hàng.');
+    }
+
     // Hiển thị danh sách lịch sử đơn hàng của User
     public function index(Request $request)
     {
@@ -66,41 +115,36 @@ class CartController extends Controller
         // Xác định ID người dùng (Nếu là khách vãng lai thì tìm hoặc tạo tài khoản guest ẩn)
         $userId = Auth::id();
         if (!$userId) {
-            $email = $request->input('cart_email');
-            $phone = $request->input('cart_phone');
-            $fullname = $request->input('cart_fullname');
+            $email = trim($request->input('cart_email'));
+            $phone = trim($request->input('cart_phone'));
+            $fullname = trim($request->input('cart_fullname'));
 
-            // Kiểm tra xem đã có tài khoản khách hàng thực thụ chưa
-            $existingCustomer = \App\Models\User::where('role', 'customer')
-                ->where(function($q) use ($email, $phone) {
-                    $q->where('email', $email)->orWhere('phone', $phone);
-                })->first();
+            // Tìm xem email hoặc số điện thoại đã tồn tại trong hệ thống chưa (bất kể vai trò nào)
+            $existingUser = \App\Models\User::where(function($q) use ($email, $phone) {
+                if ($email) {
+                    $q->where('email', $email);
+                }
+                if ($phone) {
+                    $q->orWhere('phone', $phone);
+                }
+            })->first();
 
-            if ($existingCustomer) {
-                return back()->withErrors(['error' => 'Email hoặc Số điện thoại đã được đăng ký thành viên. Vui lòng đăng nhập để đặt hàng.']);
-            }
-
-            // Tìm hoặc tạo tài khoản guest ẩn
-            $guestUser = \App\Models\User::where('role', 'guest')
-                ->where(function($q) use ($email, $phone) {
-                    $q->where('email', $email)->orWhere('phone', $phone);
-                })->first();
-
-            if (!$guestUser) {
+            if ($existingUser) {
+                if ($fullname) {
+                    $existingUser->update(['fullname' => $fullname]);
+                }
+                $userId = $existingUser->id;
+            } else {
                 $guestUser = \App\Models\User::create([
-                    'fullname' => $fullname,
+                    'fullname' => $fullname ?: 'Khách vãng lai',
                     'email' => $email,
                     'phone' => $phone,
                     'password' => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(16)),
                     'role' => 'guest',
                     'status' => true,
                 ]);
-            } else {
-                $guestUser->update([
-                    'fullname' => $fullname,
-                ]);
+                $userId = $guestUser->id;
             }
-            $userId = $guestUser->id;
         }
 
         DB::beginTransaction();
