@@ -9,7 +9,9 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
             
             @php
-                $heroBgUrl = asset('uploads/ve-dep-sai-gon-qua-ong-kinh-cua-nguoi-me-anh-ivivu-2.jpg');
+                $heroBgUrl = isset($settings['banner_image']) && $settings['banner_image']
+                    ? (\Illuminate\Support\Str::startsWith($settings['banner_image'], 'http') ? $settings['banner_image'] : asset($settings['banner_image']))
+                    : asset('uploads/ve-dep-sai-gon-qua-ong-kinh-cua-nguoi-me-anh-ivivu-2.jpg');
             @endphp
             <!-- LEFT PANEL: Dark Cityscape Hero Box (Giống Ảnh 1) -->
             <div class="lg:col-span-7 shopee-hero-bg rounded-2xl p-6 sm:p-8 text-white flex flex-col justify-between space-y-6 shadow-md" style="background: linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.85)), url('{{ $heroBgUrl }}') center/cover no-repeat;">

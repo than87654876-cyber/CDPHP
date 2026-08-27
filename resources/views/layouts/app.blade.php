@@ -36,9 +36,19 @@
         }
     </script>
 
+    @php
+        $globalSettings = \App\Models\Setting::pluck('value', 'key')->all();
+        $siteBgUrl = isset($globalSettings['site_background']) && $globalSettings['site_background'] 
+            ? (\Illuminate\Support\Str::startsWith($globalSettings['site_background'], 'http') ? $globalSettings['site_background'] : asset($globalSettings['site_background']))
+            : asset('uploads/cf1a02d49dc2b801e809fcb9adefd77e.jpg');
+        $siteLogoUrl = isset($globalSettings['logo_url']) && $globalSettings['logo_url']
+            ? (\Illuminate\Support\Str::startsWith($globalSettings['logo_url'], 'http') ? $globalSettings['logo_url'] : asset($globalSettings['logo_url']))
+            : asset('logo.jpg');
+    @endphp
+
     <style>
         body, .site-bg-overlay {
-            background-image: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url("{{ asset('uploads/cf1a02d49dc2b801e809fcb9adefd77e.jpg') }}") !important;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url("{{ $siteBgUrl }}") !important;
             background-attachment: fixed !important;
             background-position: center center !important;
             background-repeat: no-repeat !important;
@@ -55,12 +65,10 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 
-                @php
-                    $globalSettings = \App\Models\Setting::pluck('value', 'key')->all();
-                @endphp
                 <!-- Left: Brand Logo & Location -->
                 <div class="flex items-center gap-6">
-                    <a href="{{ route('trangchu') }}" class="flex items-center group">
+                    <a href="{{ route('trangchu') }}" class="flex items-center gap-2.5 group">
+                        <img src="{{ $siteLogoUrl }}" alt="Logo" class="w-9 h-9 rounded-xl object-cover shadow-xs border border-slate-100">
                         <div class="flex flex-col">
                             <span class="font-black text-2xl tracking-tighter text-[#ee4d2d] group-hover:opacity-90 transition-opacity">FOODDAILY</span>
                             <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest -mt-1.5">Food Delivery</span>

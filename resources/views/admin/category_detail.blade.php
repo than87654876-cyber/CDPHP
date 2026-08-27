@@ -1,85 +1,128 @@
 @extends('layouts.admin')
 
-@section('title', 'Chi tiết Danh mục - FOODDAILY')
+@section('title', 'Chi tiết Danh mục - FOODDAILY Admin')
 
 @section('content')
-<div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h3 mb-0 text-gray-800">Chi tiết danh mục: {{ $category->category_name }}</h1>
-    <a href="{{ route('quanly_danhmuc') }}" class="btn btn-sm btn-secondary shadow-sm">
-        <i class="fas fa-arrow-left"></i> Quay lại
-    </a>
-</div>
-
-<div class="row">
-    <div class="col-xl-4 col-lg-5 mb-4">
-        <div class="card shadow mb-4 border-left-info text-dark">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-info"><i class="fas fa-folder-open mr-2"></i>Thông tin danh mục</h6>
-            </div>
-            <div class="card-body">
-                <p class="mb-2"><strong>Tên danh mục:</strong> {{ $category->category_name }}</p>
-                <p class="mb-2"><strong>Ngày thiết lập tạo:</strong> {{ $category->created_at ? $category->created_at->format('d/m/Y H:i') : 'N/A' }}</p>
-                <p class="mb-2"><strong>Cập nhật cuối:</strong> {{ $category->updated_at ? $category->updated_at->format('d/m/Y H:i') : 'N/A' }}</p>
-                <p class="mb-3"><strong>Mô tả:</strong> {{ $category->description ?? 'Chưa có miêu tả' }}</p>
-                <a href="{{ route('danhmuc_chinhsua', $category->id) }}" class="btn btn-warning btn-sm btn-block font-weight-bold">
-                    <i class="fas fa-edit"></i> Chỉnh sửa danh mục
-                </a>
-            </div>
+<div class="space-y-6">
+    
+    <!-- Top Action Bar -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Chi Tiết Danh Mục: <span class="text-[#ee4d2d]">{{ $category->category_name }}</span></h1>
+            <p class="text-xs text-slate-500 font-medium mt-1">Xem thông tin nhóm và danh sách các món ăn thuộc danh mục này</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="{{ route('danhmuc_chinhsua', $category->id) }}" class="px-4 py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-extrabold text-xs transition-colors flex items-center gap-2">
+                <i class="fas fa-pen-to-square"></i> Chỉnh sửa
+            </a>
+            <a href="{{ route('quanly_danhmuc') }}" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors flex items-center gap-2">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
         </div>
     </div>
 
-    <div class="col-xl-8 col-lg-7 mb-4">
-        <div class="card shadow mb-4 text-dark">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-hamburger mr-2"></i>Danh sách món ăn thuộc nhóm này</h6>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        
+        <!-- Left: Category Info Card -->
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 space-y-4">
+            <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
+                <div class="w-10 h-10 rounded-2xl bg-rose-50 text-[#ee4d2d] flex items-center justify-center font-bold text-base">
+                    <i class="fas fa-folder-open"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-extrabold text-slate-900">Thông tin danh mục</h3>
+                    <p class="text-[11px] text-slate-400 font-medium">Chi tiết phân loại</p>
+                </div>
             </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped table-bordered mb-0" id="dataTable" width="100%">
-                        <thead>
-                            <tr>
-                                <th style="width: 80px;">STT</th>
-                                <th>Tên món ăn</th>
-                                <th>Giá tiền</th>
-                                <th>Trạng thái</th>
-                                <th style="width: 150px;">Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($category->dishes as $index => $dish)
-                            <tr>
-                                <td>{{ $index + 1 }}</td>
-                                <td class="font-weight-bold">{{ $dish->dish_name }}</td>
-                                <td class="text-danger font-weight-bold">{{ number_format($dish->price, 0, ',', '.') }} đ</td>
-                                <td>
-                                    @if($dish->is_available)
-                                        <span class="badge badge-success">Đang bán</span>
-                                    @else
-                                        <span class="badge badge-secondary">Tạm ngưng</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    <a href="{{ route('monandon_xem', $dish->id) }}" class="btn btn-info btn-sm">
-                                        <i class="fas fa-eye"></i> Xem
-                                    </a>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="5" class="text-center text-muted py-3">Không có món ăn nào thuộc danh mục này.</td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+
+            <div class="space-y-3 text-xs">
+                <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                    <span class="text-slate-500 font-bold">Tên danh mục:</span>
+                    <span class="font-extrabold text-slate-900">{{ $category->category_name }}</span>
+                </div>
+                <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                    <span class="text-slate-500 font-bold">Số lượng món ăn:</span>
+                    <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-black text-[11px] border border-emerald-200">
+                        {{ $category->dishes->count() }} món
+                    </span>
+                </div>
+                <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                    <span class="text-slate-500 font-bold">Ngày tạo:</span>
+                    <span class="font-semibold text-slate-700">{{ $category->created_at ? $category->created_at->format('d/m/Y H:i') : 'N/A' }}</span>
+                </div>
+                <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                    <span class="text-slate-500 font-bold">Cập nhật cuối:</span>
+                    <span class="font-semibold text-slate-700">{{ $category->updated_at ? $category->updated_at->format('d/m/Y H:i') : 'N/A' }}</span>
+                </div>
+                <div class="space-y-1.5 pt-1">
+                    <span class="text-slate-500 font-bold block">Mô tả danh mục:</span>
+                    <p class="text-slate-700 font-medium bg-slate-50 p-3 rounded-2xl border border-slate-100 leading-relaxed">
+                        {{ $category->description ?? 'Chưa có mô tả cho danh mục này.' }}
+                    </p>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-@endsection
 
-@section('scripts')
-<script src="{{ asset('admin/vendor/datatables/jquery.dataTables.min.js') }}"></script>
-<script src="{{ asset('admin/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
-<script src="{{ asset('admin/js/demo/datatables-demo.js') }}"></script>
+        <!-- Right: Dishes in Category -->
+        <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden space-y-0">
+            <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                    <i class="fas fa-utensils text-[#ee4d2d]"></i> Danh sách món ăn thuộc nhóm này ({{ $category->dishes->count() }})
+                </h3>
+                <a href="{{ route('monandon_them', ['category_id' => $category->id]) }}" class="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-[#ee4d2d] text-[#ee4d2d] hover:text-white font-extrabold text-xs transition-colors">
+                    <i class="fas fa-plus mr-1"></i> Thêm món vào nhóm
+                </a>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-100 text-[11px] text-slate-400 uppercase font-extrabold tracking-wider">
+                            <th class="py-3.5 px-6">STT</th>
+                            <th class="py-3.5 px-6">Món ăn</th>
+                            <th class="py-3.5 px-6">Đơn giá</th>
+                            <th class="py-3.5 px-6">Trạng thái</th>
+                            <th class="py-3.5 px-6 text-right">Chi tiết</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @forelse($category->dishes as $index => $dish)
+                            <tr class="hover:bg-slate-50/80 transition-colors">
+                                <td class="py-4 px-6 font-bold text-slate-400">#{{ $index + 1 }}</td>
+                                <td class="py-4 px-6 font-extrabold text-slate-900">
+                                    {{ $dish->dish_name }}
+                                </td>
+                                <td class="py-4 px-6 font-black text-[#ee4d2d]">
+                                    {{ number_format($dish->price, 0, ',', '.') }}đ
+                                </td>
+                                <td class="py-4 px-6">
+                                    @if($dish->is_available)
+                                        <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-black border border-emerald-200">
+                                            ĐANG BÁN
+                                        </span>
+                                    @else
+                                        <span class="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-black border border-slate-200">
+                                            TẠM NGƯNG
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="py-4 px-6 text-right">
+                                    <a href="{{ route('monandon_xem', $dish->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors">
+                                        <i class="fas fa-eye text-xs"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="py-8 text-center text-slate-400 font-medium">Chưa có món ăn nào thuộc danh mục này.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</div>
 @endsection
