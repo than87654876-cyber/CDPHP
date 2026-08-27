@@ -408,6 +408,33 @@ class CartController extends Controller
         return redirect()->route('giohang')->with('success', 'Yêu cầu hoàn tiền cho đơn hàng FDL-'.$order->id.' đã được gửi thành công. Ban quản lý sẽ thẩm định và phản hồi sớm nhất.');
     }
 
+    // Danh sách yêu cầu hoàn tiền của khách hàng
+    public function refundsList(Request $request)
+    {
+        if (!Auth::check()) {
+            return redirect()->route('trangchu/dangnhap')->withErrors(['login_input' => 'Vui lòng đăng nhập để xem danh sách yêu cầu hoàn tiền.']);
+        }
+
+        $query = Order::with(['orderItems.dish'])
+            ->where('user_id', Auth::id())
+            ->where('health_notes', 'like', '%[Yêu cầu hoàn tiền%')
+            ->orderBy('updated_at', 'desc');
+
+        $search = $request->input('search');
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $cleanSearch = str_replace('FDL-', '', $search);
+                $q->where('id', 'like', "%{$cleanSearch}%")
+                  ->orWhere('health_notes', 'like', "%{$search}%");
+            });
+        }
+
+        $orders = $query->get();
+        $settings = \App\Models\Setting::pluck('value', 'key')->all();
+
+        return view('client.refunds', compact('orders', 'settings', 'search'));
+    }
+
     // Trang giả lập thanh toán MoMo
     public function momoMethod(Request $request)
     {

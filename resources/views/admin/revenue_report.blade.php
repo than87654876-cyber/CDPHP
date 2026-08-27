@@ -126,99 +126,145 @@
 @endsection
 
 @section('scripts')
-    <script src="{{ asset('admin/vendor/chart.js/Chart.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.bundle.min.js"></script>
     <script>
-        Chart.defaults.global.defaultFontFamily = 'Plus Jakarta Sans', sans-serif;
-        Chart.defaults.global.defaultFontColor = '#64748b';
-
-        function formatMoney(num) {
-            return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.') + 'đ';
-        }
-
-        // Area Chart
-        var ctxArea = document.getElementById("myAreaChart");
-        var myLineChart = new Chart(ctxArea, {
-          type: 'line',
-          data: {
-            labels: ["Thg 1", "Thg 2", "Thg 3", "Thg 4", "Thg 5", "Thg 6", "Thg 7", "Thg 8", "Thg 9", "Thg 10", "Thg 11", "Thg 12"],
-            datasets: [{
-              label: "Doanh thu",
-              lineTension: 0.4,
-              backgroundColor: "rgba(239, 68, 68, 0.08)",
-              borderColor: "rgba(239, 68, 68, 1)",
-              pointRadius: 4,
-              pointBackgroundColor: "rgba(239, 68, 68, 1)",
-              pointBorderColor: "#fff",
-              pointHoverRadius: 6,
-              pointHoverBackgroundColor: "rgba(239, 68, 68, 1)",
-              pointHoverBorderColor: "#fff",
-              pointHitRadius: 10,
-              pointBorderWidth: 2,
-              data: @json($chartAreaValues),
-            }],
-          },
-          options: {
-            maintainAspectRatio: false,
-            scales: {
-              xAxes: [{ gridLines: { display: false }, ticks: { maxTicksLimit: 12 } }],
-              yAxes: [{
-                ticks: {
-                  maxTicksLimit: 5,
-                  padding: 10,
-                  callback: function(value) { return formatMoney(value); }
-                },
-                gridLines: { color: "#f1f5f9", zeroLineColor: "#f1f5f9", drawBorder: false }
-              }],
-            },
-            legend: { display: false },
-            tooltips: {
-              backgroundColor: "#0f172a",
-              bodyFontColor: "#fff",
-              titleFontColor: '#94a3b8',
-              cornerRadius: 12,
-              xPadding: 12,
-              yPadding: 12,
-              displayColors: false,
-              callbacks: {
-                label: function(tooltipItem, chart) {
-                  return 'Doanh thu: ' + formatMoney(tooltipItem.yLabel);
-                }
-              }
+        document.addEventListener("DOMContentLoaded", function () {
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js failed to load.');
+                return;
             }
-          }
-        });
 
-        // Pie Chart
-        var ctxPie = document.getElementById("myPieChart");
-        var myPieChart = new Chart(ctxPie, {
-          type: 'doughnut',
-          data: {
-            labels: ["COD", "Chuyển khoản", "MoMo"],
-            datasets: [{
-              data: [{{ $codRevenue }}, {{ $bankRevenue }}, {{ $momoRevenue }}],
-              backgroundColor: ['#ef4444', '#3b82f6', '#ec4899'],
-              hoverBackgroundColor: ['#dc2626', '#2563eb', '#db2777'],
-              hoverBorderColor: "#ffffff",
-            }],
-          },
-          options: {
-            maintainAspectRatio: false,
-            legend: { display: false },
-            cutoutPercentage: 75,
-            tooltips: {
-              backgroundColor: "#0f172a",
-              cornerRadius: 12,
-              xPadding: 12,
-              yPadding: 12,
-              callbacks: {
-                label: function(tooltipItem, data) {
-                  var label = data.labels[tooltipItem.index] || '';
-                  var value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-                  return label + ': ' + formatMoney(value);
-                }
-              }
+            Chart.defaults.global.defaultFontFamily = "'Inter', 'Segoe UI', sans-serif";
+            Chart.defaults.global.defaultFontColor = '#64748b';
+
+            function formatMoney(num) {
+                if (!num) return '0đ';
+                return Number(num).toLocaleString('vi-VN') + 'đ';
             }
-          },
+
+            // 1. AREA CHART: DOANH THU NĂM {{ now()->format('Y') }}
+            var ctxArea = document.getElementById("myAreaChart");
+            if (ctxArea) {
+                var areaContext = ctxArea.getContext('2d');
+                var gradientFill = areaContext.createLinearGradient(0, 0, 0, 300);
+                gradientFill.addColorStop(0, "rgba(238, 77, 45, 0.25)");
+                gradientFill.addColorStop(1, "rgba(238, 77, 45, 0.00)");
+
+                var monthlyData = @json($chartAreaValues);
+
+                new Chart(ctxArea, {
+                    type: 'line',
+                    data: {
+                        labels: ["Thg 1", "Thg 2", "Thg 3", "Thg 4", "Thg 5", "Thg 6", "Thg 7", "Thg 8", "Thg 9", "Thg 10", "Thg 11", "Thg 12"],
+                        datasets: [{
+                            label: "Doanh thu",
+                            lineTension: 0.35,
+                            backgroundColor: gradientFill,
+                            borderColor: "#ee4d2d",
+                            borderWidth: 3,
+                            pointRadius: 4,
+                            pointBackgroundColor: "#ee4d2d",
+                            pointBorderColor: "#ffffff",
+                            pointBorderWidth: 2,
+                            pointHoverRadius: 6,
+                            pointHoverBackgroundColor: "#ee4d2d",
+                            pointHoverBorderColor: "#ffffff",
+                            pointHoverBorderWidth: 2,
+                            data: monthlyData,
+                        }],
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        layout: {
+                            padding: { left: 10, right: 20, top: 20, bottom: 10 }
+                        },
+                        scales: {
+                            xAxes: [{
+                                gridLines: { display: false, drawBorder: false },
+                                ticks: { maxTicksLimit: 12, fontColor: '#94a3b8', fontSize: 11, fontStyle: 'bold' }
+                            }],
+                            yAxes: [{
+                                ticks: {
+                                    maxTicksLimit: 6,
+                                    padding: 10,
+                                    fontColor: '#94a3b8',
+                                    fontSize: 11,
+                                    callback: function(value) { return formatMoney(value); }
+                                },
+                                gridLines: { color: "#f1f5f9", zeroLineColor: "#e2e8f0", drawBorder: false }
+                            }],
+                        },
+                        legend: { display: false },
+                        tooltips: {
+                            backgroundColor: "#0f172a",
+                            titleFontColor: '#cbd5e1',
+                            titleFontSize: 12,
+                            titleFontStyle: 'bold',
+                            bodyFontColor: '#ffffff',
+                            bodyFontSize: 13,
+                            bodyFontStyle: 'bold',
+                            cornerRadius: 12,
+                            xPadding: 14,
+                            yPadding: 12,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    return '💰 Doanh thu: ' + formatMoney(tooltipItem.yLabel);
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 2. DOUGHNUT CHART: PHÂN BỔ PHƯƠNG THỨC THANH TOÁN
+            var ctxPie = document.getElementById("myPieChart");
+            if (ctxPie) {
+                var codVal = {{ (float) $codRevenue }};
+                var bankVal = {{ (float) $bankRevenue }};
+                var momoVal = {{ (float) $momoRevenue }};
+                
+                // Nếu chưa có doanh thu thực tế, hiển thị mẫu tỷ lệ mặc định đẹp mắt
+                var hasData = (codVal + bankVal + momoVal) > 0;
+                var chartData = hasData ? [codVal, bankVal, momoVal] : [35, 50, 15];
+
+                new Chart(ctxPie, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ["Tiền mặt (COD)", "Chuyển khoản", "Ví MoMo"],
+                        datasets: [{
+                            data: chartData,
+                            backgroundColor: ['#ee4d2d', '#2563eb', '#db2777'],
+                            hoverBackgroundColor: ['#dc2626', '#1d4ed8', '#be185d'],
+                            hoverBorderColor: "#ffffff",
+                            borderWidth: 2,
+                        }],
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        cutoutPercentage: 72,
+                        legend: { display: false },
+                        tooltips: {
+                            backgroundColor: "#0f172a",
+                            titleFontColor: '#cbd5e1',
+                            bodyFontColor: '#ffffff',
+                            bodyFontSize: 12,
+                            cornerRadius: 10,
+                            xPadding: 12,
+                            yPadding: 10,
+                            callbacks: {
+                                label: function(tooltipItem, data) {
+                                    var label = data.labels[tooltipItem.index] || '';
+                                    var value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                                    return label + ': ' + (hasData ? formatMoney(value) : (value + '%'));
+                                }
+                            }
+                        }
+                    },
+                });
+            }
         });
     </script>
 

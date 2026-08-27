@@ -41,9 +41,9 @@
 
                     <!-- Category Filter Pills Grid (ShopeeFood Style Tag Buttons) -->
                     <div class="pt-2 flex flex-wrap gap-2 text-xs font-semibold">
-                        <a href="#menu" onclick="filterCategory('all')" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-[#ee4d2d] backdrop-blur-xs border border-white/20 text-white transition-all">Tất cả</a>
+                        <a href="#menu" onclick="filterCategory('all')" id="hero-tab-all" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-[#ee4d2d] backdrop-blur-xs border border-white/20 text-white transition-all">Tất cả</a>
                         @foreach($categories as $cat)
-                            <a href="#menu" onclick="filterCategory('{{ $cat->id }}')" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-[#ee4d2d] backdrop-blur-xs border border-white/20 text-white transition-all">{{ $cat->category_name }}</a>
+                            <a href="#menu" onclick="filterCategory('cat-{{ $cat->id }}')" id="hero-tab-cat-{{ $cat->id }}" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-[#ee4d2d] backdrop-blur-xs border border-white/20 text-white transition-all">{{ $cat->category_name }}</a>
                         @endforeach
                     </div>
                 </div>
@@ -368,18 +368,27 @@
 @section('scripts')
 <script>
     function filterCategory(targetId) {
+        let key = targetId;
+        if (key !== 'all' && !String(key).startsWith('cat-')) {
+            key = 'cat-' + key;
+        }
+
+        // Ẩn tất cả các khung hiển thị món
         document.querySelectorAll('.cat-view-pane').forEach(pane => pane.classList.add('hidden'));
-        const targetPane = document.getElementById('cat-view-' + targetId);
+
+        // Hiển thị khung danh mục được chọn
+        const targetPane = document.getElementById('cat-view-' + key);
         if (targetPane) {
             targetPane.classList.remove('hidden');
         }
 
+        // Cập nhật kiểu dáng nút tab bên dưới
         document.querySelectorAll('.cat-tab-btn').forEach(btn => {
             btn.classList.remove('bg-[#ee4d2d]', 'text-white');
             btn.classList.add('bg-white', 'text-slate-700', 'hover:bg-slate-100', 'border', 'border-slate-200');
         });
 
-        const activeBtn = document.getElementById('tab-btn-' + targetId);
+        const activeBtn = document.getElementById('tab-btn-' + key);
         if (activeBtn) {
             activeBtn.classList.remove('bg-white', 'text-slate-700', 'hover:bg-slate-100', 'border', 'border-slate-200');
             activeBtn.classList.add('bg-[#ee4d2d]', 'text-white');

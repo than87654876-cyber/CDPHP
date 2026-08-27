@@ -39,7 +39,7 @@ class AdminDashboardController extends Controller
 
         // 3. Revenue distribution by Payment Methods
         $codRevenue = (float) Order::whereIn('payment_status', ['paid', 'completed'])
-            ->where('payment_method', 'cod')
+            ->whereIn('payment_method', ['cash', 'cod'])
             ->sum('final_amount');
 
         $bankRevenue = (float) Order::whereIn('payment_status', ['paid', 'completed'])
