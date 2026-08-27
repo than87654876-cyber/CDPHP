@@ -103,13 +103,6 @@
                         </div>
                     </a>
 
-                    <a href="{{ route('quanly_monandon') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_monandon') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-bowl-rice w-5 text-center"></i>
-                            <span>Món ăn</span>
-                        </div>
-                    </a>
-
                     <a href="{{ route('quanly_khuyenmai') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_khuyenmai') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
                         <div class="flex items-center gap-3">
                             <i class="fas fa-ticket w-5 text-center"></i>

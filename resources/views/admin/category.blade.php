@@ -52,7 +52,7 @@
                     <tr class="bg-slate-50 border-b border-slate-100 text-[11px] text-slate-400 uppercase font-extrabold tracking-wider">
                         <th class="py-4 px-6">STT</th>
                         <th class="py-4 px-6">Tên danh mục</th>
-                        <th class="py-4 px-6">Số lượng món</th>
+                        <th class="py-4 px-6">Món ăn thuộc nhóm</th>
                         <th class="py-4 px-6">Mô tả tóm tắt</th>
                         <th class="py-4 px-6 text-right">Thao tác</th>
                     </tr>
@@ -61,27 +61,36 @@
                     @forelse($categories as $index => $category)
                         <tr class="hover:bg-slate-50/80 transition-colors">
                             <td class="py-4 px-6 font-bold text-slate-400">#{{ $index + 1 }}</td>
-                            <td class="py-4 px-6 font-extrabold text-slate-900">
-                                {{ $category->category_name }}
+                            <td class="py-4 px-6">
+                                <a href="{{ route('danhmuc_xem', $category->id) }}" class="font-extrabold text-slate-900 hover:text-[#ee4d2d] transition-colors flex items-center gap-2 group">
+                                    <span>{{ $category->category_name }}</span>
+                                    <i class="fas fa-arrow-right text-[10px] text-slate-300 group-hover:text-[#ee4d2d] group-hover:translate-x-0.5 transition-all"></i>
+                                </a>
                             </td>
                             <td class="py-4 px-6">
-                                <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-extrabold border border-emerald-200">
-                                    {{ $category->dishes_count }} món ăn
-                                </span>
+                                <div class="flex items-center gap-2">
+                                    <a href="{{ route('danhmuc_xem', $category->id) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-[#ee4d2d] text-[#ee4d2d] hover:text-white text-xs font-extrabold transition-all border border-rose-200/60 shadow-2xs">
+                                        <i class="fas fa-utensils text-[11px]"></i>
+                                        <span>Quản lý & Sửa ({{ $category->dishes_count }} món)</span>
+                                    </a>
+                                    <a href="{{ route('monandon_them', ['category_id' => $category->id]) }}" title="Thêm món vào danh mục này" class="inline-flex items-center justify-center w-7 h-7 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold transition-colors">
+                                        <i class="fas fa-plus"></i>
+                                    </a>
+                                </div>
                             </td>
                             <td class="py-4 px-6 text-slate-500 font-medium">
                                 {{ $category->description ?? 'Chưa có mô tả' }}
                             </td>
-                            <td class="py-4 px-6 text-right space-x-2">
-                                <a href="{{ route('danhmuc_xem', $category->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors">
+                            <td class="py-4 px-6 text-right space-x-1.5">
+                                <a href="{{ route('danhmuc_xem', $category->id) }}" title="Xem chi tiết & danh sách món" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors">
                                     <i class="fas fa-eye text-xs"></i>
                                 </a>
-                                <a href="{{ route('danhmuc_chinhsua', $category->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 transition-colors">
+                                <a href="{{ route('danhmuc_chinhsua', $category->id) }}" title="Đổi tên danh mục" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 transition-colors">
                                     <i class="fas fa-pen text-xs"></i>
                                 </a>
                                 <form action="{{ route('danhmuc_xoa', $category->id) }}" method="POST" class="inline" onsubmit="return confirm('Bạn có chắc muốn xóa danh mục này?');">
                                     @csrf
-                                    <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 transition-colors">
+                                    <button type="submit" title="Xóa danh mục" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 transition-colors">
                                         <i class="fas fa-trash-can text-xs"></i>
                                     </button>
                                 </form>

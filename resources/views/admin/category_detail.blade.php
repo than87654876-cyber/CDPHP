@@ -79,18 +79,25 @@
                     <thead>
                         <tr class="bg-slate-50 border-b border-slate-100 text-[11px] text-slate-400 uppercase font-extrabold tracking-wider">
                             <th class="py-3.5 px-6">STT</th>
-                            <th class="py-3.5 px-6">Món ăn</th>
+                            <th class="py-3.5 px-6">Hình ảnh</th>
+                            <th class="py-3.5 px-6">Tên món ăn</th>
                             <th class="py-3.5 px-6">Đơn giá</th>
                             <th class="py-3.5 px-6">Trạng thái</th>
-                            <th class="py-3.5 px-6 text-right">Chi tiết</th>
+                            <th class="py-3.5 px-6 text-right">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         @forelse($category->dishes as $index => $dish)
                             <tr class="hover:bg-slate-50/80 transition-colors">
                                 <td class="py-4 px-6 font-bold text-slate-400">#{{ $index + 1 }}</td>
-                                <td class="py-4 px-6 font-extrabold text-slate-900">
-                                    {{ $dish->dish_name }}
+                                <td class="py-4 px-6">
+                                    <div class="w-11 h-11 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shadow-2xs">
+                                        <img src="{{ $dish->image_url ? (\Illuminate\Support\Str::startsWith($dish->image_url, 'http') ? $dish->image_url : asset($dish->image_url)) : ($dish->image ? asset($dish->image) : asset('logo.jpg')) }}" alt="{{ $dish->dish_name }}" class="w-full h-full object-cover">
+                                    </div>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <p class="font-extrabold text-slate-900 text-xs">{{ $dish->dish_name }}</p>
+                                    <p class="text-[10px] text-slate-400 font-medium line-clamp-1">{{ $dish->description ?? 'Không có mô tả' }}</p>
                                 </td>
                                 <td class="py-4 px-6 font-black text-[#ee4d2d]">
                                     {{ number_format($dish->price, 0, ',', '.') }}đ
@@ -106,10 +113,19 @@
                                         </span>
                                     @endif
                                 </td>
-                                <td class="py-4 px-6 text-right">
-                                    <a href="{{ route('monandon_xem', $dish->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors">
+                                <td class="py-4 px-6 text-right space-x-1">
+                                    <a href="{{ route('monandon_chinhsua', $dish->id) }}" title="Chỉnh sửa món ăn" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 transition-colors">
+                                        <i class="fas fa-pen text-xs"></i>
+                                    </a>
+                                    <a href="{{ route('monandon_xem', $dish->id) }}" title="Xem chi tiết" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors">
                                         <i class="fas fa-eye text-xs"></i>
                                     </a>
+                                    <form action="{{ route('monandon_xoa', $dish->id) }}" method="POST" class="inline" onsubmit="return confirm('Bạn có chắc muốn xóa món ăn này khỏi thực đơn?');">
+                                        @csrf
+                                        <button type="submit" title="Xóa món" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 transition-colors">
+                                            <i class="fas fa-trash-can text-xs"></i>
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         @empty
