@@ -474,17 +474,26 @@ class CartController extends Controller
 
         $order->payment_method = $request->payment_method;
         $order->payment_status = 'pending';
-        $order->save();
 
         if ($request->payment_method === 'momo') {
+            $order->save();
             return redirect()->route('thanhtoan_momo', ['order_id' => $order->id, 'amount' => $order->final_amount]);
         }
 
         if ($request->payment_method === 'bank_transfer') {
+            $order->save();
             return redirect()->route('thanhtoan_chuyenkhoan', ['order_id' => $order->id, 'amount' => $order->final_amount]);
         }
 
-        return redirect()->route('muahang.thanhtoan', ['id' => $order->id]);
+        // Nếu là tiền mặt (COD) -> Đơn hàng chuyển sang trạng thái đang chuẩn bị và chuyển hướng sang trang tra cứu đơn hàng
+        $order->order_status = 'preparing';
+        $order->save();
+
+        // Xóa giỏ hàng session
+        session()->forget('cart');
+
+        return redirect()->route('tracuu', ['order_id' => 'FDL-' . $order->id])
+            ->with('success', 'Đặt hàng thành công! Đơn hàng #FDL-' . $order->id . ' đã được tiếp nhận và đang được bếp chế biến.');
     }
 
     public function completePayment($id)
