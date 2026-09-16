@@ -1,83 +1,114 @@
 @extends('layouts.admin')
 
-@section('title', 'Chỉnh sửa chương trình khuyến mãi - FOODDAILY')
+@section('title', 'Chỉnh sửa Mã khuyến mãi - FOODDAILY Admin')
 
 @section('content')
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Chỉnh sửa chương trình khuyến mãi</h1>
-        <a href="{{ route('quanly_khuyenmai') }}" class="btn btn-sm btn-secondary shadow-sm">
-            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Quay lại
+<div class="max-w-4xl mx-auto space-y-6">
+    <!-- Top Action Bar -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Chỉnh Sửa Mã Khuyến Mãi</h1>
+            <p class="text-xs text-slate-500 font-medium mt-1">Cập nhật thông số mã ưu đãi: <strong class="text-[#ee4d2d] uppercase">{{ $promotion->coupon_code }}</strong></p>
+        </div>
+        <a href="{{ route('quanly_khuyenmai') }}" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors flex items-center gap-2">
+            <i class="fas fa-arrow-left"></i> Quay lại
         </a>
     </div>
 
-    @if($errors->any())
-    <div class="alert alert-danger alert-dismissible fade show text-dark" role="alert">
-        <strong><i class="fas fa-exclamation-triangle mr-1"></i> Có lỗi xảy ra:</strong> {{ $errors->first() }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
+    <!-- Error Alerts -->
+    @if ($errors->any())
+        <div class="bg-rose-50 border border-rose-200 text-rose-700 p-4 rounded-2xl text-xs space-y-1">
+            @foreach ($errors->all() as $error)
+                <p class="flex items-center gap-2 font-medium"><i class="fas fa-circle-exclamation text-rose-500"></i> {{ $error }}</p>
+            @endforeach
+        </div>
     @endif
 
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Biểu mẫu cập nhật khuyến mãi</h6>
+    <!-- Form Card -->
+    <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200/80 space-y-6">
+        <div class="flex items-center gap-3 pb-4 border-b border-slate-100">
+            <div class="w-10 h-10 rounded-2xl bg-rose-50 text-[#ee4d2d] flex items-center justify-center text-base font-bold shadow-xs">
+                <i class="fas fa-ticket"></i>
+            </div>
+            <div>
+                <h3 class="text-sm font-extrabold text-slate-900">Biểu mẫu cập nhật mã khuyến mãi</h3>
+                <p class="text-[11px] text-slate-400 font-medium">Mã ID hệ thống: #{{ $promotion->id }}</p>
+            </div>
         </div>
-        <div class="card-body text-dark">
-            <form action="{{ route('khuyenmai_chinhsua.post', $promotion->id) }}" method="POST">
-                @csrf
-                <div class="row">
-                    <div class="form-group col-md-3">
-                        <label class="font-weight-bold">Mã ID hệ thống</label>
-                        <input type="text" class="form-control bg-light" value="{{ $promotion->id }}" readonly>
-                    </div>
-                    <div class="form-group col-md-5">
-                        <label for="coupon_code" class="font-weight-bold">Mã khuyến mãi (Coupon Code) <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control text-uppercase" id="coupon_code" name="coupon_code" value="{{ old('coupon_code', $promotion->coupon_code) }}" required>
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="discount_type" class="font-weight-bold">Loại giảm giá <span class="text-danger">*</span></label>
-                        <select class="form-control" id="discount_type" name="discount_type" required>
-                            <option value="percent" {{ old('discount_type', $promotion->discount_type) === 'percent' ? 'selected' : '' }}>Giảm theo phần trăm (%)</option>
-                            <option value="fixed" {{ old('discount_type', $promotion->discount_type) === 'fixed' ? 'selected' : '' }}>Giảm tiền cố định (đ)</option>
-                        </select>
-                    </div>
+
+        <form action="{{ route('khuyenmai_chinhsua.post', $promotion->id) }}" method="POST" class="space-y-6">
+            @csrf
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <!-- Mã khuyến mãi -->
+                <div class="space-y-2">
+                    <label for="coupon_code" class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+                        Mã khuyến mãi (Coupon Code) <span class="text-[#ee4d2d]">*</span>
+                    </label>
+                    <input type="text" id="coupon_code" name="coupon_code" value="{{ old('coupon_code', $promotion->coupon_code) }}" required class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs font-black uppercase text-slate-900 focus:border-[#ee4d2d] outline-none transition-all shadow-xs">
                 </div>
 
-                <div class="row">
-                    <div class="form-group col-md-6">
-                        <label for="discount_value" class="font-weight-bold">Mức giảm giá <span class="text-danger">*</span></label>
-                        <input type="number" step="1" class="form-control text-danger font-weight-bold" id="discount_value" name="discount_value" value="{{ old('discount_value', (int)$promotion->discount_value) }}" min="0" required>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="min_order_value" class="font-weight-bold">Giá trị đơn tối thiểu áp dụng <span class="text-danger">*</span></label>
-                        <input type="number" step="1" class="form-control" id="min_order_value" name="min_order_value" value="{{ old('min_order_value', (int)$promotion->min_order_value) }}" min="0" required>
-                    </div>
+                <!-- Loại giảm giá -->
+                <div class="space-y-2">
+                    <label for="discount_type" class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+                        Loại chiết khấu <span class="text-[#ee4d2d]">*</span>
+                    </label>
+                    <select id="discount_type" name="discount_type" required class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs font-bold text-slate-900 focus:border-[#ee4d2d] outline-none transition-all shadow-xs bg-white">
+                        <option value="percent" {{ old('discount_type', $promotion->discount_type) === 'percent' ? 'selected' : '' }}>Giảm theo phần trăm (%)</option>
+                        <option value="fixed" {{ old('discount_type', $promotion->discount_type) === 'fixed' ? 'selected' : '' }}>Giảm tiền cố định (đ)</option>
+                    </select>
                 </div>
 
-                <div class="row">
-                    <div class="form-group col-md-4">
-                        <label for="start_date" class="font-weight-bold">Ngày bắt đầu áp dụng <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control" id="start_date" name="start_date" value="{{ old('start_date', $promotion->start_date ? $promotion->start_date->format('Y-m-d') : '') }}" required>
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="end_date" class="font-weight-bold">Ngày kết thúc áp dụng <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control" id="end_date" name="end_date" value="{{ old('end_date', $promotion->end_date ? $promotion->end_date->format('Y-m-d') : '') }}" required>
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="usage_limit" class="font-weight-bold">Giới hạn số lần sử dụng</label>
-                        <input type="number" class="form-control" id="usage_limit" name="usage_limit" value="{{ old('usage_limit', $promotion->usage_limit) }}" min="1" placeholder="Không điền = Vô hạn">
-                    </div>
+                <!-- Mức giảm giá -->
+                <div class="space-y-2">
+                    <label for="discount_value" class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+                        Mức giảm giá <span class="text-[#ee4d2d]">*</span>
+                    </label>
+                    <input type="number" step="1" min="0" id="discount_value" name="discount_value" value="{{ old('discount_value', (int)$promotion->discount_value) }}" required class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs font-black text-rose-600 focus:border-[#ee4d2d] outline-none transition-all shadow-xs">
                 </div>
 
-                <hr>
-                <div class="d-flex justify-content-start">
-                    <button type="submit" class="btn btn-warning text-dark font-weight-bold shadow-sm px-4 mr-2">
-                        <i class="fas fa-save fa-sm mr-1"></i> Lưu thay đổi
-                    </button>
-                    <a href="{{ route('quanly_khuyenmai') }}" class="btn btn-secondary shadow-sm px-3">Hủy bỏ</a>
+                <!-- Đơn tối thiểu -->
+                <div class="space-y-2">
+                    <label for="min_order_value" class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+                        Đơn tối thiểu áp dụng (đ) <span class="text-[#ee4d2d]">*</span>
+                    </label>
+                    <input type="number" step="1" min="0" id="min_order_value" name="min_order_value" value="{{ old('min_order_value', (int)$promotion->min_order_value) }}" required class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs font-semibold text-slate-900 focus:border-[#ee4d2d] outline-none transition-all shadow-xs">
                 </div>
-            </form>
-        </div>
+
+                <!-- Ngày bắt đầu -->
+                <div class="space-y-2">
+                    <label for="start_date" class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+                        Ngày bắt đầu áp dụng <span class="text-[#ee4d2d]">*</span>
+                    </label>
+                    <input type="date" id="start_date" name="start_date" value="{{ old('start_date', $promotion->start_date ? $promotion->start_date->format('Y-m-d') : '') }}" required class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs font-semibold text-slate-900 focus:border-[#ee4d2d] outline-none transition-all shadow-xs bg-white">
+                </div>
+
+                <!-- Ngày kết thúc -->
+                <div class="space-y-2">
+                    <label for="end_date" class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+                        Ngày kết thúc áp dụng <span class="text-[#ee4d2d]">*</span>
+                    </label>
+                    <input type="date" id="end_date" name="end_date" value="{{ old('end_date', $promotion->end_date ? $promotion->end_date->format('Y-m-d') : '') }}" required class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs font-semibold text-slate-900 focus:border-[#ee4d2d] outline-none transition-all shadow-xs bg-white">
+                </div>
+
+                <!-- Giới hạn lượt dùng -->
+                <div class="space-y-2 sm:col-span-2">
+                    <label for="usage_limit" class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+                        Giới hạn số lần sử dụng (Bỏ trống nếu không giới hạn)
+                    </label>
+                    <input type="number" min="1" id="usage_limit" name="usage_limit" value="{{ old('usage_limit', $promotion->usage_limit) }}" placeholder="Ví dụ: 100 (Để trống = Vô hạn)" class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs font-semibold text-slate-900 focus:border-[#ee4d2d] outline-none transition-all shadow-xs">
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
+                <a href="{{ route('quanly_khuyenmai') }}" class="px-6 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors">
+                    Hủy bỏ
+                </a>
+                <button type="submit" class="px-8 py-3 rounded-2xl bg-[#ee4d2d] hover:bg-red-600 text-white font-extrabold text-xs shadow-md shadow-rose-500/25 hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer">
+                    <i class="fas fa-save mr-1.5"></i> Lưu thay đổi
+                </button>
+            </div>
+        </form>
     </div>
+</div>
 @endsection

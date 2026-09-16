@@ -27,12 +27,26 @@ class ShopController extends Controller
             session(['last_search_query' => $query]);
         }
 
+        $sort = $request->input('sort', 'rating_desc');
+
         // Lấy tất cả các món ăn cho Tab "Tất cả"
         $allDishesQuery = \App\Models\Dish::where('is_available', true);
         if ($query) {
             $allDishesQuery->where('dish_name', 'like', '%'.$query.'%');
         }
         $allDishes = $allDishesQuery->get();
+
+        // Sắp xếp món ăn theo tiêu chí (Mặc định: Số sao đánh giá cao nhất đẩy lên đầu)
+        if ($sort === 'price_asc') {
+            $allDishes = $allDishes->sortBy('price')->values();
+        } elseif ($sort === 'price_desc') {
+            $allDishes = $allDishes->sortByDesc('price')->values();
+        } else {
+            // Món có điểm đánh giá rating_score cao nhất xếp lên đầu
+            $allDishes = $allDishes->sortByDesc(function ($dish) {
+                return $dish->rating_score * 1000 + $dish->reviews_count;
+            })->values();
+        }
 
         // Lấy các danh mục và các món ăn thuộc danh mục đó
         $categories = Category::with(['dishes' => function ($q) use ($query) {
@@ -42,7 +56,46 @@ class ShopController extends Controller
             }
         }])->get();
 
-        // 1. THUẬT TOÁN: Món hay mua (Ưu tiên theo lịch sử khách mua >= 2 lần, fallback top món hot bán chạy)
+        // Sắp xếp các món trong từng danh mục theo số sao đánh giá cao nhất
+        foreach ($categories as $cat) {
+            if ($sort === 'price_asc') {
+                $cat->setRelation('dishes', $cat->dishes->sortBy('price')->values());
+            } elseif ($sort === 'price_desc') {
+                $cat->setRelation('dishes', $cat->dishes->sortByDesc('price')->values());
+            } else {
+                $cat->setRelation('dishes', $cat->dishes->sortByDesc(function ($dish) {
+                    return $dish->rating_score * 1000 + $dish->reviews_count;
+                })->values());
+            }
+        }
+
+        // 1. THUẬT TOÁN: Đề xuất món ăn cùng loại (Cùng category_id với món đang chọn/xem)
+        $selectedDishId = $request->query('dish_id') ?? session('selected_dish_id') ?? session('added_dish.id');
+        $currentSelectedDish = null;
+
+        if ($selectedDishId) {
+            $currentSelectedDish = \App\Models\Dish::with('category')->where('is_available', true)->find($selectedDishId);
+        }
+
+        // Nếu chưa chọn món cụ thể, mặc định lấy món đầu tiên hoặc món bán chạy
+        if (!$currentSelectedDish) {
+            $topDishId = \App\Models\OrderItem::select('dish_id', \Illuminate\Support\Facades\DB::raw('SUM(quantity) as total_qty'))
+                ->groupBy('dish_id')
+                ->orderByDesc('total_qty')
+                ->value('dish_id');
+
+            if ($topDishId) {
+                $currentSelectedDish = \App\Models\Dish::with('category')->where('is_available', true)->find($topDishId);
+            }
+
+            if (!$currentSelectedDish) {
+                $currentSelectedDish = \App\Models\Dish::with('category')->where('is_available', true)->first();
+            }
+        }
+
+        $sameCategoryDishes = $currentSelectedDish ? $currentSelectedDish->getRelatedDishes(6) : collect();
+
+        // 2. THUẬT TOÁN: Món hay mua (Lịch sử hoặc Top món)
         $frequentDishes = collect();
         if (auth()->check()) {
             $frequentDishIds = \App\Models\OrderItem::whereHas('order', function($q) {
@@ -57,7 +110,6 @@ class ShopController extends Controller
             $frequentDishes = \App\Models\Dish::whereIn('id', $frequentDishIds)->where('is_available', true)->get();
         }
 
-        // Nếu chưa có lịch sử mua nhiều lần, tự động đề xuất các món được yêu thích bán chạy nhất
         if ($frequentDishes->isEmpty()) {
             $topDishIds = \App\Models\OrderItem::select('dish_id', \Illuminate\Support\Facades\DB::raw('SUM(quantity) as total_qty'))
                 ->groupBy('dish_id')
@@ -71,7 +123,7 @@ class ShopController extends Controller
             }
         }
 
-        // 2. THUẬT TOÁN: Đề xuất theo khung giờ trong ngày
+        // 3. THUẬT TOÁN: Đề xuất theo khung giờ trong ngày
         $hour = now()->hour;
         $timeRecommendation = [
             'period' => 'Sáng',
@@ -115,7 +167,7 @@ class ShopController extends Controller
             $timeRecommendation['dishes'] = \App\Models\Dish::where('is_available', true)->take(4)->get();
         }
 
-        // 3. Đề xuất từ lịch sử tìm kiếm gần nhất
+        // 4. Đề xuất từ lịch sử tìm kiếm gần nhất
         $lastSearchQuery = session('last_search_query');
         $lastSearchDishes = collect();
         if ($lastSearchQuery && !$query) {
@@ -124,16 +176,27 @@ class ShopController extends Controller
                 ->take(4)->get();
         }
 
-        // 4. Lấy cấu hình trang chủ từ bảng settings
+        // 5. Lấy cấu hình trang chủ từ bảng settings
         $settings = \App\Models\Setting::pluck('value', 'key')->all();
 
-        return view('client.shop', compact('categories', 'allDishes', 'query', 'frequentDishes', 'timeRecommendation', 'lastSearchQuery', 'lastSearchDishes', 'settings'));
+        return view('client.shop', compact('categories', 'allDishes', 'query', 'currentSelectedDish', 'sameCategoryDishes', 'frequentDishes', 'timeRecommendation', 'lastSearchQuery', 'lastSearchDishes', 'settings'));
+    }
+
+    // Chi tiết món ăn dành cho khách hàng
+    public function dishDetail($id)
+    {
+        $dish = \App\Models\Dish::with('category')->where('is_available', true)->findOrFail($id);
+        session(['selected_dish_id' => $dish->id]);
+        $relatedDishes = $dish->getRelatedDishes(6);
+
+        return view('client.dish_detail', compact('dish', 'relatedDishes'));
     }
 
     public function shopLogged(Request $request)
     {
         return redirect()->route('trangchu');
     }
+
 
     // Chatbot gợi ý món ăn qua Google Gemini AI
     public function geminiChat(Request $request)

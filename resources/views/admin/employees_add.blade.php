@@ -1,83 +1,117 @@
 @extends('layouts.admin')
 
-@section('title', 'Thêm nhân viên mới - FOODDAILY')
+@section('title', 'Thêm Nhân viên mới - FOODDAILY Admin')
 
 @section('content')
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Thêm nhân viên mới</h1>
-        <a href="{{ route('quanly_nhanvien') }}" class="btn btn-sm btn-secondary shadow-sm">
-            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Quay lại
+<div class="max-w-4xl mx-auto space-y-6">
+    <!-- Top Action Bar -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Thêm Nhân Viên Mới</h1>
+            <p class="text-xs text-slate-500 font-medium mt-1">Cấp tài khoản phân quyền cho nhân sự vận hành hoặc quản trị</p>
+        </div>
+        <a href="{{ route('quanly_nhanvien') }}" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors flex items-center gap-2">
+            <i class="fas fa-arrow-left"></i> Quay lại danh sách
         </a>
     </div>
 
-    @if($errors->any())
-    <div class="alert alert-danger alert-dismissible fade show text-dark" role="alert">
-        <strong><i class="fas fa-exclamation-triangle mr-1"></i> Có lỗi xảy ra:</strong> {{ $errors->first() }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
+    <!-- Error Alerts -->
+    @if ($errors->any())
+        <div class="bg-rose-50 border border-rose-200 text-rose-700 p-4 rounded-2xl text-xs space-y-1">
+            @foreach ($errors->all() as $error)
+                <p class="flex items-center gap-2 font-medium"><i class="fas fa-circle-exclamation text-rose-500"></i> {{ $error }}</p>
+            @endforeach
+        </div>
     @endif
 
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Biểu mẫu thêm tài khoản nhân viên mới</h6>
+    <!-- Form Card -->
+    <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200/80 space-y-6">
+        <div class="flex items-center gap-3 pb-4 border-b border-slate-100">
+            <div class="w-10 h-10 rounded-2xl bg-rose-50 text-[#ee4d2d] flex items-center justify-center text-base font-bold shadow-xs">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <div>
+                <h3 class="text-sm font-extrabold text-slate-900">Biểu mẫu khởi tạo tài khoản nhân sự</h3>
+                <p class="text-[11px] text-slate-400 font-medium">Nhập thông tin cá nhân và thiết lập quyền truy cập cho nhân viên</p>
+            </div>
         </div>
-        <div class="card-body text-dark">
-            <form action="{{ route('nhanvien_them.post') }}" method="POST">
-                @csrf
-                <div class="row">
-                    <div class="form-group col-md-6">
-                        <label for="fullname" class="font-weight-bold">Họ và Tên nhân viên <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="fullname" name="fullname" value="{{ old('fullname') }}" required placeholder="Ví dụ: Nguyễn Văn A">
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="phone" class="font-weight-bold">Số điện thoại <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="phone" name="phone" value="{{ old('phone') }}" required placeholder="Ví dụ: 0912345678">
-                    </div>
+
+        <form action="{{ route('nhanvien_them.post') }}" method="POST" class="space-y-6">
+            @csrf
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <!-- Họ và tên -->
+                <div class="space-y-2">
+                    <label for="fullname" class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+                        Họ và Tên nhân viên <span class="text-[#ee4d2d]">*</span>
+                    </label>
+                    <input type="text" id="fullname" name="fullname" value="{{ old('fullname') }}" required placeholder="Ví dụ: Nguyễn Văn An" class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs font-bold text-slate-900 focus:border-[#ee4d2d] outline-none transition-all shadow-xs">
                 </div>
 
-                <div class="row">
-                    <div class="form-group col-md-6">
-                        <label for="email" class="font-weight-bold">Địa chỉ Email <span class="text-danger">*</span></label>
-                        <input type="email" class="form-control" id="email" name="email" value="{{ old('email') }}" required placeholder="Ví dụ: name@FOODDAILY.com">
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="password" class="font-weight-bold">Mật khẩu khởi tạo <span class="text-danger">*</span></label>
-                        <input type="password" class="form-control" id="password" name="password" required placeholder="Tối thiểu 6 ký tự">
-                    </div>
+                <!-- Số điện thoại -->
+                <div class="space-y-2">
+                    <label for="phone" class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+                        Số điện thoại <span class="text-[#ee4d2d]">*</span>
+                    </label>
+                    <input type="text" id="phone" name="phone" value="{{ old('phone') }}" required placeholder="Ví dụ: 0912345678" class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs font-bold text-slate-900 focus:border-[#ee4d2d] outline-none transition-all shadow-xs">
                 </div>
 
-                <div class="row">
-                    <div class="form-group col-md-6">
-                        <label for="role" class="font-weight-bold">Quyền hạn hệ thống <span class="text-danger">*</span></label>
-                        <select class="form-control font-weight-bold" id="role" name="role" required>
-                            <option value="staff" {{ old('role') === 'staff' ? 'selected' : '' }}>Nhân viên vận hành (Staff)</option>
-                            <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>Quản trị viên (Admin)</option>
-                        </select>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="status" class="font-weight-bold">Trạng thái làm việc <span class="text-danger">*</span></label>
-                        <select class="form-control font-weight-bold" id="status" name="status" required>
-                            <option value="1" {{ old('status') === '1' ? 'selected' : '' }}>Đang hoạt động (Active)</option>
-                            <option value="0" {{ old('status') === '0' ? 'selected' : '' }}>Tạm đình chỉ (Suspended)</option>
-                        </select>
-                    </div>
+                <!-- Email -->
+                <div class="space-y-2">
+                    <label for="email" class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+                        Địa chỉ Email đăng nhập <span class="text-[#ee4d2d]">*</span>
+                    </label>
+                    <input type="email" id="email" name="email" value="{{ old('email') }}" required placeholder="name@fooddaily.com" class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs font-bold text-slate-900 focus:border-[#ee4d2d] outline-none transition-all shadow-xs">
                 </div>
 
-                <div class="form-group">
-                    <label for="notes" class="font-weight-bold">Chức vụ cụ thể / Ghi chú mô tả công việc</label>
-                    <input type="text" class="form-control" id="notes" name="notes" value="{{ old('notes') }}" placeholder="Ví dụ: Thu ngân, Giao hàng, Kế toán kho...">
+                <!-- Mật khẩu -->
+                <div class="space-y-2">
+                    <label for="password" class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+                        Mật khẩu khởi tạo <span class="text-[#ee4d2d]">*</span>
+                    </label>
+                    <input type="password" id="password" name="password" required placeholder="Tối thiểu 6 ký tự" class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs font-bold text-slate-900 focus:border-[#ee4d2d] outline-none transition-all shadow-xs">
                 </div>
 
-                <hr>
-                <div class="d-flex justify-content-start">
-                    <button type="submit" class="btn btn-primary shadow-sm px-4 mr-2">
-                        <i class="fas fa-save fa-sm mr-1"></i> Tạo tài khoản nhân viên
-                    </button>
-                    <a href="{{ route('quanly_nhanvien') }}" class="btn btn-secondary shadow-sm px-3">Hủy bỏ</a>
+                <!-- Quyền hạn -->
+                <div class="space-y-2">
+                    <label for="role" class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+                        Quyền hạn hệ thống <span class="text-[#ee4d2d]">*</span>
+                    </label>
+                    <select id="role" name="role" required class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs font-bold text-slate-900 focus:border-[#ee4d2d] outline-none transition-all shadow-xs bg-white">
+                        <option value="staff" {{ old('role') === 'staff' ? 'selected' : '' }}>👨‍🍳 Nhân viên vận hành (Staff)</option>
+                        <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>★ Quản trị viên (Admin)</option>
+                    </select>
                 </div>
-            </form>
-        </div>
+
+                <!-- Trạng thái -->
+                <div class="space-y-2">
+                    <label for="status" class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+                        Trạng thái làm việc <span class="text-[#ee4d2d]">*</span>
+                    </label>
+                    <select id="status" name="status" required class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs font-bold text-slate-900 focus:border-[#ee4d2d] outline-none transition-all shadow-xs bg-white">
+                        <option value="1" {{ old('status') === '1' ? 'selected' : '' }}>✔ Đang hoạt động (Active)</option>
+                        <option value="0" {{ old('status') === '0' ? 'selected' : '' }}>✕ Tạm đình chỉ (Suspended)</option>
+                    </select>
+                </div>
+
+                <!-- Chức vụ / Ghi chú -->
+                <div class="space-y-2 sm:col-span-2">
+                    <label for="notes" class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+                        Chức vụ cụ thể / Ghi chú công việc
+                    </label>
+                    <input type="text" id="notes" name="notes" value="{{ old('notes') }}" placeholder="Ví dụ: Bếp chính, Thu ngân ca sáng, Điều phối shipper..." class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs font-medium text-slate-900 focus:border-[#ee4d2d] outline-none transition-all shadow-xs">
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
+                <a href="{{ route('quanly_nhanvien') }}" class="px-6 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors">
+                    Hủy bỏ
+                </a>
+                <button type="submit" class="px-8 py-3 rounded-2xl bg-[#ee4d2d] hover:bg-red-600 text-white font-extrabold text-xs shadow-md shadow-rose-500/25 hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer">
+                    <i class="fas fa-save mr-1.5"></i> Tạo tài khoản
+                </button>
+            </div>
+        </form>
     </div>
+</div>
 @endsection

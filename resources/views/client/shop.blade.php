@@ -115,49 +115,68 @@
     </div>
 </section>
 
-<!-- THUẬT TOÁN ĐỀ XUẤT: Món hay mua nhiều nhất (Tự động phát hiện khi mua >= 2 lần) -->
-@if(isset($frequentDishes) && $frequentDishes->isNotEmpty())
+<!-- THUẬT TOÁN ĐỀ XUẤT: Món ăn cùng loại (Cùng category_id với món đang chọn/xem) -->
+@if(isset($sameCategoryDishes) && $sameCategoryDishes->isNotEmpty())
 <section class="py-4 bg-transparent">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-rose-200 space-y-3 relative overflow-hidden">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-rose-500 text-white text-xs font-black">
-                        <i class="fas fa-robot"></i>
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-4 sm:p-5 shadow-sm border border-rose-200 space-y-4 relative overflow-hidden">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-rose-100/70">
+                <div class="flex items-center gap-2.5">
+                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-tr from-[#ee4d2d] to-rose-400 text-white text-sm font-black shadow-xs shadow-rose-500/20">
+                        <i class="fas fa-utensils"></i>
                     </span>
                     <div>
-                        <h3 class="font-extrabold text-slate-900 text-sm">
-                            {{ (auth()->check() && auth()->user()->orders()->count() > 0) ? '❤️ Món Ngon Bạn Hay Đặt Nhất' : '🔥 Top Món Ăn Được Đặt Nhiều Nhất' }}
-                        </h3>
-                        <p class="text-[11px] text-slate-400 font-medium">Thuật toán tự động đề xuất dựa trên tần suất mua hàng của bạn</p>
-                    </div>
-                </div>
-                <a href="#menu" class="text-xs font-bold text-[#ee4d2d] hover:underline">≡ Xem thêm món</a>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                @foreach($frequentDishes as $fDish)
-                    <div class="bg-rose-50/50 hover:bg-rose-50 rounded-xl p-3 border border-rose-100 flex items-center gap-3 shadow-xs transition-all">
-                        <div class="w-14 h-14 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-slate-200">
-                            @if($fDish->image)
-                                <img src="{{ asset($fDish->image) }}" class="w-full h-full object-cover">
-                            @else
-                                <div class="w-full h-full flex items-center justify-center text-slate-400 font-bold text-xs">Món ăn</div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-extrabold text-slate-900 text-sm sm:text-base">
+                                {{ isset($currentSelectedDish) ? '🔥 Món Cùng Loại Bạn Có Thể Thích: ' . ($currentSelectedDish->category->category_name ?? 'Món Ăn') : '🔥 Món Cùng Loại Bạn Có Thể Thích' }}
+                            </h3>
+                            @if(isset($currentSelectedDish->category))
+                                <span class="px-2 py-0.5 rounded-full bg-rose-100 text-[#ee4d2d] text-[10px] font-black tracking-wide uppercase hidden md:inline-block">
+                                    {{ $currentSelectedDish->category->category_name }}
+                                </span>
                             @endif
                         </div>
-                        <div class="space-y-0.5 flex-1 min-w-0">
-                            <span class="inline-block px-1.5 py-0.5 rounded bg-rose-100 text-[#ee4d2d] text-[9px] font-black uppercase">
-                                {{ auth()->check() ? 'Đã mua nhiều lần' : 'Bán chạy' }}
-                            </span>
-                            <h4 class="font-extrabold text-slate-900 text-xs truncate">{{ $fDish->dish_name }}</h4>
-                            <p class="text-xs text-[#ee4d2d] font-black">{{ number_format($fDish->price) }}đ</p>
+                        <p class="text-[11px] text-slate-500 font-medium">
+                            {{ isset($currentSelectedDish) ? 'Tự động đề xuất các món ăn cùng danh mục với món "' . $currentSelectedDish->dish_name . '"' : 'Thuật toán tự động đề xuất các món ăn cùng danh mục' }}
+                        </p>
+                    </div>
+                </div>
+                <a href="#menu" class="text-xs font-extrabold text-[#ee4d2d] hover:text-red-700 transition-colors flex items-center gap-1 shrink-0">
+                    <span>≡ Xem tất cả thực đơn</span>
+                </a>
+            </div>
+
+            <!-- 6 Card Grid Món Cùng Loại (Responsive 2/3/6 cột) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+                @foreach($sameCategoryDishes as $rDish)
+                    <div class="bg-white hover:bg-rose-50/40 rounded-xl p-2.5 sm:p-3 border border-rose-100 hover:border-[#ee4d2d]/40 flex flex-col justify-between shadow-2xs hover:shadow-md transition-all duration-300 group">
+                        <a href="{{ route('dish.detail', $rDish->id) }}" class="space-y-2 block" title="{{ $rDish->dish_name }}">
+                            <div class="aspect-square w-full rounded-lg bg-slate-100 overflow-hidden relative border border-slate-100">
+                                <img src="{{ $rDish->display_image }}" alt="{{ $rDish->dish_name }}" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-300" loading="lazy">
+                                <span class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-white/90 backdrop-blur-xs text-[#ee4d2d] text-[9px] font-black uppercase shadow-2xs">
+                                    {{ $rDish->category->category_name ?? 'Cùng loại' }}
+                                </span>
+                            </div>
+                            <div class="space-y-1">
+                                <h4 class="font-extrabold text-slate-900 text-xs line-clamp-1 group-hover:text-[#ee4d2d] transition-colors">
+                                    {{ $rDish->dish_name }}
+                                </h4>
+                                <p class="text-[10px] text-slate-400 line-clamp-1 font-medium">
+                                    {{ $rDish->description ?? 'Món ngon đậm đà' }}
+                                </p>
+                            </div>
+                        </a>
+                        <div class="pt-2 mt-2 border-t border-slate-100 flex items-center justify-between gap-1.5">
+                            <span class="text-xs text-[#ee4d2d] font-black">{{ number_format($rDish->price) }}đ</span>
+                            <form action="{{ route('giohang.add') }}" method="POST" class="shrink-0">
+                                @csrf
+                                <input type="hidden" name="dish_id" value="{{ $rDish->id }}">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="px-2.5 py-1 bg-[#ee4d2d] hover:bg-red-600 text-white rounded-lg text-[11px] font-extrabold shadow-2xs transition-colors flex items-center gap-1 cursor-pointer">
+                                    <i class="fas fa-cart-plus text-[10px]"></i> + Đặt
+                                </button>
+                            </form>
                         </div>
-                        <form action="{{ route('giohang.add') }}" method="POST" class="shrink-0">
-                            @csrf
-                            <input type="hidden" name="dish_id" value="{{ $fDish->id }}">
-                            <button type="submit" class="px-3 py-1.5 bg-[#ee4d2d] hover:bg-red-600 text-white rounded-lg text-xs font-extrabold shadow-xs transition-colors flex items-center gap-1">
-                                <i class="fas fa-cart-plus text-[10px]"></i> + Đặt lại
-                            </button>
-                        </form>
                     </div>
                 @endforeach
             </div>
@@ -178,10 +197,10 @@
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 @foreach($timeRecommendation['dishes'] as $tDish)
                     <div class="bg-slate-50 rounded-xl p-2.5 border border-slate-100 flex items-center justify-between">
-                        <div class="truncate mr-2">
-                            <h4 class="font-extrabold text-slate-900 text-xs truncate">{{ $tDish->dish_name }}</h4>
+                        <a href="{{ route('dish.detail', $tDish->id) }}" class="truncate mr-2 block hover:text-[#ee4d2d]">
+                            <h4 class="font-extrabold text-slate-900 text-xs truncate hover:text-[#ee4d2d]">{{ $tDish->dish_name }}</h4>
                             <span class="text-[11px] font-bold text-slate-700">{{ number_format($tDish->price) }}đ</span>
-                        </div>
+                        </a>
                         <form action="{{ route('giohang.add') }}" method="POST">
                             @csrf
                             <input type="hidden" name="dish_id" value="{{ $tDish->id }}">
@@ -195,11 +214,11 @@
 </section>
 @endif
 
-<!-- SHOPEEFOOD PRODUCT GRID SECTION (Matches Image 2 Exactly) -->
+<!-- SHOPEEFOOD PRODUCT GRID SECTION -->
 <section class="py-6 bg-transparent" id="menu">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
         
-        <!-- Filter & Sort Bar (Giống 100% Ảnh 2 Header Bar) -->
+        <!-- Filter & Sort Bar -->
         <div class="bg-white/95 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-4 text-xs font-bold text-slate-700">
             <div class="flex items-center gap-4">
                 <div class="cursor-pointer hover:text-[#ee4d2d] flex items-center gap-1">
@@ -211,15 +230,15 @@
             </div>
             <div class="flex items-center gap-3">
                 <span class="text-slate-400 font-semibold">{{ count($allDishes) }} Kết quả</span>
-                <select class="bg-slate-50 border border-slate-200 rounded px-2.5 py-1 text-xs font-bold text-slate-700 outline-none">
-                    <option>Đúng nhất</option>
-                    <option>Gần tôi</option>
-                    <option>Giá thấp đến cao</option>
+                <select id="sort-select" onchange="handleSortChange(this.value)" class="bg-slate-50 border border-slate-200 rounded px-2.5 py-1 text-xs font-bold text-slate-700 outline-none cursor-pointer">
+                    <option value="rating_desc" {{ request('sort') == 'rating_desc' || !request('sort') ? 'selected' : '' }}>⭐ Đánh giá cao nhất</option>
+                    <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Giá thấp đến cao</option>
+                    <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Giá cao đến thấp</option>
                 </select>
             </div>
         </div>
 
-        <!-- CATEGORY TABS (Tất cả, Ăn sáng, Tráng miệng...) -->
+        <!-- CATEGORY TABS (Tất cả, Đồ ăn, Đồ uống...) -->
         <div class="flex items-center gap-2 overflow-x-auto pb-1 border-b border-slate-200 text-xs font-bold">
             <button type="button" onclick="filterCategory('all')" id="tab-btn-all" class="cat-tab-btn px-4 py-2 rounded-lg bg-[#ee4d2d] text-white shrink-0">
                 Tất cả món ăn
@@ -231,41 +250,52 @@
             @endforeach
         </div>
 
-        <!-- TAB CONTENT: ALL DISHES (ShopeeFood 5-Column Card Grid - Giống Ảnh 2) -->
+        <!-- TAB CONTENT: ALL DISHES -->
         <div id="cat-view-all" class="cat-view-pane">
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 @forelse($allDishes as $dIndex => $dish)
-                    <div class="bg-white/95 backdrop-blur-sm rounded-xl shadow-xs hover:shadow-md transition-all border border-slate-200 overflow-hidden flex flex-col justify-between group">
+                    <div class="dish-card-item bg-white/95 backdrop-blur-sm rounded-xl shadow-xs hover:shadow-md transition-all duration-300 border border-slate-200 overflow-hidden flex flex-col justify-between group {{ $dIndex >= 15 ? 'hidden' : '' }}" data-index="{{ $dIndex }}">
                         <div class="space-y-2">
-                            <!-- Image Thumbnail with "👍 Yêu thích" Red Badge -->
-                            <div class="aspect-square bg-slate-100 relative overflow-hidden">
-                                @if($dish->image)
-                                    <img src="{{ asset($dish->image) }}" alt="{{ $dish->dish_name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                                @else
-                                    <div class="w-full h-full flex items-center justify-center text-slate-300 bg-slate-100"><i class="fas fa-utensils text-2xl"></i></div>
-                                @endif
+                            <!-- Image Thumbnail with Rating Badge & Favorite Badge -->
+                            <a href="{{ route('dish.detail', $dish->id) }}" class="aspect-square bg-slate-100 relative overflow-hidden block">
+                                <img src="{{ $dish->display_image }}" alt="{{ $dish->dish_name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
                                 
-                                @if($dIndex % 3 == 0)
+                                <!-- Star Rating Badge on Top Right -->
+                                <span class="absolute top-2 right-2 bg-slate-900/80 backdrop-blur-xs text-amber-400 text-[10px] font-black px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1 border border-white/20">
+                                    <i class="fas fa-star text-[9px] text-amber-400"></i>
+                                    <span>{{ number_format($dish->rating_score, 1) }}</span>
+                                </span>
+
+                                @if($dish->rating_score >= 4.9 || $dIndex % 3 == 0)
                                     <span class="absolute top-2 left-0 bg-[#ee4d2d] text-white text-[9px] font-extrabold px-2 py-0.5 rounded-r-md shadow-xs flex items-center gap-1">
                                         <i class="fas fa-thumbs-up text-[8px]"></i> Yêu thích
                                     </span>
                                 @endif
-                            </div>
+                            </a>
 
-                            <!-- Content Details (Checkmark + Title + Address + Red Promo Tag) -->
-                            <div class="p-2.5 space-y-1">
-                                <div class="flex items-start gap-1">
+                            <!-- Content Details (Checkmark + Title + Address + Rating Stars + Promo Tag) -->
+                            <div class="p-2.5 space-y-1.5">
+                                <a href="{{ route('dish.detail', $dish->id) }}" class="flex items-start gap-1 group/title block">
                                     <span class="text-amber-500 text-xs shrink-0 mt-0.5">✔</span>
-                                    <h4 class="font-extrabold text-slate-900 text-xs line-clamp-1 leading-snug group-hover:text-[#ee4d2d] transition-colors">
+                                    <h4 class="font-extrabold text-slate-900 text-xs line-clamp-1 leading-snug group-hover/title:text-[#ee4d2d] transition-colors">
                                         {{ $dish->dish_name }}
                                     </h4>
-                                </div>
+                                </a>
                                 <p class="text-[10px] text-slate-500 font-medium line-clamp-1 leading-tight">
                                     {{ $dish->description ?? 'FOODDAILY Store - TP. HCM' }}
                                 </p>
                                 
-                                <!-- Red Promo Tag Badge (Giống 100% Ảnh 2) -->
-                                <div class="pt-1">
+                                <!-- Rating Stars & Review Count -->
+                                <div class="flex items-center gap-1.5 pt-0.5">
+                                    <div class="flex items-center gap-1 text-[11px] font-black text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-md border border-amber-200/70">
+                                        <i class="fas fa-star text-[9px] text-amber-500"></i>
+                                        <span>{{ number_format($dish->rating_score, 1) }}</span>
+                                    </div>
+                                    <span class="text-[10px] font-semibold text-slate-400">({{ $dish->reviews_count }} đánh giá)</span>
+                                </div>
+
+                                <!-- Red Promo Tag Badge -->
+                                <div>
                                     <span class="inline-block px-1.5 py-0.5 rounded bg-rose-50 text-[#ee4d2d] text-[9px] font-extrabold border border-rose-200">
                                         🏷️ Mã giảm {{ ($dIndex % 2 == 0) ? '11%' : '20%' }}
                                     </span>
@@ -280,7 +310,7 @@
                                 @csrf
                                 <input type="hidden" name="dish_id" value="{{ $dish->id }}">
                                 <input type="hidden" name="quantity" value="1">
-                                <button type="submit" class="w-7 h-7 rounded-lg bg-[#ee4d2d] hover:bg-red-600 text-white flex items-center justify-center text-xs font-bold transition-colors">
+                                <button type="submit" class="w-7 h-7 rounded-lg bg-[#ee4d2d] hover:bg-red-600 text-white flex items-center justify-center text-xs font-bold transition-colors cursor-pointer" title="Thêm vào giỏ hàng">
                                     +
                                 </button>
                             </form>
@@ -297,24 +327,36 @@
             <div id="cat-view-cat-{{ $category->id }}" class="cat-view-pane hidden">
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     @forelse($category->dishes as $cIndex => $dish)
-                        <div class="bg-white/95 backdrop-blur-sm rounded-xl shadow-xs hover:shadow-md transition-all border border-slate-200 overflow-hidden flex flex-col justify-between group">
+                        <div class="dish-card-item bg-white/95 backdrop-blur-sm rounded-xl shadow-xs hover:shadow-md transition-all duration-300 border border-slate-200 overflow-hidden flex flex-col justify-between group {{ $cIndex >= 15 ? 'hidden' : '' }}" data-index="{{ $cIndex }}">
                             <div class="space-y-2">
-                                <div class="aspect-square bg-slate-100 relative overflow-hidden">
-                                    @if($dish->image)
-                                        <img src="{{ asset($dish->image) }}" alt="{{ $dish->dish_name }}" class="w-full h-full object-cover">
-                                    @else
-                                        <div class="w-full h-full flex items-center justify-center text-slate-300"><i class="fas fa-utensils"></i></div>
-                                    @endif
-                                </div>
-                                <div class="p-2.5 space-y-1">
-                                    <div class="flex items-start gap-1">
+                                <a href="{{ route('dish.detail', $dish->id) }}" class="aspect-square bg-slate-100 relative overflow-hidden block">
+                                    <img src="{{ $dish->display_image }}" alt="{{ $dish->dish_name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
+                                    
+                                    <!-- Star Rating Badge on Top Right -->
+                                    <span class="absolute top-2 right-2 bg-slate-900/80 backdrop-blur-xs text-amber-400 text-[10px] font-black px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1 border border-white/20">
+                                        <i class="fas fa-star text-[9px] text-amber-400"></i>
+                                        <span>{{ number_format($dish->rating_score, 1) }}</span>
+                                    </span>
+                                </a>
+                                <div class="p-2.5 space-y-1.5">
+                                    <a href="{{ route('dish.detail', $dish->id) }}" class="flex items-start gap-1 block">
                                         <span class="text-amber-500 text-xs shrink-0 mt-0.5">✔</span>
-                                        <h4 class="font-extrabold text-slate-900 text-xs line-clamp-1 leading-snug group-hover:text-[#ee4d2d]">
+                                        <h4 class="font-extrabold text-slate-900 text-xs line-clamp-1 leading-snug hover:text-[#ee4d2d]">
                                             {{ $dish->dish_name }}
                                         </h4>
-                                    </div>
+                                    </a>
                                     <p class="text-[10px] text-slate-400 line-clamp-1">{{ $dish->description ?? 'FOODDAILY Store' }}</p>
-                                    <div class="pt-1">
+                                    
+                                    <!-- Rating Stars & Review Count -->
+                                    <div class="flex items-center gap-1.5 pt-0.5">
+                                        <div class="flex items-center gap-1 text-[11px] font-black text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-md border border-amber-200/70">
+                                            <i class="fas fa-star text-[9px] text-amber-500"></i>
+                                            <span>{{ number_format($dish->rating_score, 1) }}</span>
+                                        </div>
+                                        <span class="text-[10px] font-semibold text-slate-400">({{ $dish->reviews_count }} đánh giá)</span>
+                                    </div>
+
+                                    <div>
                                         <span class="inline-block px-1.5 py-0.5 rounded bg-rose-50 text-[#ee4d2d] text-[9px] font-extrabold border border-rose-200">
                                             🏷️ Mã giảm 11%
                                         </span>
@@ -326,7 +368,7 @@
                                 <form action="{{ route('giohang.add') }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="dish_id" value="{{ $dish->id }}">
-                                    <button type="submit" class="w-7 h-7 rounded-lg bg-[#ee4d2d] text-white flex items-center justify-center text-xs font-bold">+</button>
+                                    <button type="submit" class="w-7 h-7 rounded-lg bg-[#ee4d2d] hover:bg-red-600 text-white flex items-center justify-center text-xs font-bold transition-colors cursor-pointer">+</button>
                                 </form>
                             </div>
                         </div>
@@ -336,6 +378,27 @@
                 </div>
             </div>
         @endforeach
+
+        <!-- INFINITE SCROLL LOADER & CONTROLS -->
+        <div id="infinite-scroll-container" class="py-6 flex flex-col items-center justify-center space-y-3">
+            <!-- Scroll Sentinel (Quan sát bởi IntersectionObserver để tự động tải thêm món) -->
+            <div id="scroll-sentinel" class="flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white/95 backdrop-blur-xs border border-rose-200 text-[#ee4d2d] text-xs font-extrabold shadow-sm transition-all">
+                <i class="fas fa-circle-notch fa-spin text-sm"></i>
+                <span>Đang tải thêm món ngon...</span>
+            </div>
+
+            <!-- Nút dự phòng Xem thêm món ăn -->
+            <button type="button" id="btn-load-more" onclick="loadMoreDishes()" class="hidden px-6 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-extrabold text-xs shadow-xs hover:border-[#ee4d2d] hover:text-[#ee4d2d] transition-all cursor-pointer">
+                <i class="fas fa-chevron-down mr-1"></i> Xem thêm món ăn
+            </button>
+
+            <!-- Thông báo khi đã hiển thị hết danh sách -->
+            <div id="all-loaded-indicator" class="hidden text-xs font-bold text-slate-400 flex items-center gap-2 py-2">
+                <span class="w-2 h-2 rounded-full bg-slate-300"></span>
+                <span>Bạn đã xem hết danh sách món ăn trong mục này</span>
+                <span class="w-2 h-2 rounded-full bg-slate-300"></span>
+            </div>
+        </div>
 
     </div>
 </section>
@@ -368,11 +431,39 @@
 @endsection
 
 @section('scripts')
+<style>
+    @keyframes dishCardFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(12px) scale(0.98);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+    .dish-card-appear {
+        animation: dishCardFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+</style>
+
 <script>
+    const INITIAL_LIMIT = 15; // 3 hàng (mỗi hàng 5 card trên desktop)
+    const BATCH_SIZE = 10;    // Tải thêm 2 hàng mỗi lần cuộn
+    let currentActiveTab = 'all';
+    let visibleLimits = { 'all': INITIAL_LIMIT };
+    let isLoadingMore = false;
+    let scrollObserver = null;
+
     function filterCategory(targetId) {
         let key = targetId;
         if (key !== 'all' && !String(key).startsWith('cat-')) {
             key = 'cat-' + key;
+        }
+
+        currentActiveTab = key;
+        if (!visibleLimits[key]) {
+            visibleLimits[key] = INITIAL_LIMIT;
         }
 
         // Ẩn tất cả các khung hiển thị món
@@ -395,6 +486,113 @@
             activeBtn.classList.remove('bg-white', 'text-slate-700', 'hover:bg-slate-100', 'border', 'border-slate-200');
             activeBtn.classList.add('bg-[#ee4d2d]', 'text-white');
         }
+
+        // Cập nhật hiển thị số lượng card món cho tab này
+        updateActiveTabVisibility();
+    }
+
+    function updateActiveTabVisibility() {
+        const activePane = document.getElementById('cat-view-' + currentActiveTab);
+        if (!activePane) return;
+
+        const items = activePane.querySelectorAll('.dish-card-item');
+        const total = items.length;
+        const currentLimit = visibleLimits[currentActiveTab] || INITIAL_LIMIT;
+
+        items.forEach(item => {
+            const index = parseInt(item.dataset.index) || 0;
+            if (index < currentLimit) {
+                if (item.classList.contains('hidden')) {
+                    item.classList.remove('hidden');
+                    item.classList.add('dish-card-appear');
+                }
+            } else {
+                item.classList.add('hidden');
+                item.classList.remove('dish-card-appear');
+            }
+        });
+
+        const sentinel = document.getElementById('scroll-sentinel');
+        const btnMore = document.getElementById('btn-load-more');
+        const allLoaded = document.getElementById('all-loaded-indicator');
+
+        if (total === 0 || currentLimit >= total) {
+            if (sentinel) sentinel.classList.add('hidden');
+            if (btnMore) btnMore.classList.add('hidden');
+            if (allLoaded) {
+                if (total > INITIAL_LIMIT) {
+                    allLoaded.classList.remove('hidden');
+                } else {
+                    allLoaded.classList.add('hidden');
+                }
+            }
+        } else {
+            if (sentinel) sentinel.classList.remove('hidden');
+            if (btnMore) btnMore.classList.add('hidden');
+            if (allLoaded) allLoaded.classList.add('hidden');
+        }
+    }
+
+    function loadMoreDishes() {
+        if (isLoadingMore) return;
+
+        const activePane = document.getElementById('cat-view-' + currentActiveTab);
+        if (!activePane) return;
+
+        const items = activePane.querySelectorAll('.dish-card-item');
+        const total = items.length;
+        const currentLimit = visibleLimits[currentActiveTab] || INITIAL_LIMIT;
+
+        if (currentLimit >= total) return;
+
+        isLoadingMore = true;
+        const sentinel = document.getElementById('scroll-sentinel');
+        if (sentinel) {
+            sentinel.classList.remove('hidden');
+            sentinel.classList.add('opacity-100');
+        }
+
+        setTimeout(() => {
+            visibleLimits[currentActiveTab] = (visibleLimits[currentActiveTab] || INITIAL_LIMIT) + BATCH_SIZE;
+            updateActiveTabVisibility();
+            isLoadingMore = false;
+        }, 300);
+    }
+
+    // Thiết lập IntersectionObserver phát hiện cuộn trang
+    function initInfiniteScrollObserver() {
+        const sentinel = document.getElementById('scroll-sentinel');
+        if (!sentinel) return;
+
+        if ('IntersectionObserver' in window) {
+            scrollObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !isLoadingMore) {
+                        loadMoreDishes();
+                    }
+                });
+            }, {
+                rootMargin: '250px 0px',
+                threshold: 0.1
+            });
+
+            scrollObserver.observe(sentinel);
+        } else {
+            // Dự phòng cho trình duyệt cũ không hỗ trợ IntersectionObserver
+            const btnMore = document.getElementById('btn-load-more');
+            if (btnMore) btnMore.classList.remove('hidden');
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        updateActiveTabVisibility();
+        initInfiniteScrollObserver();
+    });
+
+    function handleSortChange(sortVal) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('sort', sortVal);
+        window.location.href = url.toString();
     }
 
     function openGroupModal() {
@@ -405,3 +603,4 @@
     }
 </script>
 @endsection
+

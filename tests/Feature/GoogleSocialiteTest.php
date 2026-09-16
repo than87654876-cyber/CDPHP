@@ -33,13 +33,16 @@ class GoogleSocialiteTest extends TestCase
         $mockUser->method('getName')->willReturn('Google Test User');
 
         $mockProvider = $this->createMock(\Laravel\Socialite\Two\GoogleProvider::class);
+        $mockProvider->method('stateless')->willReturnSelf();
         $mockProvider->method('user')->willReturn($mockUser);
 
         Socialite::shouldReceive('driver')->with('google')->andReturn($mockProvider);
 
         $response = $this->get(route('auth.google.callback'));
 
-        $response->assertRedirect(route('trangchu'));
+        $response->assertOk();
+        $response->assertViewIs('client.auth_callback');
+        $response->assertViewHas('targetUrl', route('trangchu'));
         $this->assertAuthenticated();
         $this->assertDatabaseHas('users', [
             'email' => 'googletestuser@gmail.com',
@@ -47,3 +50,4 @@ class GoogleSocialiteTest extends TestCase
         ]);
     }
 }
+

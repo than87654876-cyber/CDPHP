@@ -24,6 +24,7 @@ class CartController extends Controller
 
         $dish = Dish::findOrFail($request->dish_id);
         $quantity = max(1, intval($request->input('quantity', 1)));
+        session(['selected_dish_id' => $dish->id]);
 
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
@@ -274,7 +275,11 @@ class CartController extends Controller
     // Trang hiển thị mua hàng/giỏ hàng
     public function checkoutPage()
     {
-        return view('client.buy');
+        $selectedDishId = session('selected_dish_id') ?? session('added_dish.id');
+        $currentDish = $selectedDishId ? Dish::with('category')->find($selectedDishId) : null;
+        $relatedDishes = $currentDish ? $currentDish->getRelatedDishes(6) : collect();
+
+        return view('client.buy', compact('relatedDishes', 'currentDish'));
     }
 
     // Xử lý khách hàng hủy đơn hàng

@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             DishSeeder::class,
             ServicePackageSeeder::class,
             CouponSeeder::class,
+            CustomerOrderHistorySeeder::class,
         ]);
 
         // Create test users

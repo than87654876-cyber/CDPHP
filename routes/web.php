@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [ShopController::class, 'index'])->name('trangchu');
 Route::get('/trangchu', [ShopController::class, 'index']);
 Route::get('/trangchu_dangnhap', [ShopController::class, 'shopLogged'])->name('trangchu_dangnhap');
+Route::get('/mon/{id}', [ShopController::class, 'dishDetail'])->name('dish.detail');
 
 // Đặt đơn theo nhóm
 Route::post('/nhom/tao', [GroupOrderController::class, 'create'])->name('nhom.create');
@@ -63,7 +64,8 @@ Route::get('/dangxuat', [AuthController::class, 'logout'])->name('dangxuat');
 
 // OAuth Đăng nhập bằng Google
 Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
-Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+
 
 // Đăng ký tài khoản Khách hàng
 Route::get('/trangchu/dangky', [AuthController::class, 'showClientRegister'])->name('trangchu/dangky');

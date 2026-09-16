@@ -68,7 +68,9 @@ class AuthController extends Controller
             $fullname = $googleUser->getName() ?? 'Google User';
 
             if (!$email) {
-                return redirect()->route('dangnhap')->withErrors(['login_input' => 'Không thể lấy được địa chỉ email từ tài khoản Google của bạn.']);
+                return view('client.auth_callback', [
+                    'error' => 'Không thể lấy được địa chỉ email từ tài khoản Google của bạn.',
+                ]);
             }
 
             // Tìm hoặc tự động tạo tài khoản thành viên mới
@@ -92,17 +94,29 @@ class AuthController extends Controller
             }
 
             if (!$user->status) {
-                return redirect()->route('dangnhap')->withErrors(['login_input' => 'Tài khoản Google này hiện đang bị khóa.']);
+                return view('client.auth_callback', [
+                    'error' => 'Tài khoản Google này hiện đang bị khóa.',
+                ]);
             }
 
             Auth::login($user, true);
-            return $this->redirectBasedOnRole($user);
+
+            $targetUrl = in_array($user->role, ['admin', 'staff']) 
+                ? ($user->role === 'admin' ? route('quanly') : route('quanly_banlamviec'))
+                : route('trangchu');
+
+            return view('client.auth_callback', [
+                'targetUrl' => $targetUrl,
+            ]);
 
         } catch (\Exception $e) {
             Log::error('Google Socialite callback login error: ' . $e->getMessage(), ['exception' => $e]);
-            return redirect()->route('dangnhap')->withErrors(['login_input' => 'Có lỗi xảy ra trong quá trình xác thực đăng nhập Google.']);
+            return view('client.auth_callback', [
+                'error' => 'Có lỗi xảy ra trong quá trình xác thực đăng nhập Google.',
+            ]);
         }
     }
+
 
     // Hiển thị đăng ký (chỉ cho client/khách hàng)
     public function showClientRegister()

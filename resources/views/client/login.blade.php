@@ -78,7 +78,7 @@
             </div>
 
             <!-- Google Login Button -->
-            <a href="{{ route('auth.google') }}" class="w-full py-3 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold flex items-center justify-center gap-2 shadow-xs transition-all">
+            <a href="{{ route('auth.google') }}" onclick="openGoogleLogin(event)" class="w-full py-3 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold flex items-center justify-center gap-2 shadow-xs hover:border-slate-300 transition-all cursor-pointer">
                 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 48 48">
                     <g>
                         <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
@@ -87,7 +87,7 @@
                         <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.11-5.51c-1.97 1.32-4.5 2.12-8.78 2.12-6.26 0-11.57-4.22-13.46-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
                     </g>
                 </svg>
-                Đăng nhập nhanh với Google
+                <span>Đăng nhập nhanh với Google</span>
             </a>
 
             <p class="text-center text-xs text-slate-500 font-medium">
@@ -101,6 +101,38 @@
 
 @section('scripts')
 <script>
+    function openGoogleLogin(e) {
+        e.preventDefault();
+        const url = "{{ route('auth.google') }}";
+        const width = 520;
+        const height = 650;
+        const left = (window.screen.width / 2) - (width / 2);
+        const top = (window.screen.height / 2) - (height / 2);
+
+        const popup = window.open(
+            url,
+            'GoogleLoginWindow',
+            `toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=${width},height=${height},top=${top},left=${left}`
+        );
+
+        if (popup) {
+            popup.focus();
+
+            window.addEventListener('message', function onAuthMessage(event) {
+                if (event.data && event.data.type === 'GOOGLE_AUTH_SUCCESS') {
+                    window.removeEventListener('message', onAuthMessage);
+                    window.location.href = event.data.redirectUrl || "{{ route('trangchu') }}";
+                } else if (event.data && event.data.type === 'GOOGLE_AUTH_ERROR') {
+                    window.removeEventListener('message', onAuthMessage);
+                    window.location.reload();
+                }
+            });
+        } else {
+            // Nếu trình duyệt chặn popup, mở liên kết bình thường
+            window.location.href = url;
+        }
+    }
+
     document.getElementById('togglePassword')?.addEventListener('click', function () {
         const passwordInput = document.getElementById('password');
         const eyeIcon = document.getElementById('eyeIcon');
@@ -116,3 +148,4 @@
     });
 </script>
 @endsection
+

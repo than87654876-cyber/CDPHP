@@ -36,8 +36,30 @@
             }
         }
     </script>
+    <style>
+
+        /* Sleek Dark Scrollbar for Admin Sidebar */
+        aside nav::-webkit-scrollbar {
+            width: 5px;
+        }
+        aside nav::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        aside nav::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 9999px;
+        }
+        aside nav::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        aside nav {
+            scrollbar-width: thin;
+            scrollbar-color: #334155 #0f172a;
+        }
+    </style>
     @yield('styles')
 </head>
+
 
 <body id="page-top" class="font-sans antialiased text-slate-800 bg-[#f8fafc] min-h-full selection:bg-[#ee4d2d] selection:text-white">
     <div id="wrapper" class="flex min-h-screen">
