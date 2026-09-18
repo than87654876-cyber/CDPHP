@@ -29,6 +29,7 @@ class Dish extends Model
     protected $appends = [
         'rating_score',
         'reviews_count',
+        'display_image',
     ];
 
     /**
@@ -53,6 +54,42 @@ class Dish extends Model
     }
 
     /**
+     * Statically cached reviews summary across requests/models
+     * @var array<int, array{avg: float, count: int}>|null
+     */
+    protected static ?array $reviewsSummaryCache = null;
+
+    protected static function loadReviewsSummary(): void
+    {
+        if (self::$reviewsSummaryCache !== null) {
+            return;
+        }
+
+        self::$reviewsSummaryCache = [];
+        try {
+            $summaries = \Illuminate\Support\Facades\DB::table('reviews')
+                ->join('orders', 'reviews.order_id', '=', 'orders.id')
+                ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+                ->select(
+                    'order_items.dish_id',
+                    \Illuminate\Support\Facades\DB::raw('AVG(reviews.rating) as avg_rating'),
+                    \Illuminate\Support\Facades\DB::raw('COUNT(DISTINCT reviews.id) as total_reviews')
+                )
+                ->groupBy('order_items.dish_id')
+                ->get();
+
+            foreach ($summaries as $row) {
+                self::$reviewsSummaryCache[(int) $row->dish_id] = [
+                    'avg' => round((float) $row->avg_rating, 1),
+                    'count' => (int) $row->total_reviews,
+                ];
+            }
+        } catch (\Throwable $e) {
+            // Silently continue with fallbacks if tables don't exist yet
+        }
+    }
+
+    /**
      * Get average rating score (e.g. 5.0, 4.9, 4.8, 4.7)
      */
     public function getRatingScoreAttribute(): float
@@ -61,16 +98,12 @@ class Dish extends Model
             return (float) $this->attributes['rating_score'];
         }
 
-        // 1. Check real reviews linked through order_items
-        $realAvg = \App\Models\Review::whereHas('order.orderItems', function ($q) {
-            $q->where('dish_id', $this->id);
-        })->avg('rating');
-
-        if ($realAvg && $realAvg > 0) {
-            return round((float)$realAvg, 1);
+        self::loadReviewsSummary();
+        if (isset(self::$reviewsSummaryCache[$this->id]) && self::$reviewsSummaryCache[$this->id]['avg'] > 0) {
+            return self::$reviewsSummaryCache[$this->id]['avg'];
         }
 
-        // 2. Deterministic realistic rating score based on dish id (from 4.5 to 5.0)
+        // Deterministic realistic rating score based on dish id (from 4.5 to 5.0)
         $scores = [5.0, 4.9, 4.8, 5.0, 4.7, 4.9, 5.0, 4.8, 4.6, 4.9, 5.0, 4.8];
         return $scores[$this->id % count($scores)];
     }
@@ -84,12 +117,9 @@ class Dish extends Model
             return (int) $this->attributes['reviews_count'];
         }
 
-        $realCount = \App\Models\Review::whereHas('order.orderItems', function ($q) {
-            $q->where('dish_id', $this->id);
-        })->count();
-
-        if ($realCount > 0) {
-            return $realCount + 20;
+        self::loadReviewsSummary();
+        if (isset(self::$reviewsSummaryCache[$this->id]) && self::$reviewsSummaryCache[$this->id]['count'] > 0) {
+            return self::$reviewsSummaryCache[$this->id]['count'] + 20;
         }
 
         return 35 + (($this->id * 17) % 180);

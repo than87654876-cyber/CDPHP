@@ -169,7 +169,7 @@ class CustomerBackupService
 
         return [
             'users' => $users->map(function (User $user) {
-                return $user->toArray();
+                return $user->makeVisible(['password', 'remember_token'])->toArray();
             })->all(),
             'orders' => $orders->map(function (Order $order) {
                 return $order->toArray();

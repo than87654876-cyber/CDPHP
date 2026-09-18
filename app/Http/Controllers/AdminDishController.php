@@ -11,27 +11,18 @@ class AdminDishController extends Controller
     // List all dishes
     public function index(Request $request)
     {
-        // Tự động chuyển đổi giá từ USD/số nhỏ sang VNĐ nếu phát hiện giá nhỏ hơn 100
-        $smallPriceDishes = Dish::where('price', '<', 100)->get();
-        if ($smallPriceDishes->isNotEmpty()) {
-            foreach ($smallPriceDishes as $dish) {
-                if ($dish->price < 15) {
-                    $dish->price = $dish->price * 10000;
-                } else {
-                    $dish->price = $dish->price * 1000;
-                }
-                $dish->save();
-            }
-        }
-
         $search = $request->input('search');
         $categoryId = $request->input('category_id');
+        $categories = Category::all();
 
-        if (!$categoryId) {
-            return redirect()->route('quanly_monandon', ['category_id' => 1]);
+        if (!$categoryId && $categories->isNotEmpty()) {
+            $categoryId = $categories->first()->id;
         }
 
-        $query = Dish::with('category')->where('category_id', $categoryId);
+        $query = Dish::with('category');
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -41,7 +32,6 @@ class AdminDishController extends Controller
         }
 
         $dishes = $query->get();
-        $categories = Category::all();
 
         return view('admin.single_dishes', compact('dishes', 'categories', 'search', 'categoryId'));
     }
@@ -88,7 +78,7 @@ class AdminDishController extends Controller
 
         $dish = Dish::create($data);
 
-        return redirect()->route('quanly_monandon', ['category_id' => $dish->category_id])->with('success', 'Đã thêm món ăn mới thành công!');
+        return redirect()->route('quanly_monandon')->with('success', 'Đã thêm món ăn mới thành công!');
     }
 
     // Show edit form
@@ -131,7 +121,7 @@ class AdminDishController extends Controller
 
         $dish->update($data);
 
-        return redirect()->route('quanly_monandon', ['category_id' => $dish->category_id])->with('success', 'Đã cập nhật món ăn thành công!');
+        return redirect()->route('quanly_monandon')->with('success', 'Đã cập nhật món ăn thành công!');
     }
 
     // Delete dish
@@ -144,50 +134,35 @@ class AdminDishController extends Controller
             @unlink(public_path($dish->image_url));
         }
 
-        $categoryId = $dish->category_id;
         $dish->delete();
 
-        return redirect()->route('quanly_monandon', ['category_id' => $categoryId])->with('success', 'Đã xóa món ăn thành công!');
+        return redirect()->route('quanly_monandon')->with('success', 'Đã xóa món ăn thành công!');
     }
 
     // Xuất báo cáo món ăn bán chạy (CSV UTF-8 BOM)
     public function exportDishesCsv()
     {
-        $headers = [
-            'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="mon-an-ban-chay.csv"',
-        ];
+        $headers = ['Mã món', 'Danh mục', 'Tên món ăn', 'Đơn giá (VNĐ)', 'Trạng thái', 'Số lượng bán lẻ đã bán', 'Ngày tạo'];
+        $dishes = Dish::with('category')
+            ->withSum(['orderItems as total_sold' => function($q) {
+                $q->whereHas('order', function($sub) {
+                    $sub->where('payment_status', 'paid');
+                });
+            }], 'quantity')
+            ->get()
+            ->sortByDesc('total_sold');
 
-        $callback = function() {
-            $file = fopen('php://output', 'w');
-            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
-            
-            fputcsv($file, ['Mã món', 'Danh mục', 'Tên món ăn', 'Đơn giá (VNĐ)', 'Trạng thái', 'Số lượng bán lẻ đã bán', 'Ngày tạo']);
-
-            $dishes = Dish::with('category')->get()->map(function($dish) {
-                $dish->total_sold = \App\Models\OrderItem::where('dish_id', $dish->id)
-                    ->whereHas('order', function($q) {
-                        $q->where('payment_status', 'paid');
-                    })->sum('quantity');
-                return $dish;
-            })->sortByDesc('total_sold');
-
-            foreach ($dishes as $dish) {
-                $statusText = $dish->is_available ? 'Còn hàng' : 'Hết hàng';
-                fputcsv($file, [
-                    'MON-' . sprintf('%03d', $dish->id),
-                    $dish->category ? $dish->category->category_name : 'Không phân loại',
-                    $dish->dish_name,
-                    $dish->price,
-                    $statusText,
-                    $dish->total_sold,
-                    $dish->created_at ? $dish->created_at->format('d/m/Y H:i') : 'N/A',
-                ]);
-            }
-
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
+        return $this->exportCsvStream('mon-an-ban-chay.csv', $headers, $dishes, function ($dish) {
+            $statusText = $dish->is_available ? 'Còn hàng' : 'Hết hàng';
+            return [
+                'MON-' . sprintf('%03d', $dish->id),
+                $dish->category ? $dish->category->category_name : 'Không phân loại',
+                $dish->dish_name,
+                $dish->price,
+                $statusText,
+                $dish->total_sold ?? 0,
+                $dish->created_at ? $dish->created_at->format('d/m/Y H:i') : 'N/A',
+            ];
+        });
     }
 }

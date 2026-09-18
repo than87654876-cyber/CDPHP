@@ -124,31 +124,64 @@ class GroupOrderController extends Controller
             $notesSummary[] = "- " . $gItem->member_name . ": " . ($gItem->dish->dish_name ?? 'Món') . " x" . $gItem->quantity;
         }
 
-        // Tạo đơn hàng thật trong bảng orders
-        $order = Order::create([
-            'user_id' => auth()->id() ?? $groupOrder->host_id,
-            'total_price' => $totalPrice,
-            'final_amount' => $totalPrice,
-            'order_status' => 'preparing', // Đặt hàng tự động sang Đang chuẩn bị theo yêu cầu
-            'payment_status' => 'pending',
-            'payment_method' => $request->input('payment_method', 'cod'),
-            'health_notes' => implode("\n", $notesSummary),
-        ]);
-
-        // Tạo các items
-        foreach ($groupOrder->items as $gItem) {
-            OrderItem::create([
-                'order_id' => $order->id,
-                'dish_id' => $gItem->dish_id,
-                'quantity' => $gItem->quantity,
-                'price' => $gItem->dish->price ?? 0,
+        $userId = auth()->id() ?? $groupOrder->host_id;
+        if (!$userId) {
+            $guestUser = \App\Models\User::create([
+                'fullname' => $groupOrder->host_name ?: 'Trưởng nhóm',
+                'email' => null,
+                'phone' => null,
+                'password' => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(16)),
+                'role' => 'guest',
+                'status' => true,
             ]);
+            $userId = $guestUser->id;
+            $groupOrder->update(['host_id' => $userId]);
         }
 
-        // Đánh dấu nhóm hoàn tất
-        $groupOrder->status = 'completed';
-        $groupOrder->save();
+        $paymentMethod = $request->input('payment_method', 'cash');
+        if ($paymentMethod === 'cod') {
+            $paymentMethod = 'cash';
+        }
 
-        return redirect()->route('giohang')->with('success', '🎉 Đã chốt đơn nhóm #' . $groupOrder->code . ' thành công! Đơn hàng đã được tự động chuyển sang trạng thái Đang chuẩn bị.');
+        \Illuminate\Support\Facades\DB::beginTransaction();
+        try {
+            // Tạo đơn hàng thật trong bảng orders
+            $order = Order::create([
+                'user_id' => $userId,
+                'total_amount' => $totalPrice,
+                'final_amount' => $totalPrice,
+                'order_status' => 'preparing',
+                'payment_status' => 'pending',
+                'payment_method' => $paymentMethod,
+                'health_notes' => implode("\n", $notesSummary),
+            ]);
+
+            // Tạo các items
+            foreach ($groupOrder->items as $gItem) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'dish_id' => $gItem->dish_id,
+                    'quantity' => $gItem->quantity,
+                    'price' => $gItem->dish->price ?? 0,
+                ]);
+            }
+
+            // Đánh dấu nhóm hoàn tất
+            $groupOrder->status = 'completed';
+            $groupOrder->save();
+
+            \Illuminate\Support\Facades\DB::commit();
+
+            try {
+                event(new \App\Events\OrderUpdated($order, 'created'));
+            } catch (\Exception $broadcastException) {
+                \Illuminate\Support\Facades\Log::warning('Broadcasting failed: ' . $broadcastException->getMessage());
+            }
+
+            return redirect()->route('giohang')->with('success', '🎉 Đã chốt đơn nhóm #' . $groupOrder->code . ' thành công! Đơn hàng đã được tự động chuyển sang trạng thái Đang chuẩn bị.');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
+            return back()->with('error', 'Có lỗi xảy ra khi chốt đơn nhóm: ' . $e->getMessage());
+        }
     }
 }

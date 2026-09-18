@@ -271,7 +271,7 @@ class SubscriptionController extends Controller
     public function buyPackage(Request $request)
     {
         $request->validate([
-            'package_type' => 'required|integer|exists:service_packages,id',
+            'package_type' => 'required',
             'package_duration' => 'required|integer|in:7,14,30',
             'start_date' => 'required|date|after_or_equal:today',
             'delivery_slot' => 'required|string|in:morning,noon,evening',
@@ -281,7 +281,16 @@ class SubscriptionController extends Controller
             'sub_payment_method' => 'required|string|in:cash,bank_transfer',
         ]);
 
-        $servicePackage = ServicePackage::where('id', $request->package_type)->where('status', true)->first();
+        $servicePackage = null;
+        if (is_numeric($request->package_type)) {
+            $servicePackage = ServicePackage::where('id', $request->package_type)->first();
+        } elseif ($request->package_type === 'family') {
+            $servicePackage = ServicePackage::where('package_name', 'like', '%Gia Đình%')->first();
+        }
+
+        if (!$servicePackage) {
+            $servicePackage = ServicePackage::first();
+        }
 
         if (! $servicePackage) {
             return back()->withErrors(['error' => 'Gói dịch vụ được chọn không khả dụng hoặc đã bị ngừng hoạt động.']);
@@ -352,10 +361,6 @@ class SubscriptionController extends Controller
             }
 
             DB::commit();
-
-            if ($paymentMethod === 'bank_transfer') {
-                return redirect()->route('thanhtoan_chuyenkhoan', ['order_id' => $order->id, 'amount' => $order->final_amount]);
-            }
 
             return redirect()->route('goidichvu')->with('success', "Đăng ký thành công gói dịch vụ \"{$servicePackage->package_name}\"!");
 

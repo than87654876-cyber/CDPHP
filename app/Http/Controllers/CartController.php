@@ -115,12 +115,14 @@ class CartController extends Controller
 
         // Xác định ID người dùng (Nếu là khách vãng lai thì tìm hoặc tạo tài khoản guest ẩn)
         $userId = Auth::id();
+        $shouldAutoLogin = false;
+
         if (!$userId) {
             $email = trim($request->input('cart_email'));
             $phone = trim($request->input('cart_phone'));
             $fullname = trim($request->input('cart_fullname'));
 
-            // Tìm xem email hoặc số điện thoại đã tồn tại trong hệ thống chưa (bất kể vai trò nào)
+            // Tìm xem email hoặc số điện thoại đã tồn tại trong hệ thống chưa
             $existingUser = \App\Models\User::where(function($q) use ($email, $phone) {
                 if ($email) {
                     $q->where('email', $email);
@@ -131,9 +133,13 @@ class CartController extends Controller
             })->first();
 
             if ($existingUser) {
-                if ($fullname) {
-                    $existingUser->update(['fullname' => $fullname]);
+                if ($existingUser->role === 'guest') {
+                    if ($fullname) {
+                        $existingUser->update(['fullname' => $fullname]);
+                    }
+                    $shouldAutoLogin = true;
                 }
+                // If it's a registered customer/admin, link the order without hijacking session
                 $userId = $existingUser->id;
             } else {
                 $guestUser = \App\Models\User::create([
@@ -145,6 +151,7 @@ class CartController extends Controller
                     'status' => true,
                 ]);
                 $userId = $guestUser->id;
+                $shouldAutoLogin = true;
             }
         }
 
@@ -234,7 +241,7 @@ class CartController extends Controller
             $order->payment_method = $paymentMethod;
             $order->payment_status = 'pending';
             if ($paymentMethod === 'cash') {
-                $order->order_status = 'preparing';
+                $order->order_status = 'pending';
             } else {
                 $order->order_status = 'pending';
             }
@@ -259,11 +266,27 @@ class CartController extends Controller
                 \Illuminate\Support\Facades\Log::warning('Broadcasting failed: ' . $broadcastException->getMessage());
             }
 
-            if (!Auth::check()) {
+            try {
+                if ($order->user && $order->user->email) {
+                    Mail::to($order->user->email)->queue(new OrderPlacedMail($order));
+                }
+            } catch (\Exception $mailError) {
+                \Illuminate\Support\Facades\Log::warning('OrderPlacedMail queueing warning: ' . $mailError->getMessage());
+            }
+
+            if (!Auth::check() && $shouldAutoLogin) {
                 Auth::loginUsingId($userId);
             }
 
-            return redirect()->route('muahang.thanhtoan', ['id' => $order->id]);
+            if ($paymentMethod === 'momo') {
+                return redirect()->route('thanhtoan_momo', ['order_id' => $order->id, 'amount' => $order->final_amount]);
+            }
+
+            if ($paymentMethod === 'bank_transfer') {
+                return redirect()->route('thanhtoan_chuyenkhoan', ['order_id' => $order->id, 'amount' => $order->final_amount]);
+            }
+
+            return redirect()->route('giohang')->with('success', 'Đơn hàng FDL-'.$order->id.' đã được đặt thành công!');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -535,7 +558,7 @@ class CartController extends Controller
             ->firstOrFail();
 
         return redirect()->route('giohang')
-            ->with('info', 'Đơn hàng FDL-'.$order->id.' đang chờ hệ thống xác nhận thanh toán. Khi giao dịch được xác nhận, đơn hàng sẽ tự động cập nhật.');
+            ->with('success', 'Thanh toán đơn hàng FDL-'.$order->id.' thành công! Đơn hàng đang được nhà hàng chuẩn bị.');
     }
 
     public function notifyBankTransferPayment(Request $request)
@@ -591,7 +614,7 @@ class CartController extends Controller
         $order->payment_content = $request->content;
         $order->payment_paid_at = $request->paid_at ?: now();
         if ($order->order_status === 'pending') {
-            $order->order_status = 'preparing';
+            $order->order_status = 'confirmed';
         }
         $order->save();
 
@@ -726,20 +749,6 @@ class CartController extends Controller
         ]);
     }
 
-    public function getOrderPaymentStatus($id)
-    {
-        $order = Order::findOrFail($id);
-
-        if (!Auth::check() || Auth::id() !== $order->user_id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
-        return response()->json([
-            'id' => $order->id,
-            'payment_status' => $order->payment_status,
-            'order_status' => $order->order_status,
-        ]);
-    }
 
     public function validateCoupon(Request $request)
     {

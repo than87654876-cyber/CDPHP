@@ -14,9 +14,9 @@ class PayOSService
 
     public function __construct()
     {
-        $this->clientId = env('PAYOS_CLIENT_ID', 'demo-client-id');
-        $this->apiKey = env('PAYOS_API_KEY', 'demo-api-key');
-        $this->checksumKey = env('PAYOS_CHECKSUM_KEY', 'demo-checksum-key');
+        $this->clientId = config('services.payos.client_id', 'demo-client-id');
+        $this->apiKey = config('services.payos.api_key', 'demo-api-key');
+        $this->checksumKey = config('services.payos.checksum_key', 'demo-checksum-key');
     }
 
     /**

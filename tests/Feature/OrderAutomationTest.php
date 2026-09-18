@@ -55,7 +55,7 @@ class OrderAutomationTest extends TestCase
         $overdueOrder->saveQuietly();
 
         // 3. Create an overdue but paid order (should NOT be cancelled)
-        $paidOrder = Order::create([
+        $paidOrder = new Order([
             'user_id' => $customer->id,
             'total_amount' => 150000,
             'final_amount' => 150000,

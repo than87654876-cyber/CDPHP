@@ -22,6 +22,9 @@ class Setting extends Model
      */
     public static function setValue($key, $value)
     {
+        \Illuminate\Support\Facades\Cache::forget('app_global_settings');
+        \Illuminate\Support\Facades\Cache::forget('poll_settings_response');
+
         return self::updateOrCreate(
             ['key' => $key],
             ['value' => $value]

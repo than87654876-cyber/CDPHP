@@ -40,4 +40,26 @@ return [
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => env('GOOGLE_REDIRECT_URI') ?: url('/auth/google/callback'),
     ],
+
+    'cloudinary' => [
+        'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+        'upload_preset' => env('CLOUDINARY_UPLOAD_PRESET'),
+        'api_key' => env('CLOUDINARY_API_KEY'),
+        'api_secret' => env('CLOUDINARY_API_SECRET'),
+    ],
+
+    'payos' => [
+        'client_id' => env('PAYOS_CLIENT_ID', 'demo-client-id'),
+        'api_key' => env('PAYOS_API_KEY', 'demo-api-key'),
+        'checksum_key' => env('PAYOS_CHECKSUM_KEY', 'demo-checksum-key'),
+    ],
+
+    'gemini' => [
+        'api_key' => env('GEMINI_API_KEY'),
+    ],
+
+    'telegram' => [
+        'bot_token' => env('TELEGRAM_BOT_TOKEN'),
+        'chat_id' => env('TELEGRAM_CHAT_ID'),
+    ],
 ];

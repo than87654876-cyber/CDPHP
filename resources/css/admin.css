@@ -1,0 +1,25 @@
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import "bootstrap-icons/font/bootstrap-icons.css";
+
+/* Dashboard Layout Styles */
+:root {
+    --bs-primary: #4e73df;
+    --bs-primary-rgb: 78, 115, 223;
+}
+
+body {
+    font-family: 'Nunito', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f8f9fc;
+    color: #4a5568;
+}
+
+.admin-sidebar {
+    min-height: 100vh;
+    background: linear-gradient(180deg, #4e73df 10%, #224abe 100%);
+}
+
+.admin-card {
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}

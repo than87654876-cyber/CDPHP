@@ -13,7 +13,7 @@ class GeminiService
 
     public function __construct()
     {
-        $this->apiKey = env('GEMINI_API_KEY');
+        $this->apiKey = config('services.gemini.api_key');
     }
 
     /**
@@ -22,21 +22,23 @@ class GeminiService
     public function getSuggestion($userPrompt, $chatHistory = [])
     {
         if (empty($this->apiKey)) {
-            Log::warning('GEMINI_API_KEY is not set in .env. Returning simulated FOODELICIOUS Chatbot response.');
+            Log::warning('GEMINI_API_KEY is not set in config/services.php. Returning simulated FOODELICIOUS Chatbot response.');
             return $this->getMockResponse($userPrompt);
         }
 
-        // Fetch available dishes
-        $dishes = Dish::with('category')->where('is_available', true)->get()->map(function ($dish) {
-            return [
-                'Tên món' => $dish->dish_name,
-                'Danh mục' => $dish->category ? $dish->category->category_name : 'Món ăn',
-                'Giá' => number_format($dish->price, 0, ',', '.') . ' VNĐ',
-                'Mô tả' => $dish->description
-            ];
-        })->toArray();
+        // Fetch available dishes with short-lived cache (30 minutes)
+        $dishesJson = \Illuminate\Support\Facades\Cache::remember('gemini_dishes_menu', 1800, function () {
+            $dishes = Dish::with('category')->where('is_available', true)->get()->map(function ($dish) {
+                return [
+                    'Tên món' => $dish->dish_name,
+                    'Danh mục' => $dish->category ? $dish->category->category_name : 'Món ăn',
+                    'Giá' => number_format($dish->price, 0, ',', '.') . ' VNĐ',
+                    'Mô tả' => $dish->description
+                ];
+            })->toArray();
 
-        $dishesJson = json_encode($dishes, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+            return json_encode($dishes, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        });
 
         $systemInstruction = "Bạn là trợ lý ảo/Chatbot tư vấn ẩm thực của cửa hàng thức ăn nhanh FOODELICIOUS. "
             . "Nhiệm vụ của bạn là lắng nghe nhu cầu của khách hàng, trả lời thân thiện, lịch sự và gợi ý món ăn phù hợp nhất từ thực đơn dưới đây. "

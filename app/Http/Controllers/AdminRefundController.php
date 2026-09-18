@@ -100,37 +100,22 @@ class AdminRefundController extends Controller
     // Xuất báo cáo hoàn tiền (CSV UTF-8 BOM)
     public function exportRefundsCsv()
     {
-        $headers = [
-            'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="bao-cao-hoan-tien.csv"',
-        ];
+        $headers = ['Mã đơn hàng', 'Khách hàng', 'Email', 'Số điện thoại', 'Tổng tiền', 'Thông tin hoàn tiền / Chi tiết', 'Ngày cập nhật'];
+        $orders = Order::with('user')
+            ->where('health_notes', 'like', '%[Yêu cầu hoàn tiền%')
+            ->orderBy('updated_at', 'desc')
+            ->get();
 
-        $callback = function() {
-            $file = fopen('php://output', 'w');
-            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
-            
-            fputcsv($file, ['Mã đơn hàng', 'Khách hàng', 'Email', 'Số điện thoại', 'Tổng tiền', 'Thông tin hoàn tiền / Chi tiết', 'Ngày cập nhật']);
-
-            $orders = Order::with('user')
-                ->where('health_notes', 'like', '%[Yêu cầu hoàn tiền%')
-                ->orderBy('updated_at', 'desc')
-                ->get();
-
-            foreach ($orders as $order) {
-                fputcsv($file, [
-                    'FDL-' . $order->id,
-                    $order->user ? $order->user->fullname : 'Khách vãng lai',
-                    $order->user ? $order->user->email : 'N/A',
-                    $order->user ? $order->user->phone : 'N/A',
-                    $order->final_amount,
-                    $order->health_notes,
-                    $order->updated_at->format('d/m/Y H:i'),
-                ]);
-            }
-
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
+        return $this->exportCsvStream('bao-cao-hoan-tien.csv', $headers, $orders, function ($order) {
+            return [
+                'FDL-' . $order->id,
+                $order->user ? $order->user->fullname : 'Khách vãng lai',
+                $order->user ? $order->user->email : 'N/A',
+                $order->user ? $order->user->phone : 'N/A',
+                $order->final_amount,
+                $order->health_notes,
+                $order->updated_at->format('d/m/Y H:i'),
+            ];
+        });
     }
 }

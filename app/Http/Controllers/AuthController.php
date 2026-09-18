@@ -192,37 +192,6 @@ class AuthController extends Controller
         return redirect()->route('trangchu')->with('success', 'Đăng ký tài khoản thành công! Lịch sử đơn hàng trước đây của bạn đã được liên kết.');
     }
 
-    // Hiển thị trang đăng ký tài khoản Admin
-    public function showAdminRegister()
-    {
-        if (Auth::check()) {
-            return redirect()->route('quanly');
-        }
-
-        return view('admin.register');
-    }
-
-    // Xử lý đăng ký tài khoản Admin
-    public function adminRegister(Request $request)
-    {
-        $request->validate([
-            'fullname' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
-
-        $user = User::create([
-            'fullname' => $request->fullname,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => 'admin',
-            'status' => true,
-        ]);
-
-        Auth::login($user);
-
-        return redirect()->route('quanly')->with('success', 'Đăng ký tài khoản Quản trị viên thành công!');
-    }
 
     // Đăng xuất dùng chung
     public function logout()
@@ -358,19 +327,6 @@ class AuthController extends Controller
         return view('client.password_reset', compact('token'));
     }
 
-    // Hiển thị trang nhập mật khẩu mới cho admin
-    public function showAdminResetPassword($token)
-    {
-        $user = User::where('password_reset_token', $token)
-            ->where('password_reset_expires_at', '>', now())
-            ->first();
-            
-        if (!$user) {
-            return redirect()->route('dangnhap')->withErrors(['login_input' => 'Liên kết khôi phục mật khẩu đã hết hạn hoặc không hợp lệ. Vui lòng thử lại.']);
-        }
-        
-        return view('admin.password_reset', compact('token'));
-    }
 
     // Xử lý đổi mật khẩu mới cho khách hàng
     public function resetClientPassword(Request $request)
@@ -397,29 +353,5 @@ class AuthController extends Controller
         return redirect()->route('dangnhap')->with('success', 'Đổi mật khẩu thành công! Hãy đăng nhập bằng mật khẩu mới.');
     }
 
-    // Xử lý đổi mật khẩu mới cho admin
-    public function resetAdminPassword(Request $request)
-    {
-        $request->validate([
-            'token' => 'required|string',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
-        
-        $user = User::where('password_reset_token', $request->token)
-            ->where('password_reset_expires_at', '>', now())
-            ->first();
-            
-        if (!$user) {
-            return redirect()->route('dangnhap')->withErrors(['login_input' => 'Token không hợp lệ hoặc đã hết hạn.']);
-        }
-        
-        $user->update([
-            'password' => Hash::make($request->password),
-            'password_reset_token' => null,
-            'password_reset_expires_at' => null,
-        ]);
-        
-        return redirect()->route('dangnhap')->with('success', 'Đổi mật khẩu thành công! Hãy đăng nhập bằng mật khẩu mới.');
-    }
 }
 

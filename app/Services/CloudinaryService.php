@@ -15,10 +15,10 @@ class CloudinaryService
 
     public function __construct()
     {
-        $this->cloudName = env('CLOUDINARY_CLOUD_NAME');
-        $this->uploadPreset = env('CLOUDINARY_UPLOAD_PRESET');
-        $this->apiKey = env('CLOUDINARY_API_KEY');
-        $this->apiSecret = env('CLOUDINARY_API_SECRET');
+        $this->cloudName = config('services.cloudinary.cloud_name');
+        $this->uploadPreset = config('services.cloudinary.upload_preset');
+        $this->apiKey = config('services.cloudinary.api_key');
+        $this->apiSecret = config('services.cloudinary.api_secret');
     }
 
     /**

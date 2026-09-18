@@ -141,46 +141,52 @@ class AdminOrderController extends Controller
     // Xuất báo cáo đơn hàng (CSV UTF-8 BOM)
     public function exportOrdersCsv()
     {
-        $headers = [
-            'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="bao-cao-don-hang.csv"',
-        ];
+        $headers = ['Mã đơn hàng', 'Khách hàng', 'Email', 'Số điện thoại', 'Loại đơn', 'Tổng tiền', 'Hình thức thanh toán', 'Trạng thái thanh toán', 'Trạng thái đơn hàng', 'Ngày đặt'];
+        $orders = Order::with('user')->orderBy('created_at', 'desc')->get();
 
-        $callback = function() {
-            $file = fopen('php://output', 'w');
-            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
-            
-            fputcsv($file, ['Mã đơn hàng', 'Khách hàng', 'Email', 'Số điện thoại', 'Loại đơn', 'Tổng tiền', 'Hình thức thanh toán', 'Trạng thái thanh toán', 'Trạng thái đơn hàng', 'Ngày đặt']);
+        return $this->exportCsvStream('bao-cao-don-hang.csv', $headers, $orders, function ($order) {
+            $paymentMethodText = match ($order->payment_method) {
+                'bank_transfer' => 'Chuyển khoản',
+                'momo' => 'Ví MoMo',
+                default => 'Tiền mặt (COD)',
+            };
+            $orderTypeText = $order->order_type === 'single' ? 'Món lẻ' : 'Gói dài kỳ';
 
-            $orders = Order::with('user')->orderBy('created_at', 'desc')->get();
+            return [
+                'FDL-' . $order->id,
+                $order->user ? $order->user->fullname : 'Khách vãng lai',
+                $order->user ? $order->user->email : 'N/A',
+                $order->user ? $order->user->phone : 'N/A',
+                $orderTypeText,
+                $order->final_amount,
+                $paymentMethodText,
+                $order->payment_status,
+                $order->order_status,
+                $order->created_at->format('d/m/Y H:i'),
+            ];
+        });
+    }
 
-            foreach ($orders as $order) {
-                $paymentMethodText = 'Tiền mặt (COD)';
-                if ($order->payment_method === 'bank_transfer') {
-                    $paymentMethodText = 'Chuyển khoản';
-                } elseif ($order->payment_method === 'momo') {
-                    $paymentMethodText = 'Ví MoMo';
-                }
-                
-                $orderTypeText = $order->order_type === 'single' ? 'Món lẻ' : 'Gói dài kỳ';
+    // =========================================================================
+    // QUẢN LÝ ĐÁNH GIÁ ĐƠN HÀNG (REVIEWS)
+    // =========================================================================
 
-                fputcsv($file, [
-                    'FDL-' . $order->id,
-                    $order->user ? $order->user->fullname : 'Khách vãng lai',
-                    $order->user ? $order->user->email : 'N/A',
-                    $order->user ? $order->user->phone : 'N/A',
-                    $orderTypeText,
-                    $order->final_amount,
-                    $paymentMethodText,
-                    $order->payment_status,
-                    $order->order_status,
-                    $order->created_at->format('d/m/Y H:i'),
-                ]);
-            }
+    // Danh sách đánh giá của khách hàng
+    public function reviewsList()
+    {
+        $reviews = \App\Models\Review::with(['user', 'order'])
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-            fclose($file);
-        };
+        return view('admin.reviews', compact('reviews'));
+    }
 
-        return response()->stream($callback, 200, $headers);
+    // Xóa đánh giá
+    public function destroyReview($id)
+    {
+        $review = \App\Models\Review::findOrFail($id);
+        $review->delete();
+
+        return redirect()->route('quanly_reviews')->with('success', 'Đã xóa đánh giá thành công.');
     }
 }

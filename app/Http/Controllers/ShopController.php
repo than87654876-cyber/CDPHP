@@ -9,19 +9,6 @@ class ShopController extends Controller
 {
     public function index(Request $request)
     {
-        // Tự động chuyển đổi giá từ USD/số nhỏ sang VNĐ nếu phát hiện giá nhỏ hơn 100
-        $smallPriceDishes = \App\Models\Dish::where('price', '<', 100)->get();
-        if ($smallPriceDishes->isNotEmpty()) {
-            foreach ($smallPriceDishes as $dish) {
-                if ($dish->price < 15) {
-                    $dish->price = $dish->price * 10000;
-                } else {
-                    $dish->price = $dish->price * 1000;
-                }
-                $dish->save();
-            }
-        }
-
         $query = $request->input('search');
         if ($query) {
             session(['last_search_query' => $query]);
@@ -289,54 +276,58 @@ class ShopController extends Controller
         return view('client.track_order', compact('myOrders', 'selectedOrder', 'orderIdInput', 'email', 'phone'));
     }
 
-    // AJAX Polling for settings and data changes
+    // AJAX Polling for settings and data changes (Cached 15s)
     public function pollSettings(Request $request)
     {
-        // 1. Get all settings
-        $settings = \App\Models\Setting::pluck('value', 'key')->all();
-        
-        // Resolve logo_url to full asset/absolute URL
-        if (isset($settings['logo_url'])) {
-            $settings['logo_url'] = \Illuminate\Support\Str::startsWith($settings['logo_url'], 'http') 
-                ? $settings['logo_url'] 
-                : asset($settings['logo_url']);
-        } else {
-            $settings['logo_url'] = asset('logo.jpg');
-        }
+        $payload = \Illuminate\Support\Facades\Cache::remember('poll_settings_response', 15, function () {
+            // 1. Get all settings
+            $settings = \App\Models\Setting::pluck('value', 'key')->all();
+            
+            // Resolve logo_url to full asset/absolute URL
+            if (isset($settings['logo_url'])) {
+                $settings['logo_url'] = \Illuminate\Support\Str::startsWith($settings['logo_url'], 'http') 
+                    ? $settings['logo_url'] 
+                    : asset($settings['logo_url']);
+            } else {
+                $settings['logo_url'] = asset('logo.jpg');
+            }
 
-        // Resolve banner_image to full URL
-        if (isset($settings['banner_image'])) {
-            $settings['banner_image'] = \Illuminate\Support\Str::startsWith($settings['banner_image'], 'http') 
-                ? $settings['banner_image'] 
-                : asset($settings['banner_image']);
-        } else {
-            $settings['banner_image'] = asset('client/assets/img/hero-img.png');
-        }
+            // Resolve banner_image to full URL
+            if (isset($settings['banner_image'])) {
+                $settings['banner_image'] = \Illuminate\Support\Str::startsWith($settings['banner_image'], 'http') 
+                    ? $settings['banner_image'] 
+                    : asset($settings['banner_image']);
+            } else {
+                $settings['banner_image'] = asset('client/assets/img/hero-img.png');
+            }
 
-        // 2. Fetch max update times of core tables to build a fingerprint
-        $lastDishUpdate = \App\Models\Dish::max('updated_at');
-        $lastCategoryUpdate = \App\Models\Category::max('updated_at');
-        $lastCouponUpdate = \App\Models\Coupon::max('updated_at');
-        $lastPackageUpdate = \App\Models\ServicePackage::max('updated_at');
+            // 2. Fetch max update times of core tables to build a fingerprint
+            $lastDishUpdate = \App\Models\Dish::max('updated_at');
+            $lastCategoryUpdate = \App\Models\Category::max('updated_at');
+            $lastCouponUpdate = \App\Models\Coupon::max('updated_at');
+            $lastPackageUpdate = \App\Models\ServicePackage::max('updated_at');
 
-        $fingerprint = md5(json_encode([
-            'settings' => $settings,
-            'dish' => $lastDishUpdate,
-            'category' => $lastCategoryUpdate,
-            'coupon' => $lastCouponUpdate,
-            'package' => $lastPackageUpdate,
-        ]));
-
-        return response()->json([
-            'fingerprint' => $fingerprint,
-            'settings' => $settings,
-            'timestamps' => [
+            $fingerprint = md5(json_encode([
+                'settings' => $settings,
                 'dish' => $lastDishUpdate,
                 'category' => $lastCategoryUpdate,
                 'coupon' => $lastCouponUpdate,
                 'package' => $lastPackageUpdate,
-            ]
-        ]);
+            ]));
+
+            return [
+                'fingerprint' => $fingerprint,
+                'settings' => $settings,
+                'timestamps' => [
+                    'dish' => $lastDishUpdate,
+                    'category' => $lastCategoryUpdate,
+                    'coupon' => $lastCouponUpdate,
+                    'package' => $lastPackageUpdate,
+                ]
+            ];
+        });
+
+        return response()->json($payload);
     }
 
     // AJAX Polling for public guest order tracking
