@@ -78,8 +78,9 @@
                         Quyền hạn hệ thống <span class="text-[#ee4d2d]">*</span>
                     </label>
                     <select id="role" name="role" required class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs font-bold text-slate-900 focus:border-[#ee4d2d] outline-none transition-all shadow-xs bg-white">
-                        <option value="staff" {{ old('role') === 'staff' ? 'selected' : '' }}>👨‍🍳 Nhân viên vận hành (Staff)</option>
-                        <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>★ Quản trị viên (Admin)</option>
+                        <option value="staff" {{ old('role') === 'staff' ? 'selected' : '' }}>👨‍🍳 Nhân viên vận hành (Staff - Bàn làm việc & Bếp)</option>
+                        <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>⭐ Quản trị viên (Admin - Quản lý thực đơn, đơn hàng, khách hàng)</option>
+                        <option value="superadmin" {{ old('role') === 'superadmin' ? 'selected' : '' }}>👑 Quản trị viên tối cao (Super Admin - Toàn quyền & Phân quyền)</option>
                     </select>
                 </div>
 

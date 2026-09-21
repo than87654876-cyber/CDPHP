@@ -317,10 +317,10 @@ class AdminUserController extends Controller
     // PHÂN HỆ QUẢN TRỊ NHÂN VIÊN & ADMIN (STAFF / EMPLOYEES)
     // =========================================================================
 
-    // Danh sách nhân viên
+    // Danh sách nhân viên & ban quản trị
     public function employeesList()
     {
-        $employees = User::whereIn('role', ['staff', 'admin'])->orderBy('created_at', 'desc')->get();
+        $employees = User::whereIn('role', ['staff', 'admin', 'superadmin'])->orderBy('created_at', 'desc')->get();
 
         return view('admin.employees', compact('employees'));
     }
@@ -334,14 +334,20 @@ class AdminUserController extends Controller
     // Lưu nhân viên mới
     public function employeeStore(Request $request)
     {
+        $allowedRoles = auth()->user()->role === 'superadmin' 
+            ? 'in:staff,admin,superadmin' 
+            : 'in:staff';
+
         $request->validate([
             'fullname' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6',
-            'role' => 'required|string|in:staff,admin',
+            'role' => 'required|string|' . $allowedRoles,
             'status' => 'required|integer|in:0,1',
             'notes' => 'nullable|string',
+        ], [
+            'role.in' => 'Chỉ Quản trị viên tối cao (Super Admin) mới có quyền phân quyền cấp Quản trị viên.',
         ]);
 
         User::create([
@@ -354,13 +360,13 @@ class AdminUserController extends Controller
             'notes' => $request->notes,
         ]);
 
-        return redirect()->route('quanly_nhanvien')->with('success', 'Thêm mới nhân viên thành công!');
+        return redirect()->route('quanly_nhanvien')->with('success', 'Thêm mới và phân quyền nhân sự thành công!');
     }
 
     // Chi tiết nhân viên
     public function employeeShow($id)
     {
-        $employee = User::whereIn('role', ['staff', 'admin'])->findOrFail($id);
+        $employee = User::whereIn('role', ['staff', 'admin', 'superadmin'])->findOrFail($id);
 
         return view('admin.employees_detail', compact('employee'));
     }
@@ -368,7 +374,12 @@ class AdminUserController extends Controller
     // Form chỉnh sửa thông tin nhân viên
     public function employeeEdit($id)
     {
-        $employee = User::whereIn('role', ['staff', 'admin'])->findOrFail($id);
+        $employee = User::whereIn('role', ['staff', 'admin', 'superadmin'])->findOrFail($id);
+
+        // Quản trị viên cấp dưới không được chỉnh sửa tài khoản của Admin khác hoặc Super Admin
+        if (auth()->user()->role !== 'superadmin' && in_array($employee->role, ['admin', 'superadmin'])) {
+            return redirect()->route('quanly_nhanvien')->with('error', 'Chỉ Quản trị viên tối cao mới có quyền chỉnh sửa tài khoản Quản trị viên.');
+        }
 
         return view('admin.employees_edit', compact('employee'));
     }
@@ -376,17 +387,33 @@ class AdminUserController extends Controller
     // Cập nhật thông tin nhân viên
     public function employeeUpdate(Request $request, $id)
     {
-        $employee = User::whereIn('role', ['staff', 'admin'])->findOrFail($id);
+        $employee = User::whereIn('role', ['staff', 'admin', 'superadmin'])->findOrFail($id);
+
+        // Quản trị viên cấp dưới không được sửa tài khoản của Admin khác hoặc Super Admin
+        if (auth()->user()->role !== 'superadmin' && in_array($employee->role, ['admin', 'superadmin'])) {
+            return redirect()->route('quanly_nhanvien')->with('error', 'Chỉ Quản trị viên tối cao mới có quyền phân quyền Quản trị viên.');
+        }
+
+        $allowedRoles = auth()->user()->role === 'superadmin' 
+            ? 'in:staff,admin,superadmin' 
+            : 'in:staff';
 
         $request->validate([
             'fullname' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'email' => 'required|email|unique:users,email,'.$employee->id,
             'password' => 'nullable|string|min:6',
-            'role' => 'required|string|in:staff,admin',
+            'role' => 'required|string|' . $allowedRoles,
             'status' => 'required|integer|in:0,1',
             'notes' => 'nullable|string',
+        ], [
+            'role.in' => 'Chỉ Quản trị viên tối cao (Super Admin) mới có quyền phân quyền cấp Quản trị viên.',
         ]);
+
+        // Bảo vệ: Không cho phép hạ quyền tài khoản Quản trị viên tối cao
+        if ($employee->role === 'superadmin' && $employee->id !== auth()->id() && $request->role !== 'superadmin') {
+            return redirect()->route('quanly_nhanvien')->with('error', 'Không thể hạ quyền của Quản trị viên tối cao.');
+        }
 
         $data = $request->only('fullname', 'phone', 'email', 'role', 'status', 'notes');
         if ($request->password) {
@@ -395,13 +422,21 @@ class AdminUserController extends Controller
 
         $employee->update($data);
 
-        return redirect()->route('quanly_nhanvien')->with('success', 'Cập nhật thông tin nhân viên thành công!');
+        return redirect()->route('quanly_nhanvien')->with('success', 'Cập nhật thông tin và phân quyền thành công!');
     }
 
     // Xóa nhân viên
     public function employeeDestroy($id)
     {
-        $employee = User::whereIn('role', ['staff', 'admin'])->findOrFail($id);
+        $employee = User::whereIn('role', ['staff', 'admin', 'superadmin'])->findOrFail($id);
+
+        if ($employee->role === 'superadmin') {
+            return redirect()->route('quanly_nhanvien')->with('error', 'Không thể xóa tài khoản của Quản trị viên tối cao.');
+        }
+
+        if (auth()->user()->role !== 'superadmin' && $employee->role === 'admin') {
+            return redirect()->route('quanly_nhanvien')->with('error', 'Chỉ Quản trị viên tối cao mới có quyền xóa tài khoản Quản trị viên.');
+        }
 
         if ($employee->id === auth()->id()) {
             return redirect()->route('quanly_nhanvien')->with('error', 'Bạn không thể tự xóa tài khoản của chính mình.');

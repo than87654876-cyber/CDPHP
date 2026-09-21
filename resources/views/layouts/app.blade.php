@@ -447,6 +447,13 @@
                 msgContainer.scrollTop = msgContainer.scrollHeight;
             });
         }
+
+        // Ngăn chặn hiển thị trang từ bộ nhớ đệm (Back-Forward Cache) khi đã đăng xuất
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted || (window.performance && window.performance.navigation && window.performance.navigation.type === 2)) {
+                window.location.reload();
+            }
+        });
     </script>
     @yield('scripts')
 </body>

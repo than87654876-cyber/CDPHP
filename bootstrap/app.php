@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => AdminMiddleware::class,
             'superadmin' => SuperAdminMiddleware::class,
         ]);
+        $middleware->appendToGroup('web', \App\Http\Middleware\PreventBackHistory::class);
         $middleware->redirectTo('/trangchu/dangnhap');
     })
     ->withExceptions(function (Exceptions $exceptions): void {

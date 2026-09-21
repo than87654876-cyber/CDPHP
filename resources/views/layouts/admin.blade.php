@@ -90,7 +90,7 @@
 
                 <!-- Navigation Links -->
                 <nav class="p-4 space-y-1.5 overflow-y-auto max-h-[calc(100vh-140px)]">
-                    @if(Auth::user()->role === 'admin')
+                    @if(in_array(Auth::user()->role, ['superadmin', 'admin']))
                     <a href="{{ route('quanly') }}" class="flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all {{ Route::is('quanly') ? 'bg-[#ee4d2d] text-white shadow-lg shadow-rose-500/30' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
                         <div class="flex items-center gap-3">
                             <i class="fas fa-chart-pie w-5 text-center text-sm"></i>
@@ -110,14 +110,16 @@
                         <p class="px-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Dịch vụ & Thực đơn</p>
                     </div>
 
-                    @if(Auth::user()->role === 'admin')
+                    @if(Auth::user()->role === 'superadmin')
                     <a href="{{ route('quanly_cauhinh') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_cauhinh') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
                         <div class="flex items-center gap-3">
                             <i class="fas fa-sliders w-5 text-center"></i>
                             <span>Cấu hình trang chủ</span>
                         </div>
                     </a>
+                    @endif
 
+                    @if(in_array(Auth::user()->role, ['superadmin', 'admin']))
                     <a href="{{ route('quanly_danhmuc') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_danhmuc') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
                         <div class="flex items-center gap-3">
                             <i class="fas fa-list w-5 text-center"></i>
@@ -133,7 +135,7 @@
                     </a>
                     @endif
 
-                    @if(Auth::user()->role === 'admin')
+                    @if(in_array(Auth::user()->role, ['superadmin', 'admin']))
                     <div class="pt-4 pb-1">
                         <p class="px-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Đơn hàng & Khách hàng</p>
                     </div>
@@ -186,7 +188,7 @@
                         @endif
                     </a>
 
-                    @if(Auth::user()->role === 'admin')
+                    @if(in_array(Auth::user()->role, ['superadmin', 'admin']))
                     <div class="pt-4 pb-1">
                         <p class="px-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Tài khoản & Hệ thống</p>
                     </div>
@@ -197,11 +199,13 @@
                             <span>Quản lý Khách hàng</span>
                         </div>
                     </a>
+                    @endif
 
+                    @if(Auth::user()->role === 'superadmin')
                     <a href="{{ route('quanly_nhanvien') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_nhanvien') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
                         <div class="flex items-center gap-3">
-                            <i class="fas fa-id-card w-5 text-center"></i>
-                            <span>Quản lý Nhân viên</span>
+                            <i class="fas fa-crown w-5 text-center text-amber-400"></i>
+                            <span>Quản lý & Phân quyền</span>
                         </div>
                     </a>
                     @endif
@@ -241,7 +245,9 @@
                             </div>
                             <div class="text-left hidden sm:block">
                                 <p class="text-xs font-bold text-slate-900">{{ Auth::user()->fullname ?? Auth::user()->name }}</p>
-                                <p class="text-[10px] font-extrabold text-[#ee4d2d] uppercase tracking-wider">{{ Auth::user()->role === 'admin' ? 'Quản trị viên' : 'Nhân viên' }}</p>
+                                <p class="text-[10px] font-extrabold uppercase tracking-wider {{ (Auth::user()->role ?? '') === 'superadmin' ? 'text-purple-600' : ((Auth::user()->role ?? '') === 'admin' ? 'text-[#ee4d2d]' : 'text-blue-600') }}">
+                                    {{ (Auth::user()->role ?? '') === 'superadmin' ? '👑 Quản trị viên tối cao' : ((Auth::user()->role ?? '') === 'admin' ? 'Quản trị viên' : 'Nhân viên') }}
+                                </p>
                             </div>
                             <i class="fas fa-chevron-down text-xs text-slate-400"></i>
                         </button>
@@ -315,6 +321,13 @@
                         }
                     })
                     .catch(err => console.error('Error during admin polling:', err));
+            }
+        });
+
+        // Ngăn chặn hiển thị trang từ bộ nhớ đệm (Back-Forward Cache) khi đã đăng xuất
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted || (window.performance && window.performance.navigation && window.performance.navigation.type === 2)) {
+                window.location.reload();
             }
         });
     </script>

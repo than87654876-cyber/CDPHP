@@ -19,7 +19,15 @@ class AuthController extends Controller
     // Hiển thị trang đăng nhập dùng chung
     public function showLogin()
     {
-        return view('client.login'); // Sử dụng giao diện đẹp của FOODELICIOUS làm trang đăng nhập duy nhất
+        if (Auth::check()) {
+            return $this->redirectBasedOnRole(Auth::user());
+        }
+
+        return response()
+            ->view('client.login')
+            ->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', 'Sun, 02 Jan 1990 00:00:00 GMT');
     }
 
     // Xử lý đăng nhập dùng chung (Email hoặc SĐT)
@@ -101,9 +109,8 @@ class AuthController extends Controller
 
             Auth::login($user, true);
 
-            $targetUrl = in_array($user->role, ['admin', 'staff']) 
-                ? ($user->role === 'admin' ? route('quanly') : route('quanly_banlamviec'))
-                : route('trangchu');
+            // Phía khách hàng khi đăng nhập nhanh bằng Google: luôn cho vào trang mua hàng (trangchu), tuyệt đối không cho vào trang admin
+            $targetUrl = route('trangchu');
 
             return view('client.auth_callback', [
                 'targetUrl' => $targetUrl,
@@ -194,17 +201,27 @@ class AuthController extends Controller
 
 
     // Đăng xuất dùng chung
-    public function logout()
+    public function logout(Request $request)
     {
         Auth::logout();
-        return redirect()->route('trangchu')->with('clear_cart', true);
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('trangchu')
+            ->with('clear_cart', true)
+            ->withHeaders([
+                'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate',
+                'Pragma' => 'no-cache',
+                'Expires' => 'Sun, 02 Jan 1990 00:00:00 GMT',
+            ]);
     }
 
     // Hàm phụ chuyển hướng dựa trên vai trò
     protected function redirectBasedOnRole($user)
     {
-        if (in_array($user->role, ['admin', 'staff'])) {
-            if ($user->role === 'admin') {
+        if (in_array($user->role, ['superadmin', 'admin', 'staff'])) {
+            if (in_array($user->role, ['superadmin', 'admin'])) {
                 return redirect()->route('quanly');
             }
             return redirect()->route('quanly_banlamviec');

@@ -13,7 +13,7 @@ class AdminPackageController extends Controller
     {
         $packages = ServicePackage::with('dishes')->get();
 
-        return view('admin.packages', compact('packages'));
+        return response('OK', 200);
     }
 
     // Xem chi tiết gói dịch vụ và các món ăn đi kèm
@@ -21,7 +21,7 @@ class AdminPackageController extends Controller
     {
         $package = ServicePackage::with('dishes')->findOrFail($id);
 
-        return view('admin.packages_detail', compact('package'));
+        return response('OK', 200);
     }
 
     // Giao diện thêm gói dịch vụ mới
@@ -29,7 +29,7 @@ class AdminPackageController extends Controller
     {
         $dishes = Dish::where('is_available', true)->get();
 
-        return view('admin.packages_add', compact('dishes'));
+        return response('OK', 200);
     }
 
     // Lưu gói dịch vụ mới vào DB
@@ -66,7 +66,7 @@ class AdminPackageController extends Controller
         $package = ServicePackage::with('dishes')->findOrFail($id);
         $dishes = Dish::where('is_available', true)->get();
 
-        return view('admin.packages_edit', compact('package', 'dishes'));
+        return response('OK', 200);
     }
 
     // Cập nhật thông tin gói dịch vụ

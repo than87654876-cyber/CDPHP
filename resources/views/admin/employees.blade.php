@@ -72,25 +72,33 @@
                                 {{ $employee->email }}
                             </td>
                             <td class="py-4 px-6">
-                                @if($employee->role === 'admin')
+                                @if($employee->role === 'superadmin')
+                                    <span class="px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 text-[10px] font-black border border-purple-200 shadow-xs"><i class="fas fa-crown text-amber-500 mr-1"></i> Quản trị viên tối cao</span>
+                                @elseif($employee->role === 'admin')
                                     <span class="px-2.5 py-1 rounded-full bg-rose-50 text-[#ee4d2d] text-[10px] font-black border border-rose-200">Quản trị viên (Admin)</span>
                                 @else
                                     <span class="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-[10px] font-bold border border-blue-200">Nhân viên (Staff)</span>
                                 @endif
                             </td>
                             <td class="py-4 px-6 text-right space-x-2">
-                                <a href="{{ route('nhanvien_xem', $employee->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors">
+                                <a href="{{ route('nhanvien_xem', $employee->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors" title="Xem chi tiết">
                                     <i class="fas fa-eye text-xs"></i>
                                 </a>
-                                <a href="{{ route('nhanvien_chinhsua', $employee->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 transition-colors">
+                                <a href="{{ route('nhanvien_chinhsua', $employee->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 transition-colors" title="Chỉnh sửa & phân quyền">
                                     <i class="fas fa-pen text-xs"></i>
                                 </a>
-                                <form action="{{ route('nhanvien_xoa', $employee->id) }}" method="POST" class="inline" onsubmit="return confirm('Bạn có chắc muốn xóa tài khoản nhân viên này?');">
-                                    @csrf
-                                    <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 transition-colors">
-                                        <i class="fas fa-trash-can text-xs"></i>
-                                    </button>
-                                </form>
+                                @if($employee->role !== 'superadmin')
+                                    <form action="{{ route('nhanvien_xoa', $employee->id) }}" method="POST" class="inline" onsubmit="return confirm('Bạn có chắc muốn xóa tài khoản nhân sự này?');">
+                                        @csrf
+                                        <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 transition-colors cursor-pointer" title="Xóa tài khoản">
+                                            <i class="fas fa-trash-can text-xs"></i>
+                                        </button>
+                                    </form>
+                                @else
+                                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-50 text-slate-300 cursor-not-allowed" title="Không thể xóa Quản trị viên tối cao">
+                                        <i class="fas fa-shield-halved text-xs"></i>
+                                    </span>
+                                @endif
                             </td>
                         </tr>
                     @empty
