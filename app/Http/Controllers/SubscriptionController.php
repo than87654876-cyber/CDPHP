@@ -100,7 +100,7 @@ class SubscriptionController extends Controller
         $schedule->dish_id = $request->new_dish_id;
         $schedule->save();
 
-        return back()->with('success', 'Đổi món ăn cho ngày '.$request->day_number.' thành công!');
+        return back()->with('success', 'Đổi món ăn cho ngày ' . $request->day_number . ' thành công!');
     }
 
     // Ghi chú giao hàng cho ngày tiếp theo
@@ -132,7 +132,7 @@ class SubscriptionController extends Controller
         $schedule->delivery_notes = $request->day_note;
         $schedule->save();
 
-        return back()->with('success', 'Đã lưu ghi chú giao hàng cho ngày '.$request->day_number.' thành công!');
+        return back()->with('success', 'Đã lưu ghi chú giao hàng cho ngày ' . $request->day_number . ' thành công!');
     }
 
     // Tạm ngưng dịch vụ
@@ -172,8 +172,8 @@ class SubscriptionController extends Controller
         // Cập nhật ghi chú trên đơn hàng gốc
         if ($subscription->order) {
             $order = $subscription->order;
-            $order->health_notes = ($order->health_notes ? $order->health_notes."\n" : '').
-                '[Tạm ngưng dịch vụ - '.$days.' ngày kể từ '.Carbon::now()->addDay()->format('d/m/Y').']';
+            $order->health_notes = ($order->health_notes ? $order->health_notes . "\n" : '') .
+                '[Tạm ngưng dịch vụ - ' . $days . ' ngày kể từ ' . Carbon::now()->addDay()->format('d/m/Y') . ']';
             $order->save();
         }
 
@@ -216,22 +216,22 @@ class SubscriptionController extends Controller
             $imageUrl = null;
             if ($request->hasFile('cancel_image')) {
                 $file = $request->file('cancel_image');
-                $filename = time().'_'.$file->getClientOriginalName();
+                $filename = time() . '_' . $file->getClientOriginalName();
                 if (!file_exists(public_path('uploads/cancels'))) {
                     mkdir(public_path('uploads/cancels'), 0777, true);
                 }
                 $file->move(public_path('uploads/cancels'), $filename);
-                $imageUrl = 'uploads/cancels/'.$filename;
+                $imageUrl = 'uploads/cancels/' . $filename;
             }
 
             $imageLink = $imageUrl ? url($imageUrl) : 'Không có';
-            $refundText = '[Yêu cầu hoàn tiền - Lý do: Hủy gói ('.$request->cancel_reason.'), Hình ảnh minh chứng: '.$imageLink.', Phương thức: Chuyển khoản (Số tiền hoàn lại ước tính: '.$refundAmount.')';
+            $refundText = '[Yêu cầu hoàn tiền - Lý do: Hủy gói (' . $request->cancel_reason . '), Hình ảnh minh chứng: ' . $imageLink . ', Phương thức: Chuyển khoản (Số tiền hoàn lại ước tính: ' . $refundAmount . ')';
             if ($request->filled('bank_name')) {
                 $refundText .= ', Ngân hàng: ' . $request->bank_name . ', STK: ' . $request->bank_account . ', Chủ tài khoản: ' . $request->bank_user;
             }
             $refundText .= ']';
-            
-            $order->health_notes = ($order->health_notes ? $order->health_notes."\n" : '').$refundText;
+
+            $order->health_notes = ($order->health_notes ? $order->health_notes . "\n" : '') . $refundText;
             $order->save();
         }
 
@@ -363,11 +363,10 @@ class SubscriptionController extends Controller
             DB::commit();
 
             return redirect()->route('goidichvu')->with('success', "Đăng ký thành công gói dịch vụ \"{$servicePackage->package_name}\"!");
-
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return back()->withErrors(['error' => 'Đã xảy ra lỗi trong quá trình đăng ký gói dịch vụ: '.$e->getMessage()]);
+            return back()->withErrors(['error' => 'Đã xảy ra lỗi trong quá trình đăng ký gói dịch vụ: ' . $e->getMessage()]);
         }
     }
 }
