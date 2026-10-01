@@ -40,6 +40,10 @@ class StaffWorkspaceController extends Controller
         $shipperDeliveringOrders = $shipDeliveringOrders;
         $shipperSubDispatches = $shipTodaySubscriptions;
 
+        // 4. Thống kê Kho & Nhập Hàng
+        $lowStockCount = \App\Models\InventoryItem::where('current_stock', '<=', \Illuminate\Support\Facades\DB::raw('min_stock'))->count();
+        $todayReceiptsCount = \App\Models\GoodsReceipt::whereDate('receipt_date', $todayStr)->count();
+
         return view('admin.staff_workspace', compact(
             'kitchenSingleQty',
             'kitchenSubQty',
@@ -50,6 +54,8 @@ class StaffWorkspaceController extends Controller
             'shipTodaySubscriptions',
             'shipperDeliveringOrders',
             'shipperSubDispatches',
+            'lowStockCount',
+            'todayReceiptsCount',
             'todayStr'
         ));
     }

@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminDishController;
 use App\Http\Controllers\AdminOrderController;
 use App\Http\Controllers\AdminPackageController;
+use App\Http\Controllers\AdminProcurementController;
 use App\Http\Controllers\AdminPromotionController;
 use App\Http\Controllers\AdminRefundController;
 use App\Http\Controllers\AdminSettingController;
@@ -42,6 +43,8 @@ Route::get('/api/nhom/{code}/poll', [GroupOrderController::class, 'pollItems'])-
 
 // API Hệ thống & Thanh toán & Chatbot
 Route::get('/api/dishes/search', [ShopController::class, 'searchDishesApi'])->name('api.dishes.search');
+Route::get('/api/dishes/spin', [ShopController::class, 'spinDishesApi'])->name('api.spin_dishes');
+
 Route::post('/api/chatbot/ask', [ShopController::class, 'chatbotAsk'])->name('api.chatbot.ask');
 Route::get('/api/orders/{id}/payment-status', [CartController::class, 'getPaymentStatus'])->name('api.orders.payment-status');
 Route::post('/api/payments/bank-transfer/notify', [CartController::class, 'notifyBankTransferPayment'])->name('api.payments.bank-transfer.notify');
@@ -261,6 +264,31 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/quanly/baocao/xuat-customers', [AdminUserController::class, 'exportCustomersExcel'])->name('baocao_xuat_customers');
     Route::get('/quanly/baocao/xuat-dishes', [AdminDishController::class, 'exportDishesCsv'])->name('baocao_xuat_dishes');
     Route::get('/quanly/baocao/xuat-refunds', [AdminRefundController::class, 'exportRefundsCsv'])->name('baocao_xuat_refunds');
+
+    // --- Quản lý Kho, Nhà Cung Cấp & Nhập Hàng (Procurement & Inventory) ---
+    // 1. Kho hàng & Hàng tồn thực tế
+    Route::get('/quanly_kho', [AdminProcurementController::class, 'inventoryIndex'])->name('quanly_kho');
+    Route::get('/kho_them', [AdminProcurementController::class, 'inventoryCreate'])->name('kho_them');
+    Route::post('/kho_them', [AdminProcurementController::class, 'inventoryStore'])->name('kho_them.post');
+    Route::get('/kho_chinhsua/{id}', [AdminProcurementController::class, 'inventoryEdit'])->name('kho_chinhsua');
+    Route::post('/kho_chinhsua/{id}', [AdminProcurementController::class, 'inventoryUpdate'])->name('kho_chinhsua.post');
+    Route::post('/quanly/kho/dieuchinh/{id}', [AdminProcurementController::class, 'inventoryAdjustStock'])->name('kho_dieuchinh');
+    Route::post('/kho_xoa/{id}', [AdminProcurementController::class, 'inventoryDestroy'])->name('kho_xoa');
+
+    // 2. Nhà Cung Cấp (Nguồn nhập hàng đối tác)
+    Route::get('/quanly_nhacungcap', [AdminProcurementController::class, 'suppliersIndex'])->name('quanly_nhacungcap');
+    Route::get('/nhacungcap_them', [AdminProcurementController::class, 'supplierCreate'])->name('nhacungcap_them');
+    Route::post('/nhacungcap_them', [AdminProcurementController::class, 'supplierStore'])->name('nhacungcap_them.post');
+    Route::get('/nhacungcap_chinhsua/{id}', [AdminProcurementController::class, 'supplierEdit'])->name('nhacungcap_chinhsua');
+    Route::post('/nhacungcap_chinhsua/{id}', [AdminProcurementController::class, 'supplierUpdate'])->name('nhacungcap_chinhsua.post');
+    Route::post('/nhacungcap_xoa/{id}', [AdminProcurementController::class, 'supplierDestroy'])->name('nhacungcap_xoa');
+
+    // 3. Quy trình Nhập Hàng (Phiếu Nhập Kho)
+    Route::get('/quanly_nhaphang', [AdminProcurementController::class, 'receiptsIndex'])->name('quanly_nhaphang');
+    Route::get('/nhaphang_them', [AdminProcurementController::class, 'receiptCreate'])->name('nhaphang_them');
+    Route::post('/nhaphang_them', [AdminProcurementController::class, 'receiptStore'])->name('nhaphang_them.post');
+    Route::get('/nhaphang_xem/{id}', [AdminProcurementController::class, 'receiptShow'])->name('nhaphang_xem');
+    Route::get('/nhaphang_in/{id}', [AdminProcurementController::class, 'receiptPrint'])->name('nhaphang_in');
 });
 
 Route::get('/test-broadcast', function () {

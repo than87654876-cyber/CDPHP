@@ -156,5 +156,43 @@
         </div>
 
     </div>
+
+    <!-- Quick Procurement & Inventory Section for Staff -->
+    <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-200/80 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl {{ $lowStockCount > 0 ? 'bg-rose-50 text-rose-600 border border-rose-200 animate-bounce' : 'bg-blue-50 text-blue-600 border border-blue-200' }} flex items-center justify-center text-2xl font-bold shrink-0">
+                <i class="fas fa-boxes-stacked"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h3 class="text-base font-black text-slate-900">Quản Lý Hàng Tồn & Tiếp Nhận Hàng Nhập</h3>
+                    @if($lowStockCount > 0)
+                        <span class="px-2.5 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black uppercase">
+                            Cảnh báo: {{ $lowStockCount }} mặt hàng sắp hết
+                        </span>
+                    @else
+                        <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 text-[10px] font-black uppercase">
+                            Tồn kho an toàn
+                        </span>
+                    @endif
+                </div>
+                <p class="text-xs text-slate-500 mt-1">
+                    Nhân viên kiểm tra số lượng nguyên liệu/mặt hàng trước ca nấu và lập phiếu nhập kho khi xe hàng đối tác giao tới.
+                </p>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 shrink-0">
+            <a href="{{ route('quanly_kho') }}" class="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all flex items-center gap-2">
+                <i class="fas fa-warehouse text-blue-600"></i> Xem Hàng Tồn
+            </a>
+            <a href="{{ route('quanly_nhacungcap') }}" class="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all flex items-center gap-2">
+                <i class="fas fa-truck-field text-amber-500"></i> Nguồn Hàng NCC
+            </a>
+            <a href="{{ route('nhaphang_them') }}" class="px-5 py-2.5 rounded-2xl bg-[#ee4d2d] hover:bg-[#d73211] text-white text-xs font-black shadow-md shadow-rose-500/20 transition-all flex items-center gap-2">
+                <i class="fas fa-cart-arrow-down"></i> Lập Phiếu Nhập Kho
+            </a>
+        </div>
+    </div>
 </div>
 @endsection

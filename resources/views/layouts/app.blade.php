@@ -208,6 +208,349 @@
         @yield('content')
     </main>
 
+    <!-- ===== VÒNG QUAY HÔM NAY MÌNH ĂN GÌ – FLOATING BUTTON ===== -->
+    <button type="button" id="spin-wheel-fab"
+            onclick="openSpinWheelModal()"
+            class="fixed z-50 flex items-center gap-2.5 px-4 py-3 rounded-full font-extrabold text-xs shadow-xl cursor-pointer transition-all duration-300 hover:scale-105 select-none"
+            style="bottom: 5rem; right: 1.5rem; background: linear-gradient(135deg, #f59e0b 0%, #ee4d2d 100%); color:#fff; box-shadow: 0 8px 28px rgba(238,77,45,0.45);">
+        <span class="relative flex h-2.5 w-2.5 shrink-0">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
+        </span>
+        <span class="text-base">🎡</span>
+        <span>Hôm nay mình ăn gì?</span>
+    </button>
+
+    <!-- ===== SPIN WHEEL MODAL ===== -->
+    <div id="spin-wheel-modal"
+         class="hidden fixed inset-0 z-[999] flex items-center justify-center p-3"
+         style="background: rgba(15,23,42,0.75); backdrop-filter: blur(6px);">
+
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col"
+             style="max-height: 94vh;">
+
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between px-5 py-4 shrink-0"
+                 style="background: linear-gradient(135deg, #f59e0b 0%, #ee4d2d 100%);">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">🎡</span>
+                    <div>
+                        <h3 class="font-black text-white text-base leading-tight">Hôm nay mình ăn gì?</h3>
+                        <p class="text-amber-100 text-[11px] font-medium">Quay ngẫu nhiên & khám phá món ngon theo túi tiền!</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeSpinWheelModal()"
+                        class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/35 text-white flex items-center justify-center text-lg font-bold transition-colors cursor-pointer">
+                    &times;
+                </button>
+            </div>
+
+            <!-- Scrollable body -->
+            <div class="overflow-y-auto flex-1 px-5 py-4 bg-gradient-to-b from-amber-50/40 to-white">
+
+                <!-- Canvas Vòng Quay -->
+                <div class="relative flex justify-center items-center mb-4">
+                    <!-- Arrow pointer -->
+                    <div class="absolute top-0 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center" style="margin-top:-4px;">
+                        <div style="width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;border-top:26px solid #ee4d2d;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));"></div>
+                    </div>
+                    <canvas id="spin-wheel-canvas" width="300" height="300"
+                            class="rounded-full shadow-xl border-4 border-amber-200 cursor-pointer"
+                            style="display:block;"
+                            onclick="startSpin()"></canvas>
+                </div>
+
+                <!-- Spin Button -->
+                <div class="flex justify-center mb-4">
+                    <button type="button" id="spin-btn" onclick="startSpin()"
+                            class="px-8 py-3 rounded-full font-black text-sm text-white shadow-lg cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2"
+                            style="background: linear-gradient(135deg, #f59e0b, #ee4d2d); box-shadow: 0 6px 20px rgba(238,77,45,0.4);">
+                        <i class="fas fa-dice text-base"></i>
+                        <span id="spin-btn-text">Quay!</span>
+                    </button>
+                </div>
+
+                <!-- Price Slider -->
+                <div class="bg-white rounded-2xl p-4 border border-amber-100 shadow-xs mb-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-xs font-black text-slate-700 flex items-center gap-1.5">
+                            <i class="fas fa-wallet text-amber-500"></i>
+                            Ngân sách tối đa
+                        </label>
+                        <span id="spin-price-display"
+                              class="px-3 py-1 rounded-full text-xs font-black text-white"
+                              style="background: linear-gradient(135deg, #f59e0b, #ee4d2d);">100.000đ</span>
+                    </div>
+
+                    <input type="range" id="spin-price-slider"
+                           min="20000" max="400000" step="10000" value="100000"
+                           oninput="onPriceSliderChange(this.value)"
+                           class="w-full h-2 rounded-full appearance-none cursor-pointer"
+                           style="accent-color: #ee4d2d; background: linear-gradient(to right, #ee4d2d 0%, #ee4d2d 18.75%, #e2e8f0 18.75%, #e2e8f0 100%);">
+
+                    <div class="flex items-center justify-between mt-1.5 text-[10px] text-slate-400 font-bold">
+                        <span>18.000đ</span>
+                        <span>200.000đ</span>
+                        <span>400.000đ</span>
+                    </div>
+                </div>
+
+                <!-- Kết quả quay -->
+                <div id="spin-result-area" class="hidden bg-gradient-to-br from-amber-50 to-rose-50 rounded-2xl border border-amber-200 p-4 space-y-3">
+                    <div class="flex items-center gap-2 pb-2 border-b border-amber-200">
+                        <span class="text-lg">🎉</span>
+                        <span class="font-black text-slate-800 text-sm">Kết quả vòng quay!</span>
+                    </div>
+                    <div id="spin-result-card" class="space-y-2"></div>
+                    <div class="flex gap-2 pt-1">
+                        <button type="button" onclick="startSpin()"
+                                class="flex-1 py-2.5 rounded-xl text-xs font-black border border-amber-300 text-amber-800 bg-amber-50 hover:bg-amber-100 transition-colors cursor-pointer flex items-center justify-center gap-1.5">
+                            <i class="fas fa-redo text-xs"></i> Quay lại
+                        </button>
+                        <a id="spin-order-btn" href="{{ route('muahang') }}"
+                           class="flex-1 py-2.5 rounded-xl text-xs font-black text-white text-center flex items-center justify-center gap-1.5 cursor-pointer transition-all"
+                           style="background: linear-gradient(135deg, #f59e0b, #ee4d2d);">
+                            <i class="fas fa-shopping-cart text-xs"></i> Đặt ngay!
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SPIN WHEEL JAVASCRIPT ===== -->
+    <script>
+    (function() {
+        // ---- State ----
+        let spinDishes        = [];   // dishes loaded from API matching price
+        let spinRotation      = 0;    // current canvas rotation in degrees
+        let isSpinning        = false;
+        let spinMaxPrice      = 100000;
+        let spinAnimationId   = null;
+        let spinSegmentColors = [
+            '#ee4d2d','#f59e0b','#10b981','#3b82f6','#8b5cf6',
+            '#ec4899','#14b8a6','#f97316','#06b6d4','#84cc16',
+            '#a855f7','#ef4444'
+        ];
+
+        // ---- Format money ----
+        function fmtMoney(n) {
+            return Number(n).toLocaleString('vi-VN') + 'đ';
+        }
+
+        // ---- Open / Close Modal ----
+        window.openSpinWheelModal = function() {
+            document.getElementById('spin-wheel-modal').classList.remove('hidden');
+            loadSpinDishes(spinMaxPrice);
+        };
+        window.closeSpinWheelModal = function() {
+            document.getElementById('spin-wheel-modal').classList.add('hidden');
+            if (spinAnimationId) { cancelAnimationFrame(spinAnimationId); spinAnimationId = null; }
+        };
+
+        // ---- Price Slider ----
+        window.onPriceSliderChange = function(val) {
+            spinMaxPrice = parseInt(val);
+            const pct = ((spinMaxPrice - 20000) / (400000 - 20000)) * 100;
+            const slider = document.getElementById('spin-price-slider');
+            if (slider) slider.style.background = `linear-gradient(to right, #ee4d2d 0%, #ee4d2d ${pct}%, #e2e8f0 ${pct}%, #e2e8f0 100%)`;
+            document.getElementById('spin-price-display').textContent = fmtMoney(spinMaxPrice);
+            loadSpinDishes(spinMaxPrice);
+        };
+
+        // ---- Load dishes from API ----
+        function loadSpinDishes(maxPrice) {
+            fetch(`{{ route('api.spin_dishes') }}?max_price=${maxPrice}`)
+                .then(r => r.json())
+                .then(data => {
+                    spinDishes = data.dishes || [];
+                    if (spinDishes.length === 0) {
+                        spinDishes = [{ dish_name: 'Thử ngân sách cao hơn nhé!', price: 0, id: null }];
+                    }
+                    drawWheel(spinRotation);
+                    // Reset result
+                    document.getElementById('spin-result-area').classList.add('hidden');
+                })
+                .catch(() => {
+                    spinDishes = [{ dish_name: 'Không tải được món', price: 0, id: null }];
+                    drawWheel(spinRotation);
+                });
+        }
+
+        // ---- Draw Wheel on Canvas ----
+        function drawWheel(rotateDeg) {
+            const canvas = document.getElementById('spin-wheel-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const W = canvas.width, H = canvas.height;
+            const cx = W / 2, cy = H / 2, R = Math.min(cx, cy) - 4;
+            const n = spinDishes.length;
+            const arc = (2 * Math.PI) / n;
+
+            ctx.clearRect(0, 0, W, H);
+
+            // Outer ring shadow
+            ctx.save();
+            ctx.shadowColor = 'rgba(0,0,0,0.18)';
+            ctx.shadowBlur  = 14;
+            ctx.beginPath();
+            ctx.arc(cx, cy, R + 3, 0, 2 * Math.PI);
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+            ctx.restore();
+
+            const offsetRad = (rotateDeg - 90) * (Math.PI / 180); // 0° at top
+
+            for (let i = 0; i < n; i++) {
+                const startAngle = offsetRad + i * arc;
+                const endAngle   = startAngle + arc;
+                const color      = spinSegmentColors[i % spinSegmentColors.length];
+
+                // Segment fill
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.arc(cx, cy, R, startAngle, endAngle);
+                ctx.closePath();
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+
+                // Text
+                ctx.save();
+                ctx.translate(cx, cy);
+                ctx.rotate(startAngle + arc / 2);
+                ctx.textAlign = 'right';
+                ctx.fillStyle = '#fff';
+                ctx.font = `bold ${n > 8 ? 9 : 11}px "Plus Jakarta Sans", sans-serif`;
+                ctx.shadowColor = 'rgba(0,0,0,0.4)';
+                ctx.shadowBlur  = 3;
+
+                const name  = spinDishes[i].dish_name || '';
+                const label = name.length > 16 ? name.slice(0, 14) + '…' : name;
+                const price = spinDishes[i].price > 0 ? fmtMoney(spinDishes[i].price) : '';
+
+                ctx.fillText(label, R - 8, -3);
+                if (price) {
+                    ctx.font = `${n > 8 ? 8 : 9}px "Plus Jakarta Sans", sans-serif`;
+                    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+                    ctx.fillText(price, R - 8, 9);
+                }
+                ctx.restore();
+            }
+
+            // Center circle
+            ctx.beginPath();
+            ctx.arc(cx, cy, 26, 0, 2 * Math.PI);
+            ctx.fillStyle = '#1e293b';
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(cx, cy, 20, 0, 2 * Math.PI);
+            const grad = ctx.createRadialGradient(cx - 4, cy - 4, 2, cx, cy, 20);
+            grad.addColorStop(0, '#f59e0b');
+            grad.addColorStop(1, '#ee4d2d');
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            // Center icon
+            ctx.fillStyle = '#fff';
+            ctx.font = '14px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🎡', cx, cy);
+        }
+
+        // ---- Spin Animation ----
+        window.startSpin = function() {
+            if (isSpinning) return;
+            if (spinDishes.length === 0) return;
+
+            isSpinning = true;
+            document.getElementById('spin-result-area').classList.add('hidden');
+            const btn = document.getElementById('spin-btn');
+            const btnText = document.getElementById('spin-btn-text');
+            if (btn)     btn.disabled = true;
+            if (btnText) btnText.textContent = 'Đang quay...';
+
+            // Random total rotation: 5-10 full turns + random offset
+            const extraDeg  = 360 * (5 + Math.floor(Math.random() * 5));
+            const n         = spinDishes.length;
+            const arc       = 360 / n;
+            // Pick a random winner index
+            const winnerIdx = Math.floor(Math.random() * n);
+            // The winner segment center should land at top (270° from positive x axis in canvas coords)
+            const targetAngle = (360 - (winnerIdx * arc + arc / 2)) % 360;
+            const totalDeg  = extraDeg + targetAngle;
+
+            const startRot   = spinRotation;
+            const endRot     = startRot + totalDeg;
+            const duration   = 4000 + Math.random() * 1200; // 4–5.2s
+            const startTime  = performance.now();
+
+            function easeOut(t) {
+                return 1 - Math.pow(1 - t, 4);
+            }
+
+            function animate(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                spinRotation = startRot + (endRot - startRot) * easeOut(progress);
+                drawWheel(spinRotation);
+
+                if (progress < 1) {
+                    spinAnimationId = requestAnimationFrame(animate);
+                } else {
+                    spinRotation = spinRotation % 360;
+                    isSpinning = false;
+                    if (btn)     btn.disabled = false;
+                    if (btnText) btnText.textContent = 'Quay lại!';
+                    showSpinResult(winnerIdx);
+                }
+            }
+
+            spinAnimationId = requestAnimationFrame(animate);
+        };
+
+        // ---- Show Result ----
+        function showSpinResult(idx) {
+            const dish = spinDishes[idx];
+            if (!dish) return;
+
+            const resultArea = document.getElementById('spin-result-area');
+            const resultCard = document.getElementById('spin-result-card');
+            const orderBtn   = document.getElementById('spin-order-btn');
+
+            resultCard.innerHTML = `
+                <div class="flex items-center gap-3 bg-white rounded-xl p-3 border border-amber-200 shadow-xs">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0"
+                         style="background: linear-gradient(135deg, #fef3c7, #fee2e2);">
+                        🍽️
+                    </div>
+                    <div class="min-w-0">
+                        <p class="font-black text-slate-900 text-sm leading-tight">${dish.dish_name}</p>
+                        ${dish.price > 0 ? `<p class="text-[#ee4d2d] font-extrabold text-xs mt-0.5">${fmtMoney(dish.price)}</p>` : ''}
+                        ${dish.description ? `<p class="text-slate-400 text-[10px] mt-0.5 truncate">${dish.description}</p>` : ''}
+                    </div>
+                </div>
+            `;
+
+            if (dish.id && orderBtn) {
+                orderBtn.href = '{{ route("muahang") }}';
+            }
+
+            resultArea.classList.remove('hidden');
+            resultArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // ---- Init on DOM ready ----
+        document.addEventListener('DOMContentLoaded', function() {
+            drawWheel(0); // Draw empty / placeholder wheel immediately
+            onPriceSliderChange(100000);
+        });
+    })();
+    </script>
+
     <!-- Floating AI Chatbot Widget -->
     <button type="button" onclick="toggleChatbot()" class="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-full bg-[#ee4d2d] hover:bg-red-600 text-white font-extrabold text-xs shadow-xl shadow-rose-500/30 flex items-center gap-2.5 hover:scale-105 transition-all cursor-pointer">
         <span class="relative flex h-2.5 w-2.5">
@@ -251,6 +594,7 @@
             </button>
         </form>
     </div>
+
 
     <!-- ShopeeFood Footer -->
     <footer class="bg-white/95 backdrop-blur-md border-t border-slate-200 pt-12 pb-8 mt-0 text-xs text-slate-600">

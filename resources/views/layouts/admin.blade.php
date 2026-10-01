@@ -70,6 +70,7 @@
             $deliveringOrdersCount = \App\Models\Order::where('order_status', 'delivering')->count();
             $kitchenCount = \App\Models\Order::whereIn('order_status', ['confirmed', 'preparing'])->count();
             $refundCount = \App\Models\Order::where('health_notes', 'like', '%[Yêu cầu hoàn tiền%')->where('payment_status', '!=', 'refunded')->count();
+            $lowStockInventoryCount = \App\Models\InventoryItem::where('current_stock', '<=', \Illuminate\Support\Facades\DB::raw('min_stock'))->count();
         @endphp
 
         <!-- Ultra-Modern Dark Sidebar Navigation -->
@@ -194,6 +195,36 @@
                                 {{ $kitchenCount }}
                             </span>
                         @endif
+                    </a>
+
+                    <div class="pt-4 pb-1">
+                        <p class="px-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Kho Vận & Nhập Hàng</p>
+                    </div>
+
+                    <a href="{{ route('quanly_kho') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_kho*') || Route::is('kho_*') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-boxes-stacked w-5 text-center text-blue-400"></i>
+                            <span>Kho & Hàng tồn thực tế</span>
+                        </div>
+                        @if($lowStockInventoryCount > 0)
+                            <span class="px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black animate-pulse" title="Mặt hàng cần nhập thêm">
+                                {{ $lowStockInventoryCount }}
+                            </span>
+                        @endif
+                    </a>
+
+                    <a href="{{ route('quanly_nhacungcap') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_nhacungcap*') || Route::is('nhacungcap_*') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-truck-field w-5 text-center text-amber-400"></i>
+                            <span>Nguồn hàng & Nhà cung cấp</span>
+                        </div>
+                    </a>
+
+                    <a href="{{ route('quanly_nhaphang') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_nhaphang*') || Route::is('nhaphang_*') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-file-invoice-dollar w-5 text-center text-emerald-400"></i>
+                            <span>Phiếu Nhập Hàng (Nhập kho)</span>
+                        </div>
                     </a>
 
                     @if(in_array(Auth::user()->role, ['superadmin', 'admin']))

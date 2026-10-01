@@ -499,10 +499,39 @@ class ShopController extends Controller
         ]);
     }
 
+    // API Vòng quay "Hôm nay mình ăn gì?" – trả về tối đa 12 món theo mức giá tối đa
+    public function spinDishesApi(Request $request)
+    {
+        $maxPrice = (int) $request->query('max_price', 100000);
+        $maxPrice = max(1000, min(10000000, $maxPrice)); // sanity clamp
+
+        $dishes = \App\Models\Dish::where('is_available', true)
+            ->where('price', '<=', $maxPrice)
+            ->inRandomOrder()
+            ->take(12)
+            ->get()
+            ->map(function ($dish) {
+                return [
+                    'id'          => $dish->id,
+                    'dish_name'   => $dish->dish_name,
+                    'price'       => (float) $dish->price,
+                    'description' => $dish->description ?? null,
+                    'image'       => $dish->image ? asset($dish->image) : null,
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'dishes'  => $dishes,
+            'total'   => $dishes->count(),
+        ]);
+    }
+
     // API Chatbot tư vấn món ăn & hỗ trợ khách hàng
     public function chatbotAsk(Request $request)
     {
         $userMsg = trim($request->input('message', ''));
+
         if (empty($userMsg)) {
             return response()->json([
                 'success' => false,
