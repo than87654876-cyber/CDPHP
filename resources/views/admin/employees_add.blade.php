@@ -75,12 +75,23 @@
                 <!-- Quyền hạn -->
                 <div class="space-y-2">
                     <label for="role" class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider">
-                        Quyền hạn hệ thống <span class="text-[#ee4d2d]">*</span>
+                        Vai trò & Quyền hạn hệ thống <span class="text-[#ee4d2d]">*</span>
                     </label>
                     <select id="role" name="role" required class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs font-bold text-slate-900 focus:border-[#ee4d2d] outline-none transition-all shadow-xs bg-white">
-                        <option value="staff" {{ old('role') === 'staff' ? 'selected' : '' }}>👨‍🍳 Nhân viên vận hành (Staff - Bàn làm việc & Bếp)</option>
-                        <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>⭐ Quản trị viên (Admin - Quản lý thực đơn, đơn hàng, khách hàng)</option>
-                        <option value="superadmin" {{ old('role') === 'superadmin' ? 'selected' : '' }}>👑 Quản trị viên tối cao (Super Admin - Toàn quyền & Phân quyền)</option>
+                        @php
+                            $roleLabels = [
+                                'superadmin' => '👑 Quản trị viên tối cao (Super Admin)',
+                                'admin' => '⭐ Quản trị viên / Quản lý quán (Admin)',
+                                'staff' => '🎧 Nhân viên CSKH / Thu ngân (Staff)',
+                                'kitchen' => '🍳 Nhân viên Nhà bếp (Kitchen Chef)',
+                                'shipper' => '🛵 Nhân viên Giao hàng (Shipper)',
+                            ];
+                        @endphp
+                        @foreach($roles as $r)
+                            <option value="{{ $r->name }}" {{ old('role') === $r->name ? 'selected' : '' }}>
+                                {{ $roleLabels[$r->name] ?? ('⚙️ ' . ucfirst($r->name)) }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
 

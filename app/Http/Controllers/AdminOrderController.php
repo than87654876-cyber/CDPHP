@@ -31,23 +31,129 @@ class AdminOrderController extends Controller
     // Bảng chuẩn bị món ăn hôm nay của nhà bếp
     public function kitchenReport()
     {
-        $singleDishes = OrderItem::whereHas('order', function ($q) {
-            $q->whereIn('order_status', ['confirmed', 'preparing']);
-        })
-            ->select('dish_id', \DB::raw('SUM(quantity) as total_qty'))
-            ->groupBy('dish_id')
-            ->with('dish')
-            ->get();
-
         $todayStr = Carbon::today()->format('Y-m-d');
-        $subscriptionDishes = DailySchedule::where('delivery_date', $todayStr)
-            ->where('delivery_status', 'pending')
-            ->select('dish_id', \DB::raw('COUNT(*) as total_qty'))
-            ->groupBy('dish_id')
-            ->with('dish')
+
+        // Lấy tất cả OrderItems của các đơn đang chờ bếp nấu (kể cả vừa đặt 'pending', 'confirmed', 'preparing')
+        $kitchenOrderItems = OrderItem::with(['order.user', 'dish.category'])
+            ->whereHas('order', function ($q) {
+                $q->whereIn('order_status', ['pending', 'confirmed', 'preparing'])
+                  ->where('order_type', '!=', 'subscription');
+            })
             ->get();
 
-        return view('admin.kitchen_report', compact('singleDishes', 'subscriptionDishes', 'todayStr'));
+        // Gom nhóm theo món ăn kèm danh sách mã vận đơn chi tiết
+        $singleDishes = $kitchenOrderItems->groupBy('dish_id')->map(function ($items) {
+            $first = $items->first();
+            $dish = $first->dish;
+
+            // Danh sách các mã vận đơn có món này
+            $orders = $items->map(function ($item) {
+                $order = $item->order;
+                return (object) [
+                    'order_id' => $item->order_id,
+                    'tracking_code' => 'FDL-' . $item->order_id,
+                    'quantity' => $item->quantity,
+                    'order_status' => $order->order_status ?? 'pending',
+                    'payment_status' => $order->payment_status ?? 'pending',
+                    'customer_name' => $order->user->fullname ?? $order->user->name ?? 'Khách',
+                    'health_notes' => $order->health_notes ?? '',
+                    'created_at' => $order->created_at,
+                ];
+            })->sortByDesc('order_id')->values();
+
+            return (object) [
+                'dish_id' => $first->dish_id,
+                'dish' => $dish,
+                'total_qty' => $items->sum('quantity'),
+                'orders' => $orders,
+            ];
+        })->sortByDesc('total_qty')->values();
+
+        // Lấy lịch giao combo định kỳ hôm nay kèm mã vận đơn
+        $subscriptionSchedules = DailySchedule::with(['dish', 'subscription.user', 'subscription.package'])
+            ->where('delivery_date', $todayStr)
+            ->where('delivery_status', 'pending')
+            ->get();
+
+        $subscriptionDishes = $subscriptionSchedules->groupBy('dish_id')->map(function ($items) {
+            $first = $items->first();
+            $schedules = $items->map(function ($s) {
+                return (object) [
+                    'schedule_id' => $s->id,
+                    'subscription_id' => $s->subscription_id,
+                    'tracking_code' => 'SUB-' . $s->subscription_id . '-D' . $s->id,
+                    'customer_name' => $s->subscription->user->fullname ?? $s->subscription->user->name ?? 'Hội viên',
+                    'package_name' => $s->subscription->package->package_name ?? 'Gói Combo',
+                    'delivery_notes' => $s->delivery_notes,
+                ];
+            })->values();
+
+            return (object) [
+                'dish_id' => $first->dish_id,
+                'dish' => $first->dish,
+                'total_qty' => $items->count(),
+                'schedules' => $schedules,
+            ];
+        })->sortByDesc('total_qty')->values();
+
+        // Danh sách các đơn hàng chi tiết đang chờ nấu (Vé bếp / Order Tickets)
+        $activeOrders = Order::with(['user', 'orderItems.dish'])
+            ->whereIn('order_status', ['pending', 'confirmed', 'preparing'])
+            ->where('order_type', '!=', 'subscription')
+            ->orderBy('created_at', 'asc') // Đơn đặt trước làm trước (FIFO)
+            ->get();
+
+        // Danh sách các đơn vừa nấu xong gần đây (delivering hoặc completed trong ngày hoặc gần nhất) để hỗ trợ tra cứu xử lý sự cố
+        $recentCompletedOrders = Order::with(['user', 'orderItems.dish'])
+            ->whereIn('order_status', ['delivering', 'completed'])
+            ->where('order_type', '!=', 'subscription')
+            ->whereDate('updated_at', Carbon::today())
+            ->orderBy('updated_at', 'desc')
+            ->take(30)
+            ->get();
+
+        if ($recentCompletedOrders->isEmpty()) {
+            $recentCompletedOrders = Order::with(['user', 'orderItems.dish'])
+                ->whereIn('order_status', ['delivering', 'completed'])
+                ->where('order_type', '!=', 'subscription')
+                ->orderBy('updated_at', 'desc')
+                ->take(15)
+                ->get();
+        }
+
+        // Format dữ liệu chi tiết cho modal tra cứu và giải quyết khiếu nại của khách
+        $initialCompletedOrders = $recentCompletedOrders->map(function ($order) {
+            $customerName = $order->user->fullname ?? $order->user->name ?? 'Khách đặt món';
+            $phone = $order->user->phone ?? '';
+            $address = $order->user->address ?? '';
+            if (empty($phone) && !empty($order->health_notes) && preg_match('/SĐT:\s*([0-9\+\.\s]+)/i', $order->health_notes, $m)) {
+                $phone = trim($m[1]);
+            }
+            if (empty($address) && !empty($order->health_notes) && preg_match('/Giao:\s*([^.\n]+)/i', $order->health_notes, $m)) {
+                $address = trim($m[1]);
+            }
+
+            return [
+                'id' => $order->id,
+                'customer' => $customerName,
+                'phone' => $phone,
+                'address' => $address,
+                'healthNotes' => $order->health_notes ?? '',
+                'totalItems' => $order->orderItems->count(),
+                'finalAmount' => number_format($order->final_amount, 0, ',', '.') . 'đ',
+                'orderStatus' => $order->order_status,
+                'paymentStatus' => $order->payment_status,
+                'time' => $order->updated_at ? $order->updated_at->format('H:i') : ($order->created_at ? $order->created_at->format('H:i') : ''),
+                'dishes' => $order->orderItems->map(function ($oi) {
+                    return [
+                        'name' => $oi->dish->dish_name ?? 'Món ăn',
+                        'qty' => $oi->quantity,
+                    ];
+                })->values()->toArray(),
+            ];
+        })->values()->toArray();
+
+        return view('admin.kitchen_report', compact('singleDishes', 'subscriptionDishes', 'activeOrders', 'recentCompletedOrders', 'initialCompletedOrders', 'todayStr'));
     }
 
     // Xem chi tiết đơn hàng

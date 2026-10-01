@@ -52,7 +52,7 @@ class AppServiceProvider extends ServiceProvider
                     return [
                         'pendingOrdersCount' => \App\Models\Order::where('order_status', 'preparing')->count(),
                         'deliveringOrdersCount' => \App\Models\Order::where('order_status', 'delivering')->count(),
-                        'kitchenCount' => \App\Models\Order::whereIn('order_status', ['confirmed', 'preparing'])->count(),
+                        'kitchenCount' => \App\Models\Order::whereIn('order_status', ['pending', 'confirmed', 'preparing'])->count(),
                         'refundCount' => \App\Models\Order::where('health_notes', 'like', '%[Yêu cầu hoàn tiền%')->where('payment_status', '!=', 'refunded')->count(),
                     ];
                 } catch (\Throwable $e) {

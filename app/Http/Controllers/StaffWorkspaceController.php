@@ -16,9 +16,8 @@ class StaffWorkspaceController extends Controller
     {
         $todayStr = Carbon::today()->format('Y-m-d');
 
-        // 1. Thống kê Nhà bếp (Kitchen)
         $kitchenSingleQty = OrderItem::whereHas('order', function ($q) {
-            $q->whereIn('order_status', ['confirmed', 'preparing']);
+            $q->whereIn('order_status', ['pending', 'confirmed', 'preparing']);
         })->sum('quantity');
 
         $kitchenSubQty = DailySchedule::where('delivery_date', $todayStr)

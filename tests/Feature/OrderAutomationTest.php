@@ -126,6 +126,9 @@ class OrderAutomationTest extends TestCase
             'usage_limit' => 10,
         ]);
 
+        // Log in the customer (mã khuyến mãi chỉ dùng được sau khi đăng nhập thành công)
+        $this->actingAs($customer);
+
         // 1. Test validateCoupon API - Valid request
         $response = $this->postJson(route('api.coupon.validate'), [
             'code' => 'TESTCOUPON10',
@@ -154,9 +157,6 @@ class OrderAutomationTest extends TestCase
         $cartItems = json_encode([
             ['id' => $dish->id, 'quantity' => 1]
         ]);
-
-        // Log in the customer
-        $this->actingAs($customer);
 
         $responseCheckout = $this->post(route('muahang.process'), [
             'cart_items' => $cartItems,

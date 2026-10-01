@@ -45,20 +45,97 @@
                         <!-- Rendered by JavaScript -->
                     </div>
 
-                    <!-- Ô nhập mã giảm giá Coupon -->
-                    <div class="pt-4 border-t border-slate-100">
-                        <div class="flex flex-col sm:flex-row items-center gap-2.5">
-                            <div class="relative flex-1 w-full">
+                    <!-- KHU VỰC MÃ GIẢM GIÁ (SMART PROMO COUPON SYSTEM) -->
+                    <div class="pt-4 border-t border-slate-100 space-y-3">
+                        @guest
+                            <!-- Trạng thái CHƯA ĐĂNG NHẬP: Báo rõ điều kiện đăng nhập -->
+                            <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-700 flex items-center justify-center font-bold text-sm shrink-0">
+                                        <i class="fas fa-lock"></i>
+                                    </span>
+                                    <div>
+                                        <strong class="font-extrabold block text-slate-800">Ưu đãi giảm giá đặc quyền</strong>
+                                        <p class="text-[11px] text-amber-800">Mã khuyến mãi chỉ sử dụng được <strong>sau khi đăng nhập thành công</strong>.</p>
+                                    </div>
+                                </div>
+                                <a href="{{ route('dangnhap') }}" class="px-4 py-2 bg-[#ee4d2d] hover:bg-red-600 text-white rounded-xl text-xs font-black shadow-xs transition-colors shrink-0 flex items-center gap-1.5">
+                                    <i class="fas fa-arrow-right-to-bracket text-[10px]"></i> Đăng nhập ngay
+                                </a>
+                            </div>
+
+                            <div class="relative flex-1 w-full opacity-60">
                                 <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 text-xs">
                                     <i class="fas fa-ticket"></i>
                                 </span>
-                                <input type="text" id="coupon_code" placeholder="NHẬP MÃ GIẢM GIÁ (VD: FOODDAILY30)" class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:border-[#ee4d2d] outline-none uppercase shadow-xs">
+                                <input type="text" disabled placeholder="Đăng nhập để sử dụng mã khuyến mãi" class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-100 text-xs font-bold text-slate-400 cursor-not-allowed">
                             </div>
-                            <button type="button" onclick="applyCoupon()" class="w-full sm:w-auto px-6 py-2.5 bg-slate-900 hover:bg-[#ee4d2d] text-white rounded-xl text-xs font-extrabold transition-all shadow-xs cursor-pointer shrink-0">
-                                Áp dụng
+                        @else
+                            <!-- Trạng thái ĐÃ ĐĂNG NHẬP: Tự động chọn mã tốt nhất & Cho phép đổi mã -->
+                            <div id="auto-coupon-banner" class="hidden p-3 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 text-emerald-900 text-xs items-center justify-between gap-2 shadow-2xs">
+                                <div class="flex items-center gap-2 min-w-0">
+                                    <span class="w-6 h-6 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xs shrink-0 font-bold">
+                                        <i class="fas fa-wand-magic-sparkles"></i>
+                                    </span>
+                                    <span id="auto-coupon-text" class="font-bold truncate text-[11px]"></span>
+                                </div>
+                                <button type="button" onclick="openCouponModal()" class="text-emerald-700 hover:text-emerald-900 font-extrabold text-[11px] underline shrink-0">
+                                    Đổi mã khác
+                                </button>
+                            </div>
+
+                            <div class="flex flex-col sm:flex-row items-center gap-2">
+                                <div class="relative flex-1 w-full">
+                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 text-xs">
+                                        <i class="fas fa-ticket"></i>
+                                    </span>
+                                    <input type="text" id="coupon_code" placeholder="MÃ GIẢM GIÁ (VD: FOODDAILY30)" class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:border-[#ee4d2d] outline-none uppercase shadow-xs">
+                                </div>
+                                <div class="flex items-center gap-2 w-full sm:w-auto">
+                                    <button type="button" onclick="applyCoupon()" class="flex-1 sm:flex-none px-5 py-2.5 bg-slate-900 hover:bg-[#ee4d2d] text-white rounded-xl text-xs font-extrabold transition-all shadow-xs cursor-pointer shrink-0">
+                                        Áp dụng
+                                    </button>
+                                    <button type="button" onclick="openCouponModal()" class="flex-1 sm:flex-none px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-[#ee4d2d] border border-rose-200 rounded-xl text-xs font-extrabold transition-all shadow-2xs flex items-center justify-center gap-1.5 shrink-0 cursor-pointer">
+                                        <i class="fas fa-tags text-[10px]"></i> Chọn voucher
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="coupon-message" class="text-xs font-bold mt-1 hidden"></div>
+                        @endguest
+                    </div>
+                </div>
+
+                <!-- MODAL CHỌN MÃ KHUYẾN MÃI (VOUCHER SELECTOR MODAL) -->
+                <div id="couponSelectorModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300 hidden">
+                    <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl border border-rose-200 flex flex-col max-h-[85vh]">
+                        <div class="p-5 bg-gradient-to-r from-slate-900 to-slate-800 text-white flex items-center justify-between shrink-0">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-8 h-8 rounded-xl bg-amber-400/20 text-amber-300 flex items-center justify-center text-sm font-bold border border-amber-400/30">
+                                    <i class="fas fa-ticket"></i>
+                                </span>
+                                <div>
+                                    <h3 class="font-extrabold text-sm uppercase tracking-wider">Chọn Mã Khuyến Mãi</h3>
+                                    <p class="text-[11px] text-slate-400">Danh sách các mã ưu đãi áp dụng cho giỏ hàng của bạn</p>
+                                </div>
+                            </div>
+                            <button type="button" onclick="closeCouponModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-sm">
+                                &times;
                             </button>
                         </div>
-                        <div id="coupon-message" class="text-xs font-bold mt-2 hidden"></div>
+
+                        <!-- Danh sách mã cuộn -->
+                        <div id="coupon-modal-list" class="p-4 sm:p-5 overflow-y-auto space-y-3 flex-1 divide-y divide-slate-100">
+                            <div class="text-center py-6 text-xs text-slate-400 font-semibold">Đang tải danh sách ưu đãi...</div>
+                        </div>
+
+                        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0">
+                            <button type="button" onclick="removeCoupon()" class="text-xs font-bold text-slate-500 hover:text-rose-600 transition-colors">
+                                Không sử dụng mã
+                            </button>
+                            <button type="button" onclick="closeCouponModal()" class="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-black transition-colors">
+                                Xong
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -255,7 +332,7 @@
                     </div>
 
                     <!-- Nút đặt hàng -->
-                    <button type="submit" id="btn-submit-order" class="w-full py-4 rounded-2xl bg-gradient-to-r from-[#ee4d2d] to-[#ff5d3b] hover:from-[#d73211] hover:to-[#ee4d2d] text-white font-black text-sm shadow-lg shadow-rose-500/30 hover:scale-[1.01] active:scale-[0.99] transition-all uppercase tracking-wider cursor-pointer flex items-center justify-center gap-2">
+                    <button type="submit" id="btn-submit-order" class="w-full py-4 rounded-2xl text-white font-black text-sm shadow-lg shadow-rose-500/30 hover:brightness-110 active:scale-[0.99] transition-all uppercase tracking-wider cursor-pointer flex items-center justify-center gap-2" style="background: linear-gradient(135deg, #ee4d2d 0%, #ff5d3b 100%) !important; color: #ffffff !important; border: none !important;">
                         <i class="fas fa-shield-check text-base"></i>
                         <span>ĐẶT HÀNG NGAY</span>
                     </button>
@@ -406,19 +483,34 @@
 
         const finalTotal = Math.max(0, subtotal - appliedDiscount);
         document.getElementById('summary-total').innerText = formatMoney(finalTotal);
+
+        if (shouldAutoApply !== false) {
+            autoApplyBestVoucher();
+        }
     }
 
-    function applyCoupon() {
+    const IS_LOGGED_IN = {{ auth()->check() ? 'true' : 'false' }};
+    let userHasManuallyChosenCoupon = false;
+
+    function applyCoupon(forcedCode) {
+        if (!IS_LOGGED_IN) {
+            alert('Mã khuyến mãi chỉ sử dụng được sau khi đăng nhập thành công. Vui lòng đăng nhập để tiếp tục!');
+            window.location.href = "{{ route('dangnhap') }}";
+            return;
+        }
+
         const codeInput = document.getElementById('coupon_code');
         const hiddenCodeInput = document.getElementById('hidden_coupon_code');
-        const code = codeInput.value.trim();
+        const code = (forcedCode || (codeInput ? codeInput.value : '')).trim();
         const msgDiv = document.getElementById('coupon-message');
         const cart = getCart();
         let subtotal = cart.reduce((sum, i) => sum + ((parseFloat(i.price) || 0) * (parseInt(i.quantity) || 1)), 0);
 
         if (!code) {
-            msgDiv.innerText = 'Vui lòng nhập mã giảm giá!';
-            msgDiv.className = 'text-xs font-bold text-rose-500 block';
+            if (msgDiv) {
+                msgDiv.innerText = 'Vui lòng nhập mã giảm giá!';
+                msgDiv.className = 'text-xs font-bold text-rose-500 block';
+            }
             return;
         }
 
@@ -426,32 +518,222 @@
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                "Accept": "application/json"
             },
             body: JSON.stringify({ code: code, total_amount: subtotal })
         })
         .then(res => res.json())
         .then(data => {
+            if (data.require_login) {
+                alert(data.message);
+                window.location.href = "{{ route('dangnhap') }}";
+                return;
+            }
+
             if (data.success) {
                 appliedDiscount = data.discount_amount;
-                hiddenCodeInput.value = code;
-                msgDiv.innerText = data.message + ' (-' + formatMoney(appliedDiscount) + ')';
-                msgDiv.className = 'text-xs font-bold text-emerald-600 block';
+                if (hiddenCodeInput) hiddenCodeInput.value = code;
+                if (codeInput) codeInput.value = code;
+                userHasManuallyChosenCoupon = true;
+
+                if (msgDiv) {
+                    msgDiv.innerText = data.message + ' (-' + formatMoney(appliedDiscount) + ')';
+                    msgDiv.className = 'text-xs font-bold text-emerald-600 block';
+                }
+
+                // Show banner
+                const banner = document.getElementById('auto-coupon-banner');
+                const bannerText = document.getElementById('auto-coupon-text');
+                if (banner && bannerText) {
+                    bannerText.innerHTML = `Đang áp dụng: <strong>#${code}</strong> (Tiết kiệm ${formatMoney(appliedDiscount)})`;
+                    banner.classList.remove('hidden');
+                    banner.classList.add('flex');
+                }
+
                 document.getElementById('discount-row').style.display = 'flex';
                 document.getElementById('summary-discount').innerText = '-' + formatMoney(appliedDiscount);
-                renderCartItems();
+                renderCartItems(false);
             } else {
                 appliedDiscount = 0;
-                hiddenCodeInput.value = '';
-                msgDiv.innerText = data.message;
-                msgDiv.className = 'text-xs font-bold text-rose-500 block';
+                if (hiddenCodeInput) hiddenCodeInput.value = '';
+                if (msgDiv) {
+                    msgDiv.innerText = data.message;
+                    msgDiv.className = 'text-xs font-bold text-rose-500 block';
+                }
                 document.getElementById('discount-row').style.display = 'none';
-                renderCartItems();
+                renderCartItems(false);
             }
         })
         .catch(err => {
             console.error('Coupon error:', err);
         });
+    }
+
+    // Tự động tìm & áp dụng mã giảm giá tốt nhất khi vào trang hoặc giỏ hàng đổi
+    function autoApplyBestVoucher() {
+        if (!IS_LOGGED_IN || userHasManuallyChosenCoupon) return;
+
+        const cart = getCart();
+        let subtotal = cart.reduce((sum, i) => sum + ((parseFloat(i.price) || 0) * (parseInt(i.quantity) || 1)), 0);
+        if (subtotal <= 0) return;
+
+        fetch("{{ route('api.coupon.best') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({ total_amount: subtotal })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.has_coupon && data.best_coupon) {
+                const best = data.best_coupon;
+                appliedDiscount = best.discount_amount;
+                
+                const hiddenCodeInput = document.getElementById('hidden_coupon_code');
+                const codeInput = document.getElementById('coupon_code');
+                if (hiddenCodeInput) hiddenCodeInput.value = best.coupon_code;
+                if (codeInput) codeInput.value = best.coupon_code;
+
+                const banner = document.getElementById('auto-coupon-banner');
+                const bannerText = document.getElementById('auto-coupon-text');
+                if (banner && bannerText) {
+                    bannerText.innerHTML = `✨ Đã tự động chọn mã tốt nhất: <strong>#${best.coupon_code}</strong> (Tiết kiệm ${formatMoney(appliedDiscount)})`;
+                    banner.classList.remove('hidden');
+                    banner.classList.add('flex');
+                }
+
+                document.getElementById('discount-row').style.display = 'flex';
+                document.getElementById('summary-discount').innerText = '-' + formatMoney(appliedDiscount);
+                renderCartItems(false);
+            }
+        })
+        .catch(err => console.error('Auto coupon error:', err));
+    }
+
+    // Modal chọn mã khuyến mãi
+    function openCouponModal() {
+        if (!IS_LOGGED_IN) {
+            alert('Mã khuyến mãi chỉ sử dụng được sau khi đăng nhập thành công. Vui lòng đăng nhập!');
+            window.location.href = "{{ route('dangnhap') }}";
+            return;
+        }
+
+        const modal = document.getElementById('couponSelectorModal');
+        const listDiv = document.getElementById('coupon-modal-list');
+        modal.classList.remove('hidden');
+
+        const cart = getCart();
+        let subtotal = cart.reduce((sum, i) => sum + ((parseFloat(i.price) || 0) * (parseInt(i.quantity) || 1)), 0);
+
+        listDiv.innerHTML = '<div class="text-center py-6 text-xs text-slate-400 font-semibold"><i class="fas fa-spinner fa-spin mr-1"></i> Đang tải danh sách ưu đãi...</div>';
+
+        fetch("{{ route('api.coupon.best') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({ total_amount: subtotal })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (!data.success) {
+                listDiv.innerHTML = `<div class="p-4 text-center text-xs text-rose-500 font-bold">${data.message}</div>`;
+                return;
+            }
+
+            const currentCode = (document.getElementById('hidden_coupon_code')?.value || '').trim();
+            let html = '';
+
+            if (!data.all_coupons || data.all_coupons.length === 0) {
+                listDiv.innerHTML = '<div class="text-center py-6 text-xs text-slate-400 font-bold">Hiện không có mã khuyến mãi nào khả dụng.</div>';
+                return;
+            }
+
+            data.all_coupons.forEach(c => {
+                const isSelected = currentCode === c.coupon_code;
+                const isEligible = c.is_eligible;
+
+                html += `
+                    <div class="p-3.5 rounded-2xl border transition-all flex items-center justify-between gap-3 ${isSelected ? 'bg-rose-50/60 border-[#ee4d2d]' : (isEligible ? 'bg-white border-slate-200 hover:border-rose-300' : 'bg-slate-50/60 border-slate-200 opacity-60')}">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-12 h-12 rounded-xl ${isEligible ? 'bg-[#ee4d2d] text-white' : 'bg-slate-300 text-slate-600'} flex flex-col items-center justify-center font-black text-center shrink-0">
+                                <span class="text-xs leading-none">${c.discount_type === 'percent' ? c.discount_value + '%' : (c.discount_value/1000) + 'K'}</span>
+                                <span class="text-[8px] uppercase mt-0.5">GIẢM</span>
+                            </div>
+                            <div class="space-y-0.5 min-w-0">
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <span class="font-black text-slate-900 text-xs tracking-wider">#${c.coupon_code}</span>
+                                    ${c.is_saved ? '<span class="px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 text-[9px] font-black">Trong ví</span>' : ''}
+                                    ${c.is_expiring_soon ? `<span class="px-1.5 py-0.2 rounded bg-rose-100 text-rose-700 text-[9px] font-black">⏰ Còn ${c.days_remaining} ngày</span>` : ''}
+                                </div>
+                                <p class="text-xs font-bold text-slate-800 truncate">${c.formatted_discount} - ${c.formatted_min_order}</p>
+                                ${!isEligible ? `<p class="text-[10px] text-rose-500 font-bold">${c.ineligible_reason}</p>` : `<p class="text-[10px] text-emerald-600 font-bold">Tiết kiệm: -${formatMoney(c.discount_amount)}</p>`}
+                            </div>
+                        </div>
+
+                        <div>
+                            ${isSelected ? `
+                                <span class="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-300 font-extrabold text-xs flex items-center gap-1">
+                                    <i class="fas fa-check text-[10px]"></i> Đang dùng
+                                </span>
+                            ` : (isEligible ? `
+                                <button type="button" onclick="selectSpecificCoupon('${c.coupon_code}')" class="px-3.5 py-1.5 rounded-xl bg-[#ee4d2d] hover:bg-red-600 text-white font-extrabold text-xs shadow-xs transition-colors cursor-pointer">
+                                    Áp dụng
+                                </button>
+                            ` : `
+                                <button type="button" disabled class="px-3 py-1.5 rounded-xl bg-slate-200 text-slate-400 font-bold text-xs cursor-not-allowed">
+                                    Chưa đủ ĐK
+                                </button>
+                            `)}
+                        </div>
+                    </div>
+                `;
+            });
+
+            listDiv.innerHTML = html;
+        })
+        .catch(err => {
+            listDiv.innerHTML = '<div class="p-4 text-center text-xs text-rose-500 font-bold">Không thể tải danh sách ưu đãi.</div>';
+        });
+    }
+
+    function selectSpecificCoupon(code) {
+        closeCouponModal();
+        applyCoupon(code);
+    }
+
+    function removeCoupon() {
+        appliedDiscount = 0;
+        userHasManuallyChosenCoupon = true;
+        const hiddenCodeInput = document.getElementById('hidden_coupon_code');
+        const codeInput = document.getElementById('coupon_code');
+        const msgDiv = document.getElementById('coupon-message');
+        const banner = document.getElementById('auto-coupon-banner');
+        
+        if (hiddenCodeInput) hiddenCodeInput.value = '';
+        if (codeInput) codeInput.value = '';
+        if (msgDiv) {
+            msgDiv.innerText = 'Đã hủy áp dụng mã giảm giá.';
+            msgDiv.className = 'text-xs font-bold text-slate-500 block';
+        }
+        if (banner) {
+            banner.classList.add('hidden');
+            banner.classList.remove('flex');
+        }
+        document.getElementById('discount-row').style.display = 'none';
+        closeCouponModal();
+        renderCartItems(false);
+    }
+
+    function closeCouponModal() {
+        const modal = document.getElementById('couponSelectorModal');
+        if (modal) modal.classList.add('hidden');
     }
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -474,7 +756,7 @@
                 saveCart(cart);
             }
         @endif
-        renderCartItems();
+        renderCartItems(true);
     });
 </script>
 @endsection

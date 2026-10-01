@@ -88,6 +88,14 @@
                     </a>
                 </div>
 
+                <!-- Quick Link to Storefront -->
+                <div class="px-4 pt-3 pb-1">
+                    <a href="{{ route('trangchu') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-amber-400 hover:text-white text-xs font-bold transition-all border border-slate-700/80 shadow-xs group">
+                        <span class="flex items-center gap-2.5"><i class="fas fa-store text-amber-400 group-hover:scale-110 transition-transform"></i>Xem Trang Chủ</span>
+                        <i class="fas fa-arrow-up-right-from-square text-[10px] text-slate-400 group-hover:text-white"></i>
+                    </a>
+                </div>
+
                 <!-- Navigation Links -->
                 <nav class="p-4 space-y-1.5 overflow-y-auto max-h-[calc(100vh-140px)]">
                     @if(in_array(Auth::user()->role, ['superadmin', 'admin']))
@@ -201,12 +209,22 @@
                     </a>
                     @endif
 
-                    @if(Auth::user()->role === 'superadmin')
-                    <a href="{{ route('quanly_nhanvien') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_nhanvien') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                    @if(Auth::user()->role === 'superadmin' || (method_exists(Auth::user(), 'can') && Auth::user()->can('employees.manage')))
+                    <a href="{{ route('quanly_nhanvien') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_nhanvien*') || Route::is('nhanvien_*') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-id-badge w-5 text-center text-blue-400"></i>
+                            <span>Tài khoản Nhân viên</span>
+                        </div>
+                    </a>
+                    @endif
+
+                    @if(Auth::user()->role === 'superadmin' || (method_exists(Auth::user(), 'can') && Auth::user()->can('roles.manage')))
+                    <a href="{{ route('quanly_vaitro') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_vaitro*') || Route::is('vaitro_*') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
                         <div class="flex items-center gap-3">
                             <i class="fas fa-crown w-5 text-center text-amber-400"></i>
-                            <span>Quản lý & Phân quyền</span>
+                            <span>Vai trò & Phân quyền</span>
                         </div>
+                        <span class="px-1.5 py-0.5 rounded-md bg-purple-500/20 text-purple-300 text-[9px] font-black uppercase">RBAC</span>
                     </a>
                     @endif
                 </nav>
@@ -237,7 +255,12 @@
                 </div>
 
                 <!-- User Profile & Quick Actions -->
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <a href="{{ route('trangchu') }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold shadow-2xs hover:shadow-xs transition-all" title="Về trang chủ khách hàng">
+                        <i class="fas fa-store text-[#ee4d2d]"></i>
+                        <span class="hidden sm:inline">Xem Trang Chủ</span>
+                    </a>
+
                     <div class="relative group">
                         <button class="flex items-center gap-3 p-1.5 pr-3 rounded-full hover:bg-slate-100 transition-colors">
                             <div class="w-9 h-9 rounded-full bg-[#ee4d2d] text-white flex items-center justify-center font-black text-sm shadow-md shadow-rose-500/20">
@@ -245,8 +268,18 @@
                             </div>
                             <div class="text-left hidden sm:block">
                                 <p class="text-xs font-bold text-slate-900">{{ Auth::user()->fullname ?? Auth::user()->name }}</p>
-                                <p class="text-[10px] font-extrabold uppercase tracking-wider {{ (Auth::user()->role ?? '') === 'superadmin' ? 'text-purple-600' : ((Auth::user()->role ?? '') === 'admin' ? 'text-[#ee4d2d]' : 'text-blue-600') }}">
-                                    {{ (Auth::user()->role ?? '') === 'superadmin' ? '👑 Quản trị viên tối cao' : ((Auth::user()->role ?? '') === 'admin' ? 'Quản trị viên' : 'Nhân viên') }}
+                                @php
+                                    $userRoleName = Auth::user()->role ?? '';
+                                    $roleLabelsMap = [
+                                        'superadmin' => '👑 Quản trị viên tối cao',
+                                        'admin' => '⭐ Quản trị viên',
+                                        'staff' => '🎧 CSKH / Thu ngân',
+                                        'kitchen' => '🍳 Nhân viên Bếp',
+                                        'shipper' => '🛵 Nhân viên Giao hàng',
+                                    ];
+                                @endphp
+                                <p class="text-[10px] font-extrabold uppercase tracking-wider {{ $userRoleName === 'superadmin' ? 'text-purple-600' : ($userRoleName === 'admin' ? 'text-[#ee4d2d]' : ($userRoleName === 'kitchen' ? 'text-amber-600' : ($userRoleName === 'shipper' ? 'text-emerald-600' : 'text-blue-600'))) }}">
+                                    {{ $roleLabelsMap[$userRoleName] ?? ('⚙️ ' . ucfirst($userRoleName)) }}
                                 </p>
                             </div>
                             <i class="fas fa-chevron-down text-xs text-slate-400"></i>

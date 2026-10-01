@@ -16,8 +16,14 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && in_array(Auth::user()->role, ['superadmin', 'admin', 'staff'])) {
-            return $next($request);
+        if (Auth::check()) {
+            $user = Auth::user();
+            if (in_array($user->role, ['superadmin', 'admin', 'staff', 'kitchen', 'shipper']) 
+                || (method_exists($user, 'hasAnyRole') && $user->hasAnyRole(['superadmin', 'admin', 'staff', 'kitchen', 'shipper']))
+                || (method_exists($user, 'getAllPermissions') && $user->getAllPermissions()->isNotEmpty())
+            ) {
+                return $next($request);
+            }
         }
 
         return redirect()->route('dangnhap')->withErrors(['email' => 'Vui lòng đăng nhập bằng tài khoản Quản lý/Nhân viên.']);

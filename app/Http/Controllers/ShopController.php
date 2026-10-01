@@ -163,20 +163,114 @@ class ShopController extends Controller
                 ->take(4)->get();
         }
 
-        // 5. Lấy cấu hình trang chủ từ bảng settings
+        // 5. Lịch sử món đã xem gần đây (Recently Viewed Dishes)
+        $recentIds = session()->get('recently_viewed_dishes', []);
+        $recentlyViewedDishes = collect();
+        if (!empty($recentIds) && is_array($recentIds)) {
+            $dishesById = \App\Models\Dish::with('category')
+                ->whereIn('id', $recentIds)
+                ->where('is_available', true)
+                ->get()
+                ->keyBy('id');
+
+            foreach ($recentIds as $rId) {
+                if (isset($dishesById[$rId])) {
+                    $recentlyViewedDishes->push($dishesById[$rId]);
+                }
+            }
+        }
+
+        // 6. Lấy cấu hình trang chủ từ bảng settings
         $settings = \App\Models\Setting::pluck('value', 'key')->all();
 
-        return view('client.shop', compact('categories', 'allDishes', 'query', 'currentSelectedDish', 'sameCategoryDishes', 'frequentDishes', 'timeRecommendation', 'lastSearchQuery', 'lastSearchDishes', 'settings'));
+        // 7. Lấy danh sách mã khuyến mãi cho trang chủ (Pop-up chào mừng & Kho ưu đãi)
+        $now = now()->format('Y-m-d');
+        $activeCoupons = \App\Models\Coupon::where(function($q) use ($now) {
+                $q->whereNull('start_date')->orWhere('start_date', '<=', $now);
+            })
+            ->where(function($q) use ($now) {
+                $q->whereNull('end_date')->orWhere('end_date', '>=', $now);
+            })
+            ->where(function($q) {
+                $q->whereNull('usage_limit')->orWhere('usage_limit', '>', 0);
+            })
+            ->orderBy('discount_value', 'desc')
+            ->get();
+
+        $savedCouponIds = [];
+        if (auth()->check()) {
+            $savedCouponIds = auth()->user()->savedCoupons()->pluck('coupons.id')->toArray();
+        }
+
+        $expiringCoupons = $activeCoupons->filter(fn($c) => $c->is_expiring_soon)->values();
+
+        return view('client.shop', compact(
+            'categories', 'allDishes', 'query', 'currentSelectedDish',
+            'sameCategoryDishes', 'frequentDishes', 'timeRecommendation',
+            'lastSearchQuery', 'lastSearchDishes', 'recentlyViewedDishes', 'settings',
+            'activeCoupons', 'savedCouponIds', 'expiringCoupons'
+        ));
     }
 
-    // Chi tiết món ăn dành cho khách hàng
+    // Chi tiết món ăn dành cho khách hàng kèm danh sách đánh giá
     public function dishDetail($id)
     {
-        $dish = \App\Models\Dish::with('category')->where('is_available', true)->findOrFail($id);
-        session(['selected_dish_id' => $dish->id]);
-        $relatedDishes = $dish->getRelatedDishes(6);
+        $dish = \App\Models\Dish::with(['category', 'reviews.user'])
+            ->where('is_available', true)
+            ->findOrFail($id);
 
-        return view('client.dish_detail', compact('dish', 'relatedDishes'));
+        session(['selected_dish_id' => $dish->id]);
+
+        // Cập nhật danh sách món đã xem gần đây (LIFO - Đưa món vừa xem lên đầu)
+        $recentlyViewed = session()->get('recently_viewed_dishes', []);
+        if (!is_array($recentlyViewed)) {
+            $recentlyViewed = [];
+        }
+        $recentlyViewed = array_values(array_diff($recentlyViewed, [$dish->id]));
+        array_unshift($recentlyViewed, $dish->id);
+        $recentlyViewed = array_slice($recentlyViewed, 0, 10);
+        session(['recently_viewed_dishes' => $recentlyViewed]);
+
+        $relatedDishes = $dish->getRelatedDishes(6);
+        $reviews = $dish->reviews;
+
+        return view('client.dish_detail', compact('dish', 'relatedDishes', 'reviews'));
+    }
+
+    // Gửi đánh giá trực tiếp cho món ăn
+    public function submitDishReview(Request $request, $id)
+    {
+        $dish = \App\Models\Dish::findOrFail($id);
+
+        if (!auth()->check()) {
+            return back()->with('error', 'Vui lòng đăng nhập để gửi đánh giá món ăn!');
+        }
+
+        $request->validate([
+            'rating' => 'required|integer|between:1,5',
+            'comment' => 'required|string|max:1000',
+        ]);
+
+        \App\Models\Review::create([
+            'user_id' => auth()->id(),
+            'dish_id' => $dish->id,
+            'rating' => $request->rating,
+            'comment' => $request->comment,
+        ]);
+
+        \App\Models\Dish::clearReviewsSummaryCache();
+
+        return back()->with('success', 'Cảm ơn bạn đã gửi đánh giá cho món ' . $dish->dish_name . '!');
+    }
+
+    // Xóa lịch sử xem món ăn gần đây
+    public function clearRecentlyViewed(Request $request)
+    {
+        session()->forget('recently_viewed_dishes');
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true]);
+        }
+        return redirect()->back()->with('success', 'Đã xóa lịch sử món ăn đã xem gần đây.');
     }
 
     public function shopLogged(Request $request)
@@ -370,6 +464,7 @@ class ShopController extends Controller
 
         return response()->json([
             'changed' => $changed,
+            'status' => $order->order_status,
             'order_status' => $order->order_status,
             'payment_status' => $order->payment_status,
         ]);
@@ -468,6 +563,153 @@ class ShopController extends Controller
             'success' => true,
             'reply' => $reply,
             'dishes' => $dishesData ?? []
+        ]);
+    }
+
+    // API Lưu mã khuyến mãi vào ví của User
+    public function saveCoupon(Request $request)
+    {
+        if (!auth()->check()) {
+            return response()->json([
+                'success' => false,
+                'require_login' => true,
+                'message' => 'Vui lòng đăng nhập tài khoản để lưu mã khuyến mãi vào ví ưu đãi của bạn!'
+            ]);
+        }
+
+        $couponId = $request->input('coupon_id');
+        $couponCode = $request->input('coupon_code');
+
+        $coupon = null;
+        if ($couponId) {
+            $coupon = \App\Models\Coupon::find($couponId);
+        } elseif ($couponCode) {
+            $coupon = \App\Models\Coupon::where('coupon_code', strtoupper($couponCode))->first();
+        }
+
+        if (!$coupon) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Mã khuyến mãi không tồn tại.'
+            ]);
+        }
+
+        $user = auth()->user();
+        $existing = \App\Models\UserCoupon::where('user_id', $user->id)->where('coupon_id', $coupon->id)->first();
+
+        if ($existing) {
+            return response()->json([
+                'success' => true,
+                'already_saved' => true,
+                'message' => 'Mã ' . $coupon->coupon_code . ' đã có sẵn trong ví ưu đãi của bạn rồi!'
+            ]);
+        }
+
+        \App\Models\UserCoupon::create([
+            'user_id' => $user->id,
+            'coupon_id' => $coupon->id,
+            'is_used' => false,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'saved' => true,
+            'coupon_code' => $coupon->coupon_code,
+            'message' => 'Đã lưu mã ' . $coupon->coupon_code . ' vào ví ưu đãi thành công!'
+        ]);
+    }
+
+    // API Lưu tất cả mã khuyến mãi khả dụng vào ví
+    public function saveAllCoupons(Request $request)
+    {
+        if (!auth()->check()) {
+            return response()->json([
+                'success' => false,
+                'require_login' => true,
+                'message' => 'Vui lòng đăng nhập tài khoản để thu thập tất cả mã ưu đãi!'
+            ]);
+        }
+
+        $now = now()->format('Y-m-d');
+        $activeCoupons = \App\Models\Coupon::where(function($q) use ($now) {
+                $q->whereNull('start_date')->orWhere('start_date', '<=', $now);
+            })
+            ->where(function($q) use ($now) {
+                $q->whereNull('end_date')->orWhere('end_date', '>=', $now);
+            })
+            ->where(function($q) {
+                $q->whereNull('usage_limit')->orWhere('usage_limit', '>', 0);
+            })
+            ->get();
+
+        $user = auth()->user();
+        $savedCount = 0;
+        foreach ($activeCoupons as $coupon) {
+            $created = \App\Models\UserCoupon::firstOrCreate([
+                'user_id' => $user->id,
+                'coupon_id' => $coupon->id,
+            ], [
+                'is_used' => false,
+            ]);
+            if ($created->wasRecentlyCreated) {
+                $savedCount++;
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'saved_count' => $savedCount,
+            'total_active' => $activeCoupons->count(),
+            'message' => 'Đã thu thập thành công tất cả ' . $activeCoupons->count() . ' mã ưu đãi vào ví của bạn!'
+        ]);
+    }
+
+    // API Lấy danh sách ưu đãi của user (đã lưu, sắp hết hạn, khả dụng)
+    public function getMyCoupons(Request $request)
+    {
+        $now = now()->format('Y-m-d');
+        $allCoupons = \App\Models\Coupon::where(function($q) use ($now) {
+                $q->whereNull('start_date')->orWhere('start_date', '<=', $now);
+            })
+            ->where(function($q) use ($now) {
+                $q->whereNull('end_date')->orWhere('end_date', '>=', $now);
+            })
+            ->where(function($q) {
+                $q->whereNull('usage_limit')->orWhere('usage_limit', '>', 0);
+            })
+            ->orderBy('discount_value', 'desc')
+            ->get();
+
+        $savedCouponIds = [];
+        $usedCouponIds = [];
+        if (auth()->check()) {
+            $userCoupons = \App\Models\UserCoupon::where('user_id', auth()->id())->get();
+            $savedCouponIds = $userCoupons->pluck('coupon_id')->toArray();
+            $usedCouponIds = $userCoupons->where('is_used', true)->pluck('coupon_id')->toArray();
+        }
+
+        $formatted = $allCoupons->map(function($c) use ($savedCouponIds, $usedCouponIds) {
+            return [
+                'id' => $c->id,
+                'coupon_code' => $c->coupon_code,
+                'discount_type' => $c->discount_type,
+                'discount_value' => (float) $c->discount_value,
+                'formatted_discount' => $c->formatted_discount,
+                'min_order_value' => (float) $c->min_order_value,
+                'formatted_min_order' => $c->formatted_min_order,
+                'is_expiring_soon' => $c->is_expiring_soon,
+                'days_remaining' => $c->days_remaining,
+                'end_date' => $c->end_date ? $c->end_date->format('d/m/Y') : 'Không thời hạn',
+                'is_saved' => in_array($c->id, $savedCouponIds),
+                'is_used' => in_array($c->id, $usedCouponIds),
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'is_logged_in' => auth()->check(),
+            'coupons' => $formatted,
+            'saved_count' => count($savedCouponIds),
         ]);
     }
 }

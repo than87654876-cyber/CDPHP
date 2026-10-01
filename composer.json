@@ -13,7 +13,8 @@
         "laravel/tinker": "^3.0",
         "phpmailer/phpmailer": "^7.1",
         "phpoffice/phpspreadsheet": "^5.8",
-        "pusher/pusher-php-server": "^7.2"
+        "pusher/pusher-php-server": "^7.2",
+        "spatie/laravel-permission": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -78,7 +79,7 @@
         }
     },
     "config": {
-        "optimize-autoloader": true,
+        "optimize-autoloader": false,
         "preferred-install": "dist",
         "sort-packages": true,
         "allow-plugins": {

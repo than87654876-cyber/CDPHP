@@ -71,7 +71,7 @@ class CartController extends Controller
         $user = Auth::user();
 
         $query = Order::where('user_id', $user->id)
-            ->with(['orderItems.dish'])
+            ->with(['orderItems.dish', 'reviews'])
             ->orderBy('created_at', 'desc');
 
         if ($search) {
@@ -155,6 +155,11 @@ class CartController extends Controller
             }
         }
 
+        // BẮT BUỘC: Mã khuyến mãi chỉ dùng được sau khi đăng nhập thành công
+        if ($request->filled('coupon_code') && !Auth::check()) {
+            return back()->withInput()->withErrors(['coupon_code' => 'Mã khuyến mãi chỉ sử dụng được sau khi đăng nhập thành công. Vui lòng đăng nhập để áp dụng ưu đãi!']);
+        }
+
         DB::beginTransaction();
         try {
             // Tính tổng giá trị đơn hàng
@@ -178,6 +183,7 @@ class CartController extends Controller
 
             // Kiểm tra xem có sản phẩm hợp lệ nào không
             if (empty($orderItemsData)) {
+                DB::rollBack();
                 return back()->withErrors(['cart_items' => 'Không có món ăn hợp lệ nào trong giỏ hàng.']);
             }
 
@@ -188,35 +194,20 @@ class CartController extends Controller
                 $code = strtoupper($request->input('coupon_code'));
                 $coupon = \App\Models\Coupon::where('coupon_code', $code)->first();
                 if ($coupon) {
-                    $now = now()->format('Y-m-d');
-                    $isValid = true;
-                    if ($coupon->start_date && $now < $coupon->start_date->format('Y-m-d')) {
-                        $isValid = false;
-                    }
-                    if ($coupon->end_date && $now > $coupon->end_date->format('Y-m-d')) {
-                        $isValid = false;
-                    }
-                    if ($coupon->min_order_value && $totalAmount < $coupon->min_order_value) {
-                        $isValid = false;
-                    }
-                    if ($coupon->usage_limit !== null && $coupon->usage_limit <= 0) {
-                        $isValid = false;
-                    }
-
-                    if ($isValid) {
+                    $validation = $coupon->isValidFor($totalAmount);
+                    if ($validation['valid']) {
                         $couponId = $coupon->id;
-                        if ($coupon->discount_type === 'percent') {
-                            $discountAmount = $totalAmount * ($coupon->discount_value / 100);
-                        } else {
-                            $discountAmount = $coupon->discount_value;
-                        }
-                        if ($discountAmount > $totalAmount) {
-                            $discountAmount = $totalAmount;
-                        }
+                        $discountAmount = $coupon->calculateDiscount($totalAmount);
 
                         if ($coupon->usage_limit !== null) {
                             $coupon->decrement('usage_limit');
                         }
+
+                        // Đánh dấu mã đã dùng trong ví ưu đãi của user
+                        \App\Models\UserCoupon::updateOrCreate(
+                            ['user_id' => $userId, 'coupon_id' => $coupon->id],
+                            ['is_used' => true, 'used_at' => now()]
+                        );
                     }
                 }
             }
@@ -302,7 +293,25 @@ class CartController extends Controller
         $currentDish = $selectedDishId ? Dish::with('category')->find($selectedDishId) : null;
         $relatedDishes = $currentDish ? $currentDish->getRelatedDishes(6) : collect();
 
-        return view('client.buy', compact('relatedDishes', 'currentDish'));
+        $now = now()->format('Y-m-d');
+        $availableCoupons = \App\Models\Coupon::where(function($q) use ($now) {
+                $q->whereNull('start_date')->orWhere('start_date', '<=', $now);
+            })
+            ->where(function($q) use ($now) {
+                $q->whereNull('end_date')->orWhere('end_date', '>=', $now);
+            })
+            ->where(function($q) {
+                $q->whereNull('usage_limit')->orWhere('usage_limit', '>', 0);
+            })
+            ->orderBy('discount_value', 'desc')
+            ->get();
+
+        $savedCouponIds = [];
+        if (Auth::check()) {
+            $savedCouponIds = Auth::user()->savedCoupons()->pluck('coupons.id')->toArray();
+        }
+
+        return view('client.buy', compact('relatedDishes', 'currentDish', 'availableCoupons', 'savedCouponIds'));
     }
 
     // Xử lý khách hàng hủy đơn hàng
@@ -337,6 +346,21 @@ class CartController extends Controller
     }
 
     // Xử lý gửi đánh giá chất lượng đơn hàng
+    // Hiển thị trang đánh giá món ăn sau khi giao hàng thành công (Có thể đánh giá hoặc không đánh giá)
+    public function showOrderReviewPage(Request $request, $id)
+    {
+        $order = Order::with(['orderItems.dish.category', 'reviews.user', 'user'])->findOrFail($id);
+
+        if (Auth::check() && $order->user_id !== Auth::id()) {
+            abort(403, 'Bạn không có quyền truy cập trang đánh giá của đơn hàng này.');
+        }
+
+        $existingReview = $order->reviews->whereNull('dish_id')->first() ?? $order->reviews->first();
+
+        return view('client.order_review', compact('order', 'existingReview'));
+    }
+
+    // Xử lý gửi đánh giá đơn hàng và các món ăn
     public function reviewOrder(Request $request)
     {
         $request->validate([
@@ -345,29 +369,57 @@ class CartController extends Controller
             'review_comment' => 'required|string',
         ]);
 
-        $order = Order::where('id', $request->order_id)
-            ->where('user_id', Auth::id())
+        $order = Order::with('orderItems')->where('id', $request->order_id)
+            ->where(function($q) {
+                if (Auth::check()) {
+                    $q->where('user_id', Auth::id());
+                }
+            })
             ->firstOrFail();
 
+        $redirectTo = $request->input('redirect_to', 'giohang');
+
         // Kiểm tra xem đã đánh giá chưa
-        $exists = Review::where('order_id', $order->id)->exists();
+        $exists = Review::where('order_id', $order->id)->whereNull('dish_id')->exists();
         if ($exists) {
+            if ($redirectTo === 'review_page') {
+                return redirect()->route('donhang.danhgia', $order->id)->withErrors(['error' => 'Đơn hàng này đã được đánh giá trước đó.']);
+            }
             return redirect()->route('giohang')->withErrors(['error' => 'Đơn hàng này đã được đánh giá trước đó.']);
         }
 
+        $userId = Auth::id() ?? $order->user_id;
+
+        // 1. Lưu đánh giá chung cho đơn hàng
         Review::create([
-            'user_id' => Auth::id(),
+            'user_id' => $userId,
             'order_id' => $order->id,
             'rating' => $request->rating_stars,
             'comment' => $request->review_comment,
         ]);
 
+        // 2. Tự động lưu đánh giá cho từng món ăn trong đơn hàng
+        foreach ($order->orderItems as $item) {
+            Review::create([
+                'user_id' => $userId,
+                'order_id' => $order->id,
+                'dish_id' => $item->dish_id,
+                'rating' => $request->rating_stars,
+                'comment' => $request->review_comment,
+            ]);
+        }
+
+        \App\Models\Dish::clearReviewsSummaryCache();
         $order->touch();
 
         try {
             event(new \App\Events\OrderUpdated($order, 'reviewed'));
         } catch (\Exception $broadcastException) {
             \Illuminate\Support\Facades\Log::warning('Broadcasting failed: ' . $broadcastException->getMessage());
+        }
+
+        if ($redirectTo === 'review_page') {
+            return redirect()->route('donhang.danhgia', $order->id)->with('success', 'Cảm ơn bạn đã gửi đánh giá cho đơn hàng FDL-'.$order->id.'!');
         }
 
         return redirect()->route('giohang')->with('success', 'Cảm ơn bạn đã gửi đánh giá cho đơn hàng FDL-'.$order->id.'!');
@@ -463,28 +515,44 @@ class CartController extends Controller
         return view('client.refunds', compact('orders', 'settings', 'search'));
     }
 
-    // Trang giả lập thanh toán MoMo
+    // Trang thanh toán / quét mã QR (VietQR / MoMo)
     public function momoMethod(Request $request)
     {
-        $order_id = $request->input('order_id');
-        $amount = $request->input('amount');
-        $payment_type = 'momo';
-
-        return view('client.transfer_payment', compact('order_id', 'amount', 'payment_type'));
+        return $this->handleTransferView($request, 'momo');
     }
 
     public function atmMethod(Request $request)
     {
-        $order_id = $request->input('order_id');
-        $amount = $request->input('amount');
-        $payment_type = 'bank';
-
-        return view('client.transfer_payment', compact('order_id', 'amount', 'payment_type'));
+        return $this->handleTransferView($request, 'bank');
     }
 
     public function transferPayment(Request $request)
     {
-        return $this->atmMethod($request);
+        return $this->handleTransferView($request, 'bank');
+    }
+
+    protected function handleTransferView(Request $request, string $payment_type)
+    {
+        $order_id = $request->input('order_id');
+
+        if (!$order_id) {
+            return redirect()->route('giohang')->with('error', 'Vui lòng cung cấp mã đơn hàng cần thanh toán.');
+        }
+
+        $order = Order::with('user')->find($order_id);
+        if (!$order) {
+            return redirect()->route('giohang')->with('error', 'Đơn hàng #FDL-' . $order_id . ' không tồn tại trong hệ thống.');
+        }
+
+        // Nếu đơn hàng đã hoàn tất thanh toán, chuyển hướng tới trang tra cứu đơn hàng
+        if ($order->payment_status === 'paid') {
+            return redirect()->route('tracuu', ['order_id' => 'FDL-' . $order->id])
+                ->with('success', 'Đơn hàng #FDL-' . $order->id . ' đã được thanh toán thành công!');
+        }
+
+        $amount = (float) $order->final_amount;
+
+        return view('client.transfer_payment', compact('order', 'order_id', 'amount', 'payment_type'));
     }
 
     public function paymentPage(Request $request, $id)
@@ -563,7 +631,7 @@ class CartController extends Controller
 
     public function notifyBankTransferPayment(Request $request)
     {
-        $request->validate([
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'order_id' => 'required|integer|exists:orders,id',
             'amount' => 'required|numeric',
             'content' => 'required|string',
@@ -573,6 +641,14 @@ class CartController extends Controller
             'bank_code' => 'nullable|string',
             'paid_at' => 'nullable|date',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Dữ liệu chuyển khoản không hợp lệ.',
+                'errors' => $validator->errors()
+            ], 422);
+        }
 
         $order = Order::findOrFail($request->order_id);
         $expectedContent = 'FDL-' . $order->id;
@@ -625,9 +701,18 @@ class CartController extends Controller
         }
 
         try {
-            Mail::to($order->user->email)->send(new OrderPlacedMail($order));
+            if ($order->user && $order->user->email) {
+                Mail::to($order->user->email)->send(new OrderPlacedMail($order));
+            }
         } catch (\Exception $mailError) {
             \Illuminate\Support\Facades\Log::warning('OrderPlacedMail sending warning: ' . $mailError->getMessage());
+        }
+
+        try {
+            $telegram = app(\App\Services\TelegramService::class);
+            $telegram->sendMessage("✅ <b>Đơn hàng đã thanh toán thành công (Chuyển khoản):</b>\nMã đơn: #FDL-{$order->id}\nTổng tiền: " . number_format($order->final_amount, 0, ',', '.') . " VNĐ\nTrạng thái: Đã nhận tiền. Bếp đang chuẩn bị món!");
+        } catch (\Exception $telError) {
+            \Illuminate\Support\Facades\Log::warning('Telegram sending warning: ' . $telError->getMessage());
         }
 
         return response()->json(['success' => true, 'payment_status' => 'paid']);
@@ -662,7 +747,9 @@ class CartController extends Controller
                 }
 
                 try {
-                    Mail::to($order->user->email)->send(new OrderPlacedMail($order));
+                    if ($order->user && $order->user->email) {
+                        Mail::to($order->user->email)->send(new OrderPlacedMail($order));
+                    }
                 } catch (\Exception $mailError) {
                     \Illuminate\Support\Facades\Log::warning('OrderPlacedMail sending warning: ' . $mailError->getMessage());
                 }
@@ -752,7 +839,16 @@ class CartController extends Controller
 
     public function validateCoupon(Request $request)
     {
-        $code = strtoupper($request->input('code'));
+        // 1. BẮT BUỘC ĐĂNG NHẬP: Mã khuyến mãi chỉ dùng được sau khi đăng nhập thành công
+        if (!Auth::check()) {
+            return response()->json([
+                'success' => false,
+                'require_login' => true,
+                'message' => 'Mã khuyến mãi chỉ dùng được sau khi đăng nhập thành công. Vui lòng đăng nhập để áp dụng ưu đãi!'
+            ]);
+        }
+
+        $code = strtoupper(trim($request->input('code')));
         $totalAmount = floatval($request->input('total_amount'));
 
         $coupon = \App\Models\Coupon::where('coupon_code', $code)->first();
@@ -760,59 +856,121 @@ class CartController extends Controller
         if (!$coupon) {
             return response()->json([
                 'success' => false,
-                'message' => 'Mã giảm giá không tồn tại.'
+                'message' => 'Mã khuyến mãi không tồn tại.'
             ]);
         }
 
-        // Check date
-        $now = now()->format('Y-m-d');
-        if ($coupon->start_date && $now < $coupon->start_date->format('Y-m-d')) {
+        $check = $coupon->isValidFor($totalAmount);
+        if (!$check['valid']) {
             return response()->json([
                 'success' => false,
-                'message' => 'Chương trình khuyến mãi chưa bắt đầu.'
+                'message' => $check['message']
             ]);
         }
 
-        if ($coupon->end_date && $now > $coupon->end_date->format('Y-m-d')) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Mã giảm giá đã hết hạn sử dụng.'
-            ]);
-        }
-
-        // Check min order value
-        if ($coupon->min_order_value && $totalAmount < $coupon->min_order_value) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Giá trị đơn hàng chưa đạt tối thiểu (' . number_format($coupon->min_order_value, 0, ',', '.') . 'đ) để áp dụng mã.'
-            ]);
-        }
-
-        // Check usage limit
-        if ($coupon->usage_limit !== null && $coupon->usage_limit <= 0) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Mã giảm giá đã hết lượt sử dụng.'
-            ]);
-        }
-
-        // Calculate discount
-        $discountAmount = 0;
-        if ($coupon->discount_type === 'percent') {
-            $discountAmount = $totalAmount * ($coupon->discount_value / 100);
-        } else {
-            $discountAmount = $coupon->discount_value;
-        }
-
-        if ($discountAmount > $totalAmount) {
-            $discountAmount = $totalAmount;
-        }
+        // Tính giảm giá
+        $discountAmount = $coupon->calculateDiscount($totalAmount);
 
         return response()->json([
             'success' => true,
+            'coupon_id' => $coupon->id,
+            'coupon_code' => $coupon->coupon_code,
             'discount_amount' => $discountAmount,
-            'final_amount' => $totalAmount - $discountAmount,
-            'message' => 'Áp dụng mã giảm giá thành công!'
+            'formatted_discount' => $coupon->formatted_discount,
+            'final_amount' => max(0, $totalAmount - $discountAmount),
+            'message' => 'Áp dụng mã ' . $coupon->coupon_code . ' thành công! (' . $coupon->formatted_discount . ')'
+        ]);
+    }
+
+    // Tự động tìm & áp dụng mã khuyến mãi TỐT NHẤT phù hợp với giỏ hàng
+    public function getBestAvailableCoupon(Request $request)
+    {
+        if (!Auth::check()) {
+            return response()->json([
+                'success' => false,
+                'require_login' => true,
+                'message' => 'Vui lòng đăng nhập để hệ thống tự động áp dụng mã khuyến mãi phù hợp.'
+            ]);
+        }
+
+        $totalAmount = floatval($request->input('total_amount', 0));
+        $user = Auth::user();
+
+        $now = now()->format('Y-m-d');
+        // Lấy tất cả coupon active
+        $allCoupons = \App\Models\Coupon::where(function($q) use ($now) {
+                $q->whereNull('start_date')->orWhere('start_date', '<=', $now);
+            })
+            ->where(function($q) use ($now) {
+                $q->whereNull('end_date')->orWhere('end_date', '>=', $now);
+            })
+            ->where(function($q) {
+                $q->whereNull('usage_limit')->orWhere('usage_limit', '>', 0);
+            })
+            ->get();
+
+        $savedCouponIds = $user->savedCoupons()->pluck('coupons.id')->toArray();
+
+        $eligibleCoupons = [];
+        $ineligibleCoupons = [];
+        $bestCoupon = null;
+        $maxDiscount = 0;
+
+        foreach ($allCoupons as $coupon) {
+            $isSaved = in_array($coupon->id, $savedCouponIds);
+            $check = $coupon->isValidFor($totalAmount);
+
+            $itemData = [
+                'id' => $coupon->id,
+                'coupon_code' => $coupon->coupon_code,
+                'discount_type' => $coupon->discount_type,
+                'discount_value' => (float) $coupon->discount_value,
+                'formatted_discount' => $coupon->formatted_discount,
+                'min_order_value' => (float) $coupon->min_order_value,
+                'formatted_min_order' => $coupon->formatted_min_order,
+                'is_expiring_soon' => $coupon->is_expiring_soon,
+                'days_remaining' => $coupon->days_remaining,
+                'end_date' => $coupon->end_date ? $coupon->end_date->format('d/m/Y') : null,
+                'is_saved' => $isSaved,
+            ];
+
+            if ($check['valid']) {
+                $discount = $coupon->calculateDiscount($totalAmount);
+                $itemData['discount_amount'] = $discount;
+                $itemData['is_eligible'] = true;
+                $eligibleCoupons[] = $itemData;
+
+                if ($discount > $maxDiscount) {
+                    $maxDiscount = $discount;
+                    $bestCoupon = $coupon;
+                }
+            } else {
+                $itemData['discount_amount'] = 0;
+                $itemData['is_eligible'] = false;
+                $itemData['ineligible_reason'] = $check['message'];
+                $itemData['need_more'] = $check['need_more'] ?? 0;
+                $ineligibleCoupons[] = $itemData;
+            }
+        }
+
+        // Sắp xếp mã đủ điều kiện theo số tiền giảm giảm dần
+        usort($eligibleCoupons, fn($a, $b) => $b['discount_amount'] <=> $a['discount_amount']);
+
+        return response()->json([
+            'success' => true,
+            'has_coupon' => $bestCoupon !== null,
+            'best_coupon' => $bestCoupon ? [
+                'id' => $bestCoupon->id,
+                'coupon_code' => $bestCoupon->coupon_code,
+                'discount_amount' => $maxDiscount,
+                'formatted_discount' => $bestCoupon->formatted_discount,
+                'formatted_min_order' => $bestCoupon->formatted_min_order,
+                'final_amount' => max(0, $totalAmount - $maxDiscount),
+                'message' => 'Đã tự động chọn mã ' . $bestCoupon->coupon_code . ' (' . $bestCoupon->formatted_discount . ')'
+            ] : null,
+            'eligible_coupons' => $eligibleCoupons,
+            'ineligible_coupons' => $ineligibleCoupons,
+            'all_coupons' => array_merge($eligibleCoupons, $ineligibleCoupons),
         ]);
     }
 

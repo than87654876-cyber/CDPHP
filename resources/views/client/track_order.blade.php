@@ -148,6 +148,25 @@
                             </div>
                         @endif
                     </div>
+
+                    @if($status === 'completed')
+                        <div class="mt-6 p-4 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-amber-500/10 to-rose-500/10 border border-emerald-300 flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-2xs">
+                                    <i class="fas fa-circle-check"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-black text-slate-900 text-xs sm:text-sm">Đơn hàng #FDL-{{ $selectedOrder->id }} đã giao thành công!</h4>
+                                    <p class="text-[11px] text-slate-500 font-medium">Bạn có thể đánh giá các món ăn vừa nhận hoặc bỏ qua không đánh giá.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto">
+                                <a href="{{ route('donhang.danhgia', $selectedOrder->id) }}" class="w-full sm:w-auto text-center px-4 py-2 bg-gradient-to-r from-amber-500 to-[#ee4d2d] hover:brightness-110 text-white text-xs font-black rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                                    <i class="fas fa-star text-amber-200"></i> Mở trang đánh giá món ăn
+                                </a>
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Order Details Card -->
@@ -242,7 +261,11 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.changed) {
-                        window.location.reload();
+                        if (data.status === 'completed') {
+                            window.location.href = "{{ url('/donhang') }}/" + orderId + "/danhgia";
+                        } else {
+                            window.location.reload();
+                        }
                     }
                 })
                 .catch(err => console.error('Error polling order status:', err));

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\User;
+use App\Models\UserCoupon;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -34,13 +35,32 @@ class AdminPromotionController extends Controller
         return view('admin.promotion_detail', compact('promotion'));
     }
 
-    // Form thêm mới khuyến mãi
+    // Form thêm mới khuyến mãi (kèm danh sách dịp đặc biệt & ngày đôi Shopee)
     public function create()
     {
-        return view('admin.promotion_add');
+        $customerCount = User::where('role', 'customer')->where('status', true)->count();
+        $gmailCustomerCount = User::where('role', 'customer')
+            ->where('status', true)
+            ->where('email', 'like', '%@gmail.com')
+            ->count();
+
+        // Tự động phát hiện ngày đôi của tháng hiện tại (VD: 10.10, 11.11, 12.12...)
+        $month = (int) now()->format('m');
+        $year = (int) now()->format('Y');
+        $doubleDayStr = sprintf('%02d.%02d', $month, $month);
+        $doubleDayCode = sprintf('SHOPEE_%02d%02d', $month, $month);
+        $doubleDayDate = sprintf('%04d-%02d-%02d', $year, $month, $month);
+
+        return view('admin.promotion_add', compact(
+            'customerCount',
+            'gmailCustomerCount',
+            'doubleDayStr',
+            'doubleDayCode',
+            'doubleDayDate'
+        ));
     }
 
-    // Lưu khuyến mãi mới
+    // Lưu khuyến mãi mới & tùy chọn gửi email hàng loạt qua Gmail cho khách hàng
     public function store(Request $request)
     {
         $request->validate([
@@ -51,11 +71,59 @@ class AdminPromotionController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'usage_limit' => 'nullable|integer|min:1',
+            'send_email_now' => 'nullable|boolean',
+            'auto_save_wallet' => 'nullable|boolean',
+            'email_subject' => 'nullable|string|max:255',
+            'email_message' => 'nullable|string',
         ]);
 
-        Coupon::create($request->only(
+        $coupon = Coupon::create($request->only(
             'coupon_code', 'discount_type', 'discount_value', 'min_order_value', 'start_date', 'end_date', 'usage_limit'
         ));
+
+        // Nếu admin tích chọn "Gửi email hàng loạt cho khách hàng qua Gmail"
+        if ($request->boolean('send_email_now')) {
+            $query = User::where('role', 'customer')
+                ->where('status', true)
+                ->where('email', 'like', '%@gmail.com');
+
+            $customers = $query->get();
+            $sentCount = 0;
+            $subject = $request->input('email_subject') ?: ('[FOODDAILY] 🎁 Tặng bạn mã giảm giá #' . $coupon->coupon_code . ' - Siêu ưu đãi hôm nay!');
+            $customBody = $request->input('email_message');
+            $expiryDays = $coupon->end_date ? max(1, (int) now()->diffInDays(Carbon::parse($coupon->end_date), false)) : 30;
+
+            foreach ($customers as $customer) {
+                // Tự động lưu mã vào ví ưu đãi cá nhân của khách hàng
+                if ($request->boolean('auto_save_wallet', true)) {
+                    UserCoupon::updateOrCreate(
+                        ['user_id' => $customer->id, 'coupon_id' => $coupon->id],
+                        ['is_used' => false]
+                    );
+                }
+
+                $body = $customBody ?: (
+                    "Xin chào " . ($customer->fullname ?: 'quý khách') . ",\n\n" .
+                    "FOODDAILY trân trọng gửi tặng bạn mã giảm giá độc quyền #" . $coupon->coupon_code . " " .
+                    "(" . $coupon->formatted_discount . " cho " . $coupon->formatted_min_order . ") " .
+                    "nhân dịp siêu ưu đãi!\n\n" .
+                    "Mã ưu đãi đã được lưu trực tiếp vào Ví Voucher trong tài khoản của bạn. Đặt món ngay để thưởng thức những món ăn ngon tuyệt đỉnh cùng giá siêu hời!"
+                );
+
+                \App\Jobs\SendPromoCouponEmail::dispatch(
+                    $customer->email,
+                    $customer->fullname ?: 'Khách hàng',
+                    $coupon->coupon_code,
+                    $subject,
+                    $body,
+                    (int) $expiryDays
+                );
+
+                $sentCount++;
+            }
+
+            return redirect()->route('quanly_khuyenmai')->with('success', "Thêm mã khuyến mãi #{$coupon->coupon_code} thành công và đã gửi email thông báo tới {$sentCount} tài khoản Gmail khách hàng!");
+        }
 
         return redirect()->route('quanly_khuyenmai')->with('success', 'Thêm chương trình khuyến mãi thành công!');
     }
@@ -103,6 +171,62 @@ class AdminPromotionController extends Controller
         $promotion->delete();
 
         return redirect()->route('quanly_khuyenmai')->with('success', 'Đã xóa chương trình khuyến mãi thành công!');
+    }
+
+    // Gửi email hàng loạt cho một coupon cụ thể tới các tài khoản Gmail của khách hàng
+    public function broadcastCoupon(Request $request, $id)
+    {
+        $coupon = Coupon::findOrFail($id);
+
+        $query = User::where('role', 'customer')
+            ->where('status', true);
+
+        // Mặc định lọc theo Gmail nếu có tùy chọn hoặc ưu tiên Gmail
+        if ($request->has('only_gmail') ? $request->boolean('only_gmail') : true) {
+            $query->where('email', 'like', '%@gmail.com');
+        }
+
+        $customers = $query->get();
+
+        if ($customers->isEmpty()) {
+            return back()->with('error', 'Không tìm thấy tài khoản khách hàng nào có Gmail để gửi mã!');
+        }
+
+        $subject = $request->input('email_subject') ?: ('[FOODDAILY] 🎁 Tặng bạn mã giảm giá #' . $coupon->coupon_code . ' - Siêu ưu đãi hôm nay!');
+        $customBody = $request->input('email_message');
+        $expiryDays = $coupon->end_date ? max(1, (int) now()->diffInDays(Carbon::parse($coupon->end_date), false)) : 30;
+        $sentCount = 0;
+
+        foreach ($customers as $customer) {
+            // Tự động lưu vào ví ưu đãi của user nếu chọn
+            if ($request->boolean('auto_save_wallet', true)) {
+                UserCoupon::updateOrCreate(
+                    ['user_id' => $customer->id, 'coupon_id' => $coupon->id],
+                    ['is_used' => false]
+                );
+            }
+
+            $body = $customBody ?: (
+                "Xin chào " . ($customer->fullname ?: 'quý khách') . ",\n\n" .
+                "FOODDAILY trân trọng gửi tặng bạn mã giảm giá độc quyền #" . $coupon->coupon_code . " " .
+                "(" . $coupon->formatted_discount . " cho " . $coupon->formatted_min_order . ") " .
+                "nhân dịp ưu đãi đặc biệt hôm nay!\n\n" .
+                "Mã ưu đãi đã được lưu trực tiếp vào Ví Voucher trong tài khoản của bạn. Khi thanh toán giỏ hàng, hệ thống sẽ tự động áp dụng mã tốt nhất để giúp bạn tiết kiệm tối đa!"
+            );
+
+            \App\Jobs\SendPromoCouponEmail::dispatch(
+                $customer->email,
+                $customer->fullname ?: 'Khách hàng',
+                $coupon->coupon_code,
+                $subject,
+                $body,
+                (int) $expiryDays
+            );
+
+            $sentCount++;
+        }
+
+        return back()->with('success', "Đã gửi email thông báo mã #{$coupon->coupon_code} thành công tới {$sentCount} tài khoản Gmail khách hàng!");
     }
 
     // ==========================================

@@ -17,9 +17,17 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => AdminMiddleware::class,
             'superadmin' => SuperAdminMiddleware::class,
+            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
         $middleware->appendToGroup('web', \App\Http\Middleware\PreventBackHistory::class);
         $middleware->redirectTo('/trangchu/dangnhap');
+        $middleware->validateCsrfTokens(except: [
+            'api/payments/bank-transfer/notify',
+            'api/payments/webhook',
+            'api/payos/webhook',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

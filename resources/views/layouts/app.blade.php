@@ -85,16 +85,22 @@
 
                 <!-- Center: ShopeeFood Navigation Tabs -->
                 <nav class="hidden lg:flex items-center gap-6 text-xs font-bold text-slate-600 h-full">
-                    <a href="{{ route('trangchu') }}" class="h-full flex items-center border-b-2 border-[#ee4d2d] text-[#ee4d2d] px-1 font-extrabold">
+                    <a href="{{ route('trangchu') }}" class="h-full flex items-center {{ request()->routeIs('trangchu') ? 'border-b-2 border-[#ee4d2d] text-[#ee4d2d] font-extrabold' : 'hover:text-[#ee4d2d] transition-colors' }} px-1">
                         Đồ ăn
                     </a>
-                    <a href="{{ route('tracuu') }}" class="h-full flex items-center hover:text-[#ee4d2d] transition-colors px-1">
+                    <a href="{{ route('tracuu') }}" class="h-full flex items-center {{ request()->routeIs('tracuu') ? 'border-b-2 border-[#ee4d2d] text-[#ee4d2d] font-extrabold' : 'hover:text-[#ee4d2d] transition-colors' }} px-1">
                         Tra cứu đơn
                     </a>
-                    <a href="{{ route('yeucauhoan') }}" class="h-full flex items-center hover:text-[#ee4d2d] transition-colors px-1">
+                    <a href="{{ route('yeucauhoan') }}" class="h-full flex items-center {{ request()->routeIs('yeucauhoan') ? 'border-b-2 border-[#ee4d2d] text-[#ee4d2d] font-extrabold' : 'hover:text-[#ee4d2d] transition-colors' }} px-1">
                         Đổi/Hoàn tiền
                     </a>
+                    <button type="button" onclick="openGlobalUserVoucherModal('all')" class="h-full flex items-center hover:text-[#ee4d2d] transition-colors px-1 cursor-pointer">
+                        <i class="fas fa-ticket-alt text-[#ee4d2d] mr-1.5 text-xs"></i>
+                        <span>Kho Ưu Đãi</span>
+                        <span class="ml-1.5 px-1.5 py-0.2 bg-gradient-to-r from-red-500 to-amber-500 text-[9px] text-white font-black rounded-full animate-pulse">HOT</span>
+                    </button>
                 </nav>
+
 
                 <!-- Right: Search, Auth & Language -->
                 <div class="flex items-center gap-4">
@@ -112,6 +118,16 @@
                     </a>
 
                     @auth
+                        <!-- Nút truy cập nhanh Trang Admin cho Superadmin/Admin/Staff -->
+                        @if(in_array(Auth::user()->role, ['superadmin', 'admin', 'staff', 'kitchen', 'shipper']) || (method_exists(Auth::user(), 'hasAnyRole') && Auth::user()->hasAnyRole(['superadmin', 'admin', 'staff', 'kitchen', 'shipper'])))
+                            <a href="{{ in_array(Auth::user()->role, ['superadmin', 'admin']) ? route('quanly') : (Auth::user()->role === 'kitchen' ? route('quanly_bep') : route('quanly_banlamviec')) }}" 
+                               class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900 hover:bg-slate-800 text-amber-300 font-extrabold text-xs shadow-xs border border-slate-700 transition-all hover:scale-102"
+                               title="Truy cập Bảng điều khiển Quản trị">
+                                <i class="fas fa-shield-halved text-amber-400"></i>
+                                <span>Trang Admin</span>
+                            </a>
+                        @endif
+
                         <!-- User Profile Dropdown -->
                         <div class="relative group">
                             <button class="flex items-center gap-2 p-1 pl-2 pr-2.5 bg-slate-100 hover:bg-slate-200/80 rounded-full border border-slate-200 transition-all">
@@ -121,19 +137,30 @@
                                 <span class="text-xs font-bold text-slate-800 hidden sm:inline">{{ Auth::user()->fullname ?? Auth::user()->name }}</span>
                                 <i class="fas fa-chevron-down text-[10px] text-slate-400"></i>
                             </button>
-                            <div class="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl border border-slate-100 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                            <div class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-100 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                                 <div class="px-4 py-2 border-b border-slate-100">
                                     <p class="text-xs font-bold text-slate-900 truncate">{{ Auth::user()->fullname ?? Auth::user()->name }}</p>
                                     <p class="text-[10px] text-slate-400 truncate">{{ Auth::user()->email }}</p>
+                                    @if(Auth::user()->role === 'superadmin')
+                                        <span class="inline-block mt-1 px-2 py-0.5 rounded-md bg-purple-100 text-purple-700 text-[10px] font-black uppercase">👑 Super Admin</span>
+                                    @elseif(Auth::user()->role === 'admin')
+                                        <span class="inline-block mt-1 px-2 py-0.5 rounded-md bg-rose-100 text-[#ee4d2d] text-[10px] font-black uppercase">⭐ Admin</span>
+                                    @endif
                                 </div>
-                                @if(in_array(Auth::user()->role, ['admin', 'staff']))
-                                    <a href="{{ route('quanly') }}" class="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-[#ee4d2d] hover:bg-rose-50">
-                                        <i class="fas fa-chart-line"></i>Admin Portal
+                                @if(in_array(Auth::user()->role, ['superadmin', 'admin', 'staff', 'kitchen', 'shipper']) || (method_exists(Auth::user(), 'hasAnyRole') && Auth::user()->hasAnyRole(['superadmin', 'admin', 'staff', 'kitchen', 'shipper'])))
+                                    <a href="{{ in_array(Auth::user()->role, ['superadmin', 'admin']) ? route('quanly') : (Auth::user()->role === 'kitchen' ? route('quanly_bep') : route('quanly_banlamviec')) }}" class="flex items-center gap-2 px-4 py-2.5 text-xs font-extrabold text-[#ee4d2d] bg-rose-50/50 hover:bg-rose-50 border-b border-rose-100">
+                                        <i class="fas fa-shield-halved text-[#ee4d2d]"></i>Vào trang Quản trị (Admin)
                                     </a>
                                 @endif
                                 <a href="{{ route('giohang') }}" class="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">
                                     <i class="fas fa-receipt text-slate-400"></i>Đơn hàng của tôi
                                 </a>
+                                <button type="button" onclick="openGlobalUserVoucherModal('saved')" class="w-full text-left flex items-center justify-between px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-orange-50 hover:text-[#ee4d2d] transition-colors cursor-pointer">
+                                    <span class="flex items-center gap-2">
+                                        <i class="fas fa-ticket-alt text-amber-500"></i>Ví voucher của tôi
+                                    </span>
+                                    <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-1.5 py-0.5 rounded-full">Ưu đãi</span>
+                                </button>
                                 <hr class="my-1 border-slate-100">
                                 <a href="{{ route('dangxuat') }}" class="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50">
                                     <i class="fas fa-right-from-bracket"></i>Đăng xuất
@@ -454,7 +481,279 @@
                 window.location.reload();
             }
         });
+
+        // ================= KHO ƯU ĐÃI & VÍ VOUCHER TOÀN TRANG =================
+        let globalCouponsData = [];
+        let currentVoucherTab = 'all';
+
+        function openGlobalUserVoucherModal(tab = 'all') {
+            currentVoucherTab = tab;
+            const modal = document.getElementById('globalUserVoucherModal');
+            if (!modal) return;
+            modal.classList.remove('hidden');
+
+            loadGlobalCoupons();
+        }
+
+        function closeGlobalUserVoucherModal() {
+            const modal = document.getElementById('globalUserVoucherModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function switchGlobalVoucherTab(tab) {
+            currentVoucherTab = tab;
+            document.querySelectorAll('.global-tab-btn').forEach(btn => {
+                const isActive = btn.getAttribute('data-tab') === tab;
+                btn.className = `global-tab-btn flex-1 py-2 rounded-xl text-xs font-black transition-all ${
+                    isActive ? 'bg-[#ee4d2d] text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`;
+            });
+            renderGlobalCoupons();
+        }
+
+        function loadGlobalCoupons() {
+            const listDiv = document.getElementById('global-voucher-list');
+            if (!listDiv) return;
+
+            listDiv.innerHTML = '<div class="py-12 text-center text-xs text-slate-400 font-bold"><i class="fas fa-spinner fa-spin mr-2"></i>Đang nạp kho voucher...</div>';
+
+            fetch("{{ route('api.coupons.my') }}")
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        globalCouponsData = data.coupons || [];
+                        const savedCount = globalCouponsData.filter(c => c.is_saved).length;
+                        const expiringCount = globalCouponsData.filter(c => c.is_expiring_soon).length;
+
+                        const savedCountBadge = document.getElementById('global-badge-saved');
+                        const expiringCountBadge = document.getElementById('global-badge-expiring');
+                        if (savedCountBadge) savedCountBadge.innerText = savedCount;
+                        if (expiringCountBadge) expiringCountBadge.innerText = expiringCount;
+
+                        switchGlobalVoucherTab(currentVoucherTab);
+                    } else {
+                        listDiv.innerHTML = '<div class="p-6 text-center text-xs text-rose-500 font-bold">Không thể tải kho ưu đãi. Vui lòng thử lại.</div>';
+                    }
+                })
+                .catch(err => {
+                    listDiv.innerHTML = '<div class="p-6 text-center text-xs text-rose-500 font-bold">Lỗi kết nối máy chủ.</div>';
+                });
+        }
+
+        function renderGlobalCoupons() {
+            const listDiv = document.getElementById('global-voucher-list');
+            if (!listDiv) return;
+
+            let filtered = [...globalCouponsData];
+            if (currentVoucherTab === 'saved') {
+                filtered = filtered.filter(c => c.is_saved);
+            } else if (currentVoucherTab === 'expiring') {
+                filtered = filtered.filter(c => c.is_expiring_soon);
+            }
+
+            if (filtered.length === 0) {
+                let emptyMsg = 'Chưa có voucher nào trong mục này.';
+                if (currentVoucherTab === 'saved') {
+                    @guest
+                        emptyMsg = 'Bạn chưa đăng nhập. Vui lòng đăng nhập để lưu và quản lý mã giảm giá của bạn!';
+                    @else
+                        emptyMsg = 'Bạn chưa lưu mã ưu đãi nào. Hãy chuyển sang tab "Tất cả" để lưu mã nhé!';
+                    @endguest
+                } else if (currentVoucherTab === 'expiring') {
+                    emptyMsg = 'Hiện không có mã nào sắp hết hạn trong 3 ngày tới.';
+                }
+
+                listDiv.innerHTML = `
+                    <div class="py-12 px-4 text-center">
+                        <div class="w-16 h-16 mx-auto mb-3 rounded-2xl bg-orange-50 text-orange-400 flex items-center justify-center text-2xl">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                        <p class="text-xs font-bold text-slate-600 max-w-sm mx-auto leading-relaxed">${emptyMsg}</p>
+                        ${currentVoucherTab === 'saved' && {{ Auth::check() ? 'false' : 'true' }} ? `
+                            <a href="{{ route('dangnhap') }}" class="inline-flex items-center gap-1.5 mt-4 px-4 py-2 bg-[#ee4d2d] text-white rounded-xl text-xs font-black shadow-xs hover:bg-red-600">
+                                <i class="fas fa-sign-in-alt"></i> Đăng nhập ngay
+                            </a>
+                        ` : ''}
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(c => {
+                html += `
+                    <div class="p-3.5 bg-white rounded-2xl border border-slate-200 hover:border-orange-300 transition-all flex items-center justify-between gap-3 shadow-2xs">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-13 h-13 rounded-2xl bg-rose-50 border border-rose-200 text-[#ee4d2d] flex flex-col items-center justify-center font-black text-center shrink-0">
+                                <span class="text-xs leading-none">${c.discount_type === 'percent' ? c.discount_value + '%' : (c.discount_value/1000) + 'K'}</span>
+                                <span class="text-[8px] uppercase tracking-wider text-slate-500 font-bold mt-0.5">GIẢM</span>
+                            </div>
+                            <div class="min-w-0 space-y-0.5">
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <span class="font-black text-slate-900 text-xs tracking-wider">#${c.coupon_code}</span>
+                                    <button type="button" onclick="navigator.clipboard.writeText('${c.coupon_code}'); alert('Đã sao chép mã #${c.coupon_code}');" class="text-[10px] text-slate-400 hover:text-slate-700" title="Sao chép mã">
+                                        <i class="far fa-copy"></i>
+                                    </button>
+                                    ${c.is_saved ? '<span class="px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 text-[9px] font-black">Trong ví</span>' : ''}
+                                    ${c.is_expiring_soon ? `<span class="px-1.5 py-0.2 rounded bg-rose-100 text-rose-700 text-[9px] font-black animate-pulse">⏰ Còn ${c.days_remaining} ngày</span>` : ''}
+                                </div>
+                                <p class="text-xs font-bold text-slate-700 truncate">${c.formatted_discount} - ${c.formatted_min_order}</p>
+                                <p class="text-[10px] text-slate-400">HSD: ${c.end_date}</p>
+                            </div>
+                        </div>
+
+                        <div class="shrink-0 flex items-center gap-2">
+                            ${c.is_saved ? `
+                                <a href="{{ route('muahang') }}" class="px-3 py-1.5 bg-[#ee4d2d] hover:bg-red-600 text-white font-black text-xs rounded-xl shadow-xs inline-flex items-center gap-1">
+                                    Dùng <i class="fas fa-arrow-right text-[10px]"></i>
+                                </a>
+                            ` : `
+                                <button type="button" onclick="handleGlobalSaveCoupon(${c.id}, '${c.coupon_code}', this)" class="px-3 py-1.5 bg-orange-50 hover:bg-orange-100 text-[#ee4d2d] border border-orange-200 font-black text-xs rounded-xl transition-all cursor-pointer">
+                                    + Lưu mã
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            });
+
+            listDiv.innerHTML = html;
+        }
+
+        function handleGlobalSaveCoupon(couponId, couponCode, btn) {
+            @guest
+                alert('Mã khuyến mãi chỉ sử dụng được sau khi đăng nhập thành công. Vui lòng đăng nhập!');
+                window.location.href = "{{ route('dangnhap') }}";
+                return;
+            @endguest
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            fetch("{{ route('api.coupons.save') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({ coupon_id: couponId })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    btn.className = "px-3 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-300 font-bold text-xs rounded-xl";
+                    btn.innerText = "Đã lưu ✓";
+                    loadGlobalCoupons();
+                } else {
+                    btn.disabled = false;
+                    btn.innerText = "+ Lưu mã";
+                    alert(data.message || 'Lưu mã thất bại.');
+                }
+            })
+            .catch(err => {
+                btn.disabled = false;
+                btn.innerText = "+ Lưu mã";
+                alert('Có lỗi kết nối máy chủ.');
+            });
+        }
+
+        function handleGlobalSaveAllCoupons() {
+            @guest
+                alert('Mã khuyến mãi chỉ sử dụng được sau khi đăng nhập thành công. Vui lòng đăng nhập!');
+                window.location.href = "{{ route('dangnhap') }}";
+                return;
+            @endguest
+
+            const btn = document.getElementById('global-save-all-btn');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Đang thu thập...';
+            }
+
+            fetch("{{ route('api.coupons.save_all') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({})
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`Đã lưu thành công ${data.saved_count} mã vào ví ưu đãi của bạn!`);
+                    loadGlobalCoupons();
+                } else {
+                    alert(data.message || 'Không thể lưu mã.');
+                }
+            })
+            .catch(err => alert('Lỗi kết nối máy chủ.'))
+            .finally(() => {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-bolt mr-1"></i> Thu thập tất cả mã';
+                }
+            });
+        }
     </script>
+
+    <!-- GLOBAL VÍ VOUCHER & KHO ƯU ĐÃI MODAL -->
+    <div id="globalUserVoucherModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm hidden">
+        <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-100 flex flex-col max-h-[85vh] animate-in fade-in zoom-in duration-200">
+            <!-- Modal Header -->
+            <div class="p-5 bg-gradient-to-r from-[#ee4d2d] to-amber-500 text-white flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-xl shadow-inner">
+                        🎟️
+                    </span>
+                    <div>
+                        <h3 class="text-base font-black tracking-tight">Kho Ưu Đãi & Ví Voucher</h3>
+                        <p class="text-[11px] text-rose-100 font-semibold">Tự động áp dụng mã tốt nhất khi thanh toán</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeGlobalUserVoucherModal()" class="w-8 h-8 rounded-full bg-black/15 hover:bg-black/30 text-white flex items-center justify-center text-lg font-bold transition-colors">
+                    &times;
+                </button>
+            </div>
+
+            <!-- Tab Switcher -->
+            <div class="p-3 bg-slate-50 border-b border-slate-100 flex items-center gap-1.5 shrink-0">
+                <button type="button" data-tab="all" onclick="switchGlobalVoucherTab('all')" class="global-tab-btn flex-1 py-2 rounded-xl text-xs font-black transition-all bg-[#ee4d2d] text-white shadow-xs">
+                    Tất cả
+                </button>
+                <button type="button" data-tab="saved" onclick="switchGlobalVoucherTab('saved')" class="global-tab-btn flex-1 py-2 rounded-xl text-xs font-black transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+                    Đã lưu (<span id="global-badge-saved">0</span>)
+                </button>
+                <button type="button" data-tab="expiring" onclick="switchGlobalVoucherTab('expiring')" class="global-tab-btn flex-1 py-2 rounded-xl text-xs font-black transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+                    ⏰ Sắp hết (<span id="global-badge-expiring">0</span>)
+                </button>
+            </div>
+
+            <!-- Notice for login -->
+            <div class="px-4 py-2 bg-amber-50 border-b border-amber-100 flex items-center gap-2 text-[11px] text-amber-800 font-bold shrink-0">
+                <i class="fas fa-shield-alt text-amber-600"></i>
+                <span>Mã khuyến mãi chỉ sử dụng được sau khi đăng nhập thành công.</span>
+            </div>
+
+            <!-- Modal List Content -->
+            <div id="global-voucher-list" class="p-4 overflow-y-auto space-y-2.5 flex-1 min-h-[260px] bg-slate-50/50">
+                <!-- Voucher items rendered via JS -->
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 bg-white border-t border-slate-100 flex items-center justify-between gap-3 shrink-0">
+                <button type="button" id="global-save-all-btn" onclick="handleGlobalSaveAllCoupons()" class="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl text-xs font-black shadow-xs flex items-center gap-1.5 cursor-pointer">
+                    <i class="fas fa-bolt"></i> Thu thập tất cả mã
+                </button>
+                <a href="{{ route('muahang') }}" class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-extrabold transition-colors">
+                    Đặt món ngay →
+                </a>
+            </div>
+        </div>
+    </div>
+
     @yield('scripts')
 </body>
 </html>

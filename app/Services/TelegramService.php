@@ -45,9 +45,9 @@ class TelegramService
                 1.5 // Connection timeout
             );
 
-            if ($fp) {
+            if ($fp && is_resource($fp)) {
                 // Set stream to non-blocking
-                stream_set_blocking($fp, false);
+                @stream_set_blocking($fp, false);
 
                 $out = "POST " . $parts['path'] . " HTTP/1.1\r\n";
                 $out .= "Host: " . $parts['host'] . "\r\n";
@@ -56,8 +56,8 @@ class TelegramService
                 $out .= "Connection: Close\r\n\r\n";
                 $out .= $postData;
 
-                fwrite($fp, $out);
-                fclose($fp);
+                @fwrite($fp, $out);
+                @fclose($fp);
                 return true;
             }
             

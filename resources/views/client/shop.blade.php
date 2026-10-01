@@ -115,6 +115,254 @@
     </div>
 </section>
 
+<!-- MÓN ĐÃ XEM GẦN ĐÂY (Recently Viewed Dishes) -->
+@if(isset($recentlyViewedDishes) && $recentlyViewedDishes->isNotEmpty())
+<section class="py-3 bg-transparent" id="recently-viewed-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-4 sm:p-5 shadow-sm border border-amber-200/90 space-y-4 relative overflow-hidden">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-amber-100">
+                <div class="flex items-center gap-2.5">
+                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-400 text-white text-sm font-black shadow-xs shadow-amber-500/20">
+                        <i class="fas fa-clock-rotate-left"></i>
+                    </span>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-extrabold text-slate-900 text-sm sm:text-base">
+                                🕒 Món Ăn Bạn Đã Xem Gần Đây
+                            </h3>
+                            <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-black tracking-wide uppercase">
+                                {{ $recentlyViewedDishes->count() }} món
+                            </span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 font-medium">
+                            Lịch sử các món bạn vừa tìm hiểu, dễ dàng xem lại và đặt hàng nhanh
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <form action="{{ route('api.recently_viewed.clear') }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" class="px-2.5 py-1 rounded-lg hover:bg-rose-50 text-[11px] font-bold text-slate-400 hover:text-rose-600 transition-colors flex items-center gap-1 cursor-pointer" title="Xóa toàn bộ lịch sử xem gần đây">
+                            <i class="fas fa-trash-can text-[10px]"></i> Xóa lịch sử xem
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Responsive Cards Grid for Recently Viewed Dishes -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+                @foreach($recentlyViewedDishes as $vDish)
+                    <div class="bg-white hover:bg-amber-50/30 rounded-xl p-2.5 sm:p-3 border border-amber-100 hover:border-amber-400/60 flex flex-col justify-between shadow-2xs hover:shadow-md transition-all duration-300 group">
+                        <a href="{{ route('dish.detail', $vDish->id) }}" class="space-y-2 block" title="{{ $vDish->dish_name }}">
+                            <div class="aspect-square w-full rounded-lg bg-slate-100 overflow-hidden relative border border-slate-100">
+                                <img src="{{ $vDish->display_image }}" alt="{{ $vDish->dish_name }}" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-300" loading="lazy">
+                                <span class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-white/95 backdrop-blur-xs text-amber-700 text-[9px] font-black uppercase shadow-2xs border border-amber-200">
+                                    <i class="fas fa-eye text-[8px] mr-0.5 text-amber-500"></i> Đã xem
+                                </span>
+                            </div>
+                            <div class="space-y-1">
+                                <h4 class="font-extrabold text-slate-900 text-xs line-clamp-1 group-hover:text-[#ee4d2d] transition-colors">
+                                    {{ $vDish->dish_name }}
+                                </h4>
+                                <p class="text-[10px] text-slate-400 line-clamp-1 font-medium">
+                                    {{ $vDish->category->category_name ?? 'Món ngon' }}
+                                </p>
+                            </div>
+                        </a>
+                        <div class="pt-2 mt-2 border-t border-slate-100 flex items-center justify-between gap-1.5">
+                            <span class="text-xs text-[#ee4d2d] font-black">{{ number_format($vDish->price) }}đ</span>
+                            <form action="{{ route('giohang.add') }}" method="POST" class="shrink-0">
+                                @csrf
+                                <input type="hidden" name="dish_id" value="{{ $vDish->id }}">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="px-2.5 py-1 bg-[#ee4d2d] hover:bg-red-600 text-white rounded-lg text-[11px] font-extrabold shadow-2xs transition-colors flex items-center gap-1 cursor-pointer">
+                                    <i class="fas fa-cart-plus text-[10px]"></i> + Đặt
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+</section>
+@endif
+
+<!-- KHO ƯU ĐÃI & MÃ GIẢM GIÁ ĐỘC QUYỀN (Promotional Coupons Section) -->
+@if(isset($activeCoupons) && $activeCoupons->isNotEmpty())
+<section class="py-5 bg-transparent" id="coupons-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="coupon-section-box bg-white rounded-3xl p-5 sm:p-7 border border-slate-200/90 shadow-xl relative overflow-hidden" style="background: #ffffff !important;">
+            <!-- Dải màu gradient viền trên cao cấp -->
+            <div class="h-1.5 w-full bg-gradient-to-r from-[#ee4d2d] via-orange-500 to-amber-400 absolute top-0 left-0"></div>
+            
+            <!-- Header bar của Kho Ưu Đãi -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+                <div class="flex items-center gap-3.5">
+                    <span class="w-12 h-12 rounded-2xl flex items-center justify-center text-white text-xl font-black shadow-md shadow-rose-500/25 shrink-0" style="background: linear-gradient(135deg, #ee4d2d 0%, #ff5722 100%) !important;">
+                        <i class="fas fa-ticket-alt"></i>
+                    </span>
+                    <div>
+                        <div class="flex items-center gap-2.5 flex-wrap">
+                            <h3 class="font-black text-slate-900 text-lg sm:text-xl tracking-tight">
+                                🎟️ Kho Ưu Đãi & Mã Giảm Giá Hôm Nay
+                            </h3>
+                            <span class="px-2.5 py-0.5 rounded-full text-white text-[11px] font-black uppercase shadow-xs tracking-wider" style="background: linear-gradient(135deg, #ee4d2d 0%, #ff5722 100%) !important;">
+                                {{ $activeCoupons->count() }} mã hot
+                            </span>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-600 font-medium mt-1">
+                            Thu thập mã giảm giá ngay — Hệ thống sẽ <strong class="text-slate-900">tự động áp dụng mã hời nhất</strong> khi bạn thanh toán!
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Action buttons: Filter tabs & Save All -->
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <div class="bg-slate-100 p-1 rounded-2xl border border-slate-200 flex items-center gap-1 shadow-inner text-xs font-black">
+                        <button type="button" onclick="filterCouponTab('all')" id="coupon-tab-all" class="px-3.5 py-2 rounded-xl text-white transition-all shadow-xs cursor-pointer" style="background: #ee4d2d !important;">
+                            Tất cả ({{ $activeCoupons->count() }})
+                        </button>
+                        <button type="button" onclick="filterCouponTab('saved')" id="coupon-tab-saved" class="px-3.5 py-2 rounded-xl text-slate-600 hover:text-[#ee4d2d] transition-all cursor-pointer">
+                            Đã lưu (<span id="saved-badge-count">{{ count($savedCouponIds) }}</span>)
+                        </button>
+                        <button type="button" onclick="filterCouponTab('expiring')" id="coupon-tab-expiring" class="px-3.5 py-2 rounded-xl text-slate-600 hover:text-[#ee4d2d] transition-all flex items-center gap-1.5 cursor-pointer">
+                            <span>⏰ Sắp hết hạn</span>
+                            <span class="px-1.5 py-0.2 rounded-full bg-rose-100 text-rose-700 text-[10px] font-black">{{ $expiringCoupons->count() }}</span>
+                        </button>
+                    </div>
+
+                    <button type="button" onclick="saveAllCoupons()" class="px-4 py-2 text-white rounded-2xl font-black text-xs shadow-md hover:shadow-lg hover:scale-102 transition-all flex items-center gap-1.5 cursor-pointer" style="background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%) !important;">
+                        <i class="fas fa-bolt text-yellow-200"></i> Thu thập tất cả
+                    </button>
+                </div>
+            </div>
+
+            <!-- Notice bar về mẹo mua sắm và điều kiện đăng nhập -->
+            <div class="mt-4 p-3 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs" style="background: #fffbeb !important; border: 1px solid #fde68a !important;">
+                <div class="flex items-start sm:items-center gap-2.5">
+                    <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shrink-0 text-xs">
+                        <i class="fas fa-lightbulb"></i>
+                    </span>
+                    <span class="text-xs sm:text-sm font-medium" style="color: #92400e !important;">
+                        <strong>Mẹo mua sắm:</strong> Sau khi lưu mã, khi vào đặt món hệ thống sẽ <strong>tự động chọn mã hời nhất</strong> cho bạn. <em>(Lưu ý: Mã khuyến mãi chỉ dùng được sau khi đăng nhập thành công)</em>
+                    </span>
+                </div>
+                @guest
+                    <a href="{{ route('dangnhap') }}" class="px-3.5 py-1.5 text-white rounded-xl text-xs font-black shrink-0 transition-all shadow-xs hover:opacity-95 text-center" style="background: #ee4d2d !important;">
+                        <i class="fas fa-sign-in-alt mr-1"></i> Đăng nhập ngay
+                    </a>
+                @endguest
+            </div>
+
+            <!-- Grid danh sách mã khuyến mãi phong cách Ticket Card ShopeeFood -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4.5 mt-5" id="coupons-grid">
+                @foreach($activeCoupons as $coupon)
+                    @php
+                        $isSaved = in_array($coupon->id, $savedCouponIds);
+                        $isExpiring = $coupon->is_expiring_soon;
+                    @endphp
+                    <div class="coupon-card bg-white rounded-2xl border border-slate-200 hover:border-orange-400 hover:shadow-lg transition-all duration-300 flex overflow-hidden relative group"
+                         data-is-saved="{{ $isSaved ? '1' : '0' }}"
+                         data-is-expiring="{{ $isExpiring ? '1' : '0' }}"
+                         id="coupon-card-{{ $coupon->id }}">
+
+                        <!-- Cuống vé bên trái (Ticket Stub) với gradient cam đỏ ép buộc inline style -->
+                        <div class="w-32 sm:w-36 coupon-stub p-3 sm:p-3.5 flex flex-col justify-between items-center text-center relative border-r-2 border-dashed border-white/60 shrink-0 select-none"
+                             style="background: linear-gradient(135deg, #ee4d2d 0%, #ff5722 100%) !important; color: #ffffff !important;">
+                            <!-- Rãnh tròn đục lỗ vé trên và dưới (Ticket Notches) -->
+                            <div class="w-4 h-4 rounded-full bg-white absolute -top-2 -right-2 z-10 border-b border-l border-slate-200"></div>
+                            <div class="w-4 h-4 rounded-full bg-white absolute -bottom-2 -right-2 z-10 border-t border-l border-slate-200"></div>
+
+                            <span class="text-[10px] font-black uppercase tracking-wider text-white px-2 py-0.5 rounded-full"
+                                  style="background: rgba(255, 255, 255, 0.25);">
+                                {{ $coupon->discount_type === 'percent' ? 'VOUCHER' : 'GIẢM GIÁ' }}
+                            </span>
+
+                            <div class="my-auto py-1 text-center">
+                                <span class="text-2xl sm:text-3xl font-black block tracking-tight leading-none text-white drop-shadow-sm">
+                                    {{ $coupon->formatted_discount }}
+                                </span>
+                                <span class="text-[11px] text-white/95 font-bold block mt-1.5 drop-shadow-2xs">
+                                    {{ $coupon->formatted_min_order }}
+                                </span>
+                            </div>
+
+                            <span class="text-[9px] text-white/80 font-bold uppercase tracking-widest flex items-center gap-1 justify-center">
+                                <i class="fas fa-utensils text-[8px]"></i> FOODDAILY
+                            </span>
+                        </div>
+
+                        <!-- Thân vé bên phải (Main Body) -->
+                        <div class="p-3.5 sm:p-4 flex-1 flex flex-col justify-between space-y-2.5 min-w-0 bg-white">
+                            <div>
+                                <div class="flex items-center justify-between gap-1.5 flex-wrap">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="px-2.5 py-1 rounded-lg bg-slate-900 text-amber-300 font-mono font-black text-xs tracking-wider shadow-xs">
+                                            #{{ $coupon->coupon_code }}
+                                        </span>
+                                        <button type="button" onclick="copyCouponCode('{{ $coupon->coupon_code }}', this)" class="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors text-xs cursor-pointer" title="Sao chép mã">
+                                            <i class="far fa-copy"></i>
+                                        </button>
+                                    </div>
+
+                                    @if($isExpiring)
+                                        <span class="px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-200 text-[10px] sm:text-[11px] font-black animate-pulse flex items-center gap-1" title="Sắp hết hạn sử dụng">
+                                            <i class="fas fa-fire text-rose-500"></i> Còn {{ $coupon->days_remaining }} ngày
+                                        </span>
+                                    @endif
+                                </div>
+
+                                <h4 class="text-xs sm:text-sm font-black text-slate-900 mt-2 line-clamp-1 group-hover:text-[#ee4d2d] transition-colors">
+                                    {{ $coupon->discount_type === 'percent' ? 'Giảm ' . (int)$coupon->discount_value . '% toàn menu' : 'Giảm trực tiếp ' . number_format($coupon->discount_value, 0, ',', '.') . 'đ' }}
+                                </h4>
+                                <p class="text-[11px] sm:text-xs text-slate-500 font-medium mt-0.5">
+                                    Áp dụng cho đơn hàng từ <strong class="text-slate-700">{{ number_format($coupon->min_order_value, 0, ',', '.') }}đ</strong>
+                                </p>
+                            </div>
+
+                            <!-- Footer của vé: HSD & Nút lưu -->
+                            <div class="pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
+                                <span class="text-[11px] text-slate-400 font-semibold flex items-center gap-1.5">
+                                    <i class="far fa-calendar-alt text-slate-400"></i> HSD: {{ $coupon->end_date ? $coupon->end_date->format('d/m/Y') : 'Vô thời hạn' }}
+                                </span>
+
+                                <div class="flex items-center gap-1.5">
+                                    <button type="button" 
+                                            onclick="saveCoupon({{ $coupon->id }}, '{{ $coupon->coupon_code }}', this)" 
+                                            class="btn-save-coupon px-3.5 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1
+                                                   {{ $isSaved ? 'bg-emerald-50 text-emerald-700 border border-emerald-300 cursor-default' : 'bg-rose-50 hover:bg-[#ee4d2d] text-[#ee4d2d] hover:text-white border border-rose-200 cursor-pointer shadow-2xs hover:shadow-xs' }}"
+                                            {{ $isSaved ? 'disabled' : '' }}>
+                                        <i class="fas {{ $isSaved ? 'fa-check' : 'fa-bookmark' }} text-[11px]"></i>
+                                        <span>{{ $isSaved ? 'Đã lưu' : 'Lưu mã' }}</span>
+                                    </button>
+
+                                    <a href="{{ route('muahang') }}" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-900 text-slate-700 hover:text-white text-xs font-extrabold transition-all">
+                                        Dùng
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                @endforeach
+            </div>
+
+            <!-- Empty state khi lọc tab -->
+            <div id="coupons-empty" class="hidden text-center py-12 space-y-2 bg-slate-50 rounded-2xl mt-5 border border-dashed border-slate-200">
+                <div class="w-14 h-14 rounded-full bg-rose-50 text-[#ee4d2d] flex items-center justify-center text-2xl mx-auto shadow-inner">
+                    <i class="fas fa-ticket-alt"></i>
+                </div>
+                <p class="text-sm font-bold text-slate-700">Chưa có mã ưu đãi nào trong mục này</p>
+                <p class="text-xs text-slate-400">Hãy chuyển sang tab "Tất cả" để lưu các mã giảm giá hời nhất nhé!</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+@endif
+
 <!-- THUẬT TOÁN ĐỀ XUẤT: Món ăn cùng loại (Cùng category_id với món đang chọn/xem) -->
 @if(isset($sameCategoryDishes) && $sameCategoryDishes->isNotEmpty())
 <section class="py-4 bg-transparent">
@@ -601,6 +849,286 @@
     function closeGroupModal() {
         document.getElementById('groupModal').classList.add('hidden');
     }
+
+    // Xử lý Tabs trong Kho Ưu Đãi
+    function filterCouponTab(tab) {
+        document.querySelectorAll('#coupons-section button[id^="coupon-tab-"]').forEach(btn => {
+            btn.className = 'px-3.5 py-2 rounded-xl text-slate-600 hover:text-[#ee4d2d] transition-all cursor-pointer';
+            btn.style.background = 'transparent';
+            btn.style.color = '';
+        });
+        const activeBtn = document.getElementById('coupon-tab-' + tab);
+        if (activeBtn) {
+            activeBtn.className = 'px-3.5 py-2 rounded-xl text-white transition-all shadow-xs cursor-pointer';
+            activeBtn.style.background = '#ee4d2d';
+            activeBtn.style.color = '#ffffff';
+        }
+
+        const cards = document.querySelectorAll('.coupon-card');
+        let visibleCount = 0;
+        cards.forEach(card => {
+            const isSaved = card.getAttribute('data-is-saved') === '1';
+            const isExpiring = card.getAttribute('data-is-expiring') === '1';
+
+            if (tab === 'all') {
+                card.style.display = 'flex';
+                visibleCount++;
+            } else if (tab === 'saved') {
+                if (isSaved) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            } else if (tab === 'expiring') {
+                if (isExpiring) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            }
+        });
+
+        const emptyNotice = document.getElementById('coupons-empty');
+        if (emptyNotice) {
+            emptyNotice.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+    }
+
+    // Sao chép mã coupon
+    function copyCouponCode(code, btn) {
+        if (!code) return;
+        navigator.clipboard.writeText(code).then(() => {
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check text-emerald-500"></i>';
+            
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-28 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-2xl flex items-center gap-2 transition-all';
+            toast.innerHTML = `<i class="fas fa-check-circle text-emerald-400"></i> Đã sao chép mã: <strong>#${code}</strong>`;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 1800);
+
+            setTimeout(() => { btn.innerHTML = originalHtml; }, 1500);
+        }).catch(err => {
+            console.error('Copy coupon error:', err);
+        });
+    }
+
+    // Lưu từng mã coupon
+    function saveCoupon(couponId, couponCode, btn) {
+        fetch("{{ route('api.coupons.save') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({ coupon_id: couponId, coupon_code: couponCode })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.require_login) {
+                if (confirm(data.message + '\n\nBạn có muốn chuyển tới trang đăng nhập ngay không?')) {
+                    window.location.href = "{{ route('dangnhap') }}";
+                }
+                return;
+            }
+
+            if (data.success) {
+                // Đổi style các nút lưu của mã này trên trang
+                document.querySelectorAll(`button[onclick*="'${couponCode}'"]`).forEach(b => {
+                    b.className = 'btn-save-coupon px-3.5 py-1.5 rounded-xl text-xs font-black bg-emerald-50 text-emerald-700 border border-emerald-300 cursor-default flex items-center gap-1 shadow-2xs';
+                    b.innerHTML = '<i class="fas fa-check text-[11px]"></i><span>Đã lưu</span>';
+                    b.disabled = true;
+                    b.style.background = '';
+                });
+
+                // Cập nhật card attribute
+                const card = document.getElementById('coupon-card-' + couponId);
+                if (card) {
+                    card.setAttribute('data-is-saved', '1');
+                }
+
+                // Cập nhật badge số lượng đã lưu
+                const badge = document.getElementById('saved-badge-count');
+                if (badge) {
+                    badge.innerText = parseInt(badge.innerText || 0) + 1;
+                }
+            }
+        })
+        .catch(err => console.error('Save coupon error:', err));
+    }
+
+    // Lưu tất cả mã coupon
+    function saveAllCoupons() {
+        fetch("{{ route('api.coupons.save_all') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                "Accept": "application/json"
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.require_login) {
+                if (confirm(data.message + '\n\nBạn có muốn chuyển tới trang đăng nhập ngay không?')) {
+                    window.location.href = "{{ route('dangnhap') }}";
+                }
+                return;
+            }
+
+            if (data.success) {
+                alert(data.message);
+                document.querySelectorAll('.btn-save-coupon').forEach(b => {
+                    b.className = 'btn-save-coupon px-3.5 py-1.5 rounded-xl text-xs font-black bg-emerald-50 text-emerald-700 border border-emerald-300 cursor-default flex items-center gap-1 shadow-2xs';
+                    b.innerHTML = '<i class="fas fa-check text-[11px]"></i><span>Đã lưu</span>';
+                    b.disabled = true;
+                    b.style.background = '';
+                });
+                document.querySelectorAll('.coupon-card').forEach(c => {
+                    c.setAttribute('data-is-saved', '1');
+                });
+                const badge = document.getElementById('saved-badge-count');
+                if (badge && data.total_active) {
+                    badge.innerText = data.total_active;
+                }
+            }
+        })
+        .catch(err => console.error('Save all coupons error:', err));
+    }
+
+    // Modal Chào Mừng Hàng Loạt Voucher
+    function openVoucherModal() {
+        const modal = document.getElementById('voucherModal');
+        const content = document.getElementById('voucherModalContent');
+        if (!modal) return;
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
+
+    function closeVoucherModal() {
+        const modal = document.getElementById('voucherModal');
+        const content = document.getElementById('voucherModalContent');
+        if (!modal) return;
+        content.classList.remove('scale-100', 'opacity-100');
+        content.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 200);
+        sessionStorage.setItem('voucher_modal_dismissed', '1');
+    }
+
+    // Tự động bật Modal voucher khi vào trang chủ (nếu chưa xem trong phiên)
+    document.addEventListener("DOMContentLoaded", function() {
+        if (!sessionStorage.getItem('voucher_modal_dismissed')) {
+            setTimeout(openVoucherModal, 800);
+        }
+    });
 </script>
+
+<!-- FLOATING ACTION BUTTON: KHO ƯU ĐÃI NỔI BẬT GÓC DƯỚI (Xếp trên nút Trợ lý AI) -->
+@if(isset($activeCoupons) && $activeCoupons->isNotEmpty())
+<div class="fixed bottom-[86px] right-6 z-40 group">
+    <button type="button" onclick="openVoucherModal()" class="relative flex items-center gap-2 px-4 py-2.5 rounded-full text-white font-black text-xs shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 border-white cursor-pointer" style="background: linear-gradient(135deg, #ee4d2d 0%, #ff5722 100%) !important;">
+        <span class="text-base animate-bounce">🎁</span>
+        <span>Kho Ưu Đãi</span>
+        <span class="px-2 py-0.5 rounded-full bg-white text-[#ee4d2d] font-black text-[10px] shadow-2xs">
+            {{ $activeCoupons->count() }} mã
+        </span>
+    </button>
+</div>
+
+<!-- POP-UP MODAL: CHÀO MỪNG HÀNG LOẠT MÃ KHUYẾN MÃI (ShopeeFood Style) -->
+<div id="voucherModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300 hidden">
+    <div class="bg-white rounded-3xl max-w-xl w-full overflow-hidden shadow-2xl border border-rose-200 transform transition-all duration-300 scale-95 opacity-0 flex flex-col max-h-[90vh]" id="voucherModalContent">
+        
+        <!-- Header Pop-up với hình hộp quà hoạt họa và gradient đỏ cam -->
+        <div class="p-6 text-white text-center relative overflow-hidden shrink-0" style="background: linear-gradient(135deg, #ee4d2d 0%, #ff5722 50%, #f59e0b 100%) !important;">
+            <!-- Nút đóng -->
+            <button type="button" onclick="closeVoucherModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-black/20 hover:bg-black/40 text-white flex items-center justify-center transition-colors text-lg font-bold cursor-pointer">
+                &times;
+            </button>
+
+            <!-- Bong bóng trang trí -->
+            <div class="w-32 h-32 rounded-full bg-white/10 absolute -top-10 -left-10 blur-xl"></div>
+            <div class="w-32 h-32 rounded-full bg-white/10 absolute -bottom-10 -right-10 blur-xl"></div>
+
+            <div class="relative z-10 space-y-2">
+                <span class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white/20 text-3xl shadow-inner mb-1 animate-pulse">
+                    🎁
+                </span>
+                <h3 class="text-xl sm:text-2xl font-black tracking-tight leading-tight">
+                    TẶNG BẠN KHO MÃ GIẢM GIÁ ĐỘC QUYỀN!
+                </h3>
+                <p class="text-xs text-rose-100 max-w-md mx-auto">
+                    Chọn thu thập các mã siêu hời bên dưới. Hệ thống sẽ <strong>tự động áp dụng mã tốt nhất</strong> khi bạn thanh toán!
+                </p>
+                <div class="pt-1">
+                    <span class="inline-block px-3 py-1 rounded-full bg-white/20 text-[11px] font-bold text-yellow-200">
+                        🔒 Lưu ý: Mã khuyến mãi chỉ dùng được sau khi đăng nhập thành công
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thân Modal: Danh sách các mã cuộn mượt -->
+        <div class="p-4 sm:p-5 overflow-y-auto space-y-3 flex-1 divide-y divide-slate-100">
+            @foreach($activeCoupons as $coupon)
+                @php
+                    $isSaved = in_array($coupon->id, $savedCouponIds);
+                @endphp
+                <div class="pt-3 first:pt-0 flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-14 h-14 rounded-2xl text-white flex flex-col items-center justify-center font-black text-center shrink-0 shadow-xs" style="background: linear-gradient(135deg, #ee4d2d 0%, #ff5722 100%) !important;">
+                            <span class="text-xs leading-none drop-shadow-2xs">{{ $coupon->discount_type === 'percent' ? (int)$coupon->discount_value . '%' : number_format($coupon->discount_value/1000) . 'K' }}</span>
+                            <span class="text-[9px] uppercase tracking-wider text-rose-100 font-bold mt-0.5">GIẢM</span>
+                        </div>
+                        <div class="min-w-0 space-y-0.5">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="font-black text-slate-900 text-xs tracking-wider">#{{ $coupon->coupon_code }}</span>
+                                @if($coupon->is_expiring_soon)
+                                    <span class="px-1.5 py-0.2 rounded bg-rose-100 text-rose-700 text-[9px] font-black animate-pulse">
+                                        ⏰ Còn {{ $coupon->days_remaining }} ngày
+                                    </span>
+                                @endif
+                            </div>
+                            <p class="text-xs font-bold text-slate-700 truncate">{{ $coupon->formatted_discount }} - {{ $coupon->formatted_min_order }}</p>
+                            <p class="text-[10px] text-slate-400">HSD: {{ $coupon->end_date ? $coupon->end_date->format('d/m/Y') : 'Vô thời hạn' }}</p>
+                        </div>
+                    </div>
+
+                    <button type="button" 
+                            onclick="saveCoupon({{ $coupon->id }}, '{{ $coupon->coupon_code }}', this)" 
+                            class="px-3.5 py-1.5 rounded-xl text-xs font-black transition-all shrink-0
+                                   {{ $isSaved ? 'bg-emerald-50 text-emerald-700 border border-emerald-300 cursor-default' : 'text-white shadow-xs hover:opacity-90 cursor-pointer' }}"
+                            style="{{ $isSaved ? '' : 'background: #ee4d2d !important;' }}"
+                            {{ $isSaved ? 'disabled' : '' }}>
+                        {{ $isSaved ? 'Đã lưu ✓' : 'Lưu mã' }}
+                    </button>
+                </div>
+            @endforeach
+        </div>
+
+        <!-- Footer Modal -->
+        <div class="p-4 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+            <button type="button" onclick="saveAllCoupons()" class="w-full sm:w-auto px-5 py-2.5 text-white rounded-xl text-xs font-black shadow-xs flex items-center justify-center gap-1.5 cursor-pointer hover:opacity-95" style="background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%) !important;">
+                <i class="fas fa-bolt text-yellow-200"></i> Thu thập tất cả mã
+            </button>
+            <button type="button" onclick="closeVoucherModal()" class="w-full sm:w-auto px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-extrabold transition-colors cursor-pointer">
+                Khám phá món ngay →
+            </button>
+        </div>
+
+    </div>
+</div>
+@endif
 @endsection
 

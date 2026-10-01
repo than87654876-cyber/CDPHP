@@ -19,6 +19,27 @@
             <span class="text-[#ee4d2d] font-bold truncate max-w-xs">{{ $dish->dish_name }}</span>
         </nav>
 
+        <!-- Alerts -->
+        @if(session('success'))
+            <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 rounded-2xl text-xs font-bold flex items-center justify-between shadow-xs">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-circle-check text-emerald-600 text-sm"></i>
+                    <span>{{ session('success') }}</span>
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-emerald-600 hover:text-emerald-800 text-sm cursor-pointer">&times;</button>
+            </div>
+        @endif
+
+        @if(session('error') || $errors->any())
+            <div class="bg-rose-50 border border-rose-200 text-rose-800 p-4 rounded-2xl text-xs font-bold flex items-center justify-between shadow-xs">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-circle-exclamation text-rose-600 text-sm"></i>
+                    <span>{{ session('error') ?? $errors->first() }}</span>
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-rose-600 hover:text-rose-800 text-sm cursor-pointer">&times;</button>
+            </div>
+        @endif
+
         <!-- MAIN DISH DETAIL CARD -->
         <div class="bg-white/95 backdrop-blur-md rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-sm border border-slate-200 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-start">
             
@@ -58,11 +79,11 @@
                         {{ $dish->dish_name }}
                     </h1>
                     <div class="flex flex-wrap items-center gap-4 text-xs text-slate-500 font-semibold">
-                        <div class="flex items-center gap-1.5 text-amber-500 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200/80">
+                        <a href="#dish-reviews-section" class="flex items-center gap-1.5 text-amber-500 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200/80 hover:bg-amber-100 transition-colors">
                             <i class="fas fa-star text-xs text-amber-400"></i>
                             <span class="font-black text-slate-900 text-sm">{{ number_format($dish->rating_score, 1) }} / 5.0</span>
                             <span class="text-slate-400 font-medium text-xs">({{ $dish->reviews_count }} đánh giá)</span>
-                        </div>
+                        </a>
                         <span>•</span>
                         <span class="text-slate-600 font-medium"><i class="fas fa-fire text-rose-500 mr-1"></i>Đã bán {{ number_format($dish->reviews_count * 8) }}+</span>
                         <span>•</span>
@@ -112,7 +133,7 @@
                         <button type="submit" class="w-full sm:flex-1 py-3.5 px-6 rounded-xl bg-rose-50 hover:bg-rose-100 text-[#ee4d2d] border border-rose-200 font-black text-xs sm:text-sm shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer">
                             <i class="fas fa-cart-plus text-base"></i> THÊM VÀO GIỎ HÀNG
                         </button>
-                        <button type="button" onclick="buyNowSubmit()" class="w-full sm:flex-1 py-3.5 px-6 rounded-xl bg-gradient-to-r from-[#ee4d2d] to-red-600 hover:from-red-600 hover:to-[#ee4d2d] text-white font-black text-xs sm:text-sm shadow-lg shadow-rose-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer uppercase tracking-wider">
+                        <button type="button" onclick="buyNowSubmit()" class="w-full sm:flex-1 py-3.5 px-6 rounded-xl text-white font-black text-xs sm:text-sm shadow-lg shadow-rose-500/25 hover:brightness-110 transition-all flex items-center justify-center gap-2 cursor-pointer uppercase tracking-wider" style="background: linear-gradient(135deg, #ee4d2d 0%, #dc2626 100%) !important; color: #ffffff !important; border: none !important;">
                             <i class="fas fa-bolt text-amber-300"></i> ĐẶT MÓN NGAY
                         </button>
                     </div>
@@ -136,6 +157,226 @@
 
             </div>
         </div>
+
+        <!-- SECTION: ĐÁNH GIÁ & NHẬN XÉT CỦA KHÁCH HÀNG VỀ MÓN ĂN NÀY -->
+        <section class="space-y-6 pt-2" id="dish-reviews-section">
+            <div class="bg-white/95 backdrop-blur-md rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+                
+                <!-- Section Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                    <div class="flex items-center gap-3">
+                        <span class="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-500 border border-amber-200 flex items-center justify-center text-lg font-black shrink-0">
+                            <i class="fas fa-star"></i>
+                        </span>
+                        <div>
+                            <h2 class="font-black text-slate-900 text-lg sm:text-xl flex items-center gap-2">
+                                Đánh Giá & Nhận Xét Món Ăn
+                                <span class="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 text-xs font-black border border-amber-200">
+                                    {{ $dish->reviews_count }} đánh giá
+                                </span>
+                            </h2>
+                            <p class="text-xs text-slate-500 font-medium mt-0.5">
+                                Khách hàng nhận xét thực tế sau khi đặt và thưởng thức món "{{ $dish->dish_name }}"
+                            </p>
+                        </div>
+                    </div>
+
+                    @auth
+                        <a href="#write-dish-review" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-black shadow-xs transition-all">
+                            <i class="fas fa-pen-to-square"></i> Viết đánh giá món này
+                        </a>
+                    @else
+                        <a href="{{ route('dangnhap') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all">
+                            <i class="fas fa-arrow-right-to-bracket text-slate-400"></i> Đăng nhập để đánh giá
+                        </a>
+                    @endauth
+                </div>
+
+                <!-- Rating Overview Statistics Grid -->
+                <div class="bg-gradient-to-br from-amber-50/60 via-orange-50/40 to-rose-50/40 rounded-2xl p-5 border border-amber-200/70 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                    
+                    <!-- Left: Average Score -->
+                    <div class="md:col-span-4 text-center md:text-left space-y-2 md:border-r md:border-amber-200/80 pr-4">
+                        <div class="flex items-baseline justify-center md:justify-start gap-2">
+                            <span class="text-4xl sm:text-5xl font-black text-[#ee4d2d]">
+                                {{ number_format($dish->rating_score, 1) }}
+                            </span>
+                            <span class="text-base text-slate-400 font-bold">/ 5.0</span>
+                        </div>
+                        <div class="flex items-center justify-center md:justify-start gap-1 text-amber-400 text-lg">
+                            @for($i = 1; $i <= 5; $i++)
+                                @if($i <= round($dish->rating_score))
+                                    <i class="fas fa-star"></i>
+                                @else
+                                    <i class="far fa-star text-slate-300"></i>
+                                @endif
+                            @endfor
+                        </div>
+                        <p class="text-xs font-bold text-slate-600">
+                            Dựa trên <strong class="text-slate-900">{{ $dish->reviews_count }}</strong> lượt đánh giá từ người mua
+                        </p>
+                    </div>
+
+                    <!-- Middle: Star Distribution Bars -->
+                    <div class="md:col-span-5 space-y-1.5">
+                        @php
+                            $ratingDist = [
+                                5 => 86,
+                                4 => 10,
+                                3 => 3,
+                                2 => 1,
+                                1 => 0,
+                            ];
+                        @endphp
+                        @foreach($ratingDist as $star => $pct)
+                            <div class="flex items-center gap-2 text-xs">
+                                <span class="font-extrabold text-slate-600 w-8">{{ $star }} ★</span>
+                                <div class="flex-1 bg-white rounded-full h-2 overflow-hidden border border-amber-200/80">
+                                    <div class="bg-amber-400 h-full rounded-full transition-all duration-500" style="width: {{ $pct }}%;"></div>
+                                </div>
+                                <span class="text-[11px] font-bold text-slate-400 w-10 text-right">{{ $pct }}%</span>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <!-- Right: Quality Highlights -->
+                    <div class="md:col-span-3 space-y-2 text-xs text-slate-600 border-t md:border-t-0 md:border-l md:border-amber-200/80 pt-3 md:pt-0 pl-0 md:pl-4">
+                        <div class="font-black text-slate-800 uppercase tracking-wider text-[11px]">Đặc điểm nổi bật:</div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-check-circle text-emerald-500 text-xs"></i>
+                            <span class="font-semibold">Hương vị chuẩn vị, nóng sốt</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-check-circle text-emerald-500 text-xs"></i>
+                            <span class="font-semibold">Đóng gói sạch sẽ, cẩn thận</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-check-circle text-emerald-500 text-xs"></i>
+                            <span class="font-semibold">Giao hàng đúng hẹn</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Form Gửi Đánh Giá Trực Tiếp Cho Món Ăn Này -->
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4" id="write-dish-review">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-black text-slate-900 text-sm flex items-center gap-2">
+                            <i class="fas fa-comment-dots text-[#ee4d2d]"></i> Viết Đánh Giá Của Bạn Cho Món Này
+                        </h3>
+                        <span class="text-[11px] text-slate-400 font-medium">Đánh giá giúp cộng đồng chọn món ngon hơn</span>
+                    </div>
+
+                    @auth
+                        <form action="{{ route('dish.review', $dish->id) }}" method="POST" class="space-y-4">
+                            @csrf
+                            <input type="hidden" name="rating" id="direct-rating-input" value="5">
+
+                            <!-- Interactive Stars -->
+                            <div class="flex flex-wrap items-center gap-4">
+                                <label class="text-xs font-bold text-slate-700">Chấm điểm món ăn:</label>
+                                <div class="flex items-center gap-1.5" id="direct-stars-picker">
+                                    @for($s = 1; $s <= 5; $s++)
+                                        <button type="button" 
+                                                onclick="selectDirectRating({{ $s }})" 
+                                                class="text-2xl text-amber-400 transition-transform hover:scale-125 cursor-pointer direct-star-btn"
+                                                data-star="{{ $s }}">
+                                            <i class="fas fa-star"></i>
+                                        </button>
+                                    @endfor
+                                </div>
+                                <span class="text-xs font-black text-amber-600" id="direct-rating-text">⭐⭐⭐⭐⭐ Tuyệt vời! Rất hài lòng</span>
+                            </div>
+
+                            <!-- Comment Input -->
+                            <div>
+                                <textarea name="comment" rows="3" required
+                                          placeholder="Chia sẻ cảm nhận chi tiết của bạn về hương vị món ăn, nguyên liệu, độ ngon miệng..."
+                                          class="w-full p-3.5 rounded-xl bg-white border border-slate-200 text-xs text-slate-800 outline-none focus:border-[#ee4d2d] transition-all shadow-2xs"></textarea>
+                            </div>
+
+                            <div class="flex justify-end">
+                                <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:brightness-110 text-white font-black text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer">
+                                    <i class="fas fa-paper-plane text-xs"></i> Gửi Đánh Giá Ngay
+                                </button>
+                            </div>
+                        </form>
+                    @else
+                        <div class="py-4 text-center space-y-2">
+                            <p class="text-xs text-slate-500 font-medium">Vui lòng đăng nhập để có thể gửi đánh giá cho món ăn này.</p>
+                            <a href="{{ route('dangnhap') }}" class="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-[#ee4d2d] hover:bg-red-600 text-white text-xs font-black shadow-xs transition-all">
+                                <i class="fas fa-right-to-bracket text-xs"></i> Đăng nhập ngay
+                            </a>
+                        </div>
+                    @endauth
+                </div>
+
+                <!-- Danh Sách Đánh Giá Khách Hàng (Customer Reviews List) -->
+                <div class="space-y-4 pt-2">
+                    <h3 class="font-extrabold text-slate-900 text-sm uppercase tracking-wider flex items-center gap-2">
+                        <span>Nhận xét gần đây</span>
+                        <span class="text-slate-400 text-xs font-normal">({{ $reviews->count() }} nhận xét)</span>
+                    </h3>
+
+                    @if($reviews->isEmpty())
+                        <div class="p-8 text-center bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
+                            <div class="w-12 h-12 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center text-xl mx-auto">
+                                <i class="far fa-comment-dots"></i>
+                            </div>
+                            <h4 class="text-xs font-bold text-slate-700">Chưa có đánh giá nào cho món ăn này</h4>
+                            <p class="text-[11px] text-slate-400">Hãy là người đầu tiên trải nghiệm và chia sẻ nhận xét của bạn về món ăn này nhé!</p>
+                        </div>
+                    @else
+                        <div class="divide-y divide-slate-100 space-y-3">
+                            @foreach($reviews as $rev)
+                                <div class="pt-3.5 first:pt-0 space-y-2">
+                                    <!-- Review Header -->
+                                    <div class="flex items-start justify-between gap-3">
+                                        <div class="flex items-center gap-3">
+                                            <!-- User Avatar -->
+                                            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-[#ee4d2d] to-amber-500 text-white font-black text-xs flex items-center justify-center shadow-2xs">
+                                                {{ strtoupper(substr($rev->user->fullname ?? $rev->user->name ?? 'K', 0, 1)) }}
+                                            </div>
+                                            <div>
+                                                <h4 class="font-black text-slate-900 text-xs flex items-center gap-2">
+                                                    <span>{{ $rev->user->fullname ?? $rev->user->name ?? 'Khách hàng FOODDAILY' }}</span>
+                                                    <span class="px-2 py-0.2 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">
+                                                        <i class="fas fa-check-circle text-[9px] mr-0.5"></i> Đã mua món
+                                                    </span>
+                                                </h4>
+                                                <!-- Stars -->
+                                                <div class="flex items-center gap-2 text-xs pt-0.5">
+                                                    <div class="flex items-center text-amber-400 text-[11px]">
+                                                        @for($s = 1; $s <= 5; $s++)
+                                                            @if($s <= $rev->rating)
+                                                                <i class="fas fa-star"></i>
+                                                            @else
+                                                                <i class="far fa-star text-slate-300"></i>
+                                                            @endif
+                                                        @endfor
+                                                    </div>
+                                                    <span class="text-[11px] text-slate-400 font-medium">
+                                                        {{ $rev->created_at ? $rev->created_at->format('d/m/Y H:i') : '' }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Review Content -->
+                                    <div class="pl-12">
+                                        <p class="text-xs text-slate-700 leading-relaxed font-medium bg-slate-50/80 p-3 rounded-xl border border-slate-100">
+                                            {{ $rev->comment }}
+                                        </p>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+
+            </div>
+        </section>
 
         <!-- KHU VỰC ĐỀ XUẤT: MÓN CÙNG LOẠI BẠN CÓ THỂ THÍCH -->
         @if(isset($relatedDishes) && $relatedDishes->isNotEmpty())
@@ -237,6 +478,30 @@
         if (form) {
             form.submit();
         }
+    }
+
+    // Direct Star Rating on Dish Detail Page
+    const directRatingLabels = {
+        1: '⭐ Rất tệ! Không hài lòng',
+        2: '⭐⭐ Tệ! Cần cải thiện',
+        3: '⭐⭐⭐ Bình thường! Tạm được',
+        4: '⭐⭐⭐⭐ Ngon! Khá hài lòng',
+        5: '⭐⭐⭐⭐⭐ Tuyệt vời! Rất hài lòng'
+    };
+
+    function selectDirectRating(stars) {
+        document.getElementById('direct-rating-input').value = stars;
+        document.getElementById('direct-rating-text').innerText = directRatingLabels[stars] || '';
+        document.querySelectorAll('.direct-star-btn').forEach(btn => {
+            const s = parseInt(btn.getAttribute('data-star'));
+            if (s <= stars) {
+                btn.classList.add('text-amber-400');
+                btn.classList.remove('text-slate-200');
+            } else {
+                btn.classList.remove('text-amber-400');
+                btn.classList.add('text-slate-200');
+            }
+        });
     }
 </script>
 @endsection

@@ -28,6 +28,27 @@
             </form>
         </div>
 
+        <!-- Alerts -->
+        @if(session('success'))
+            <div class="mb-5 bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 rounded-2xl text-xs font-bold flex items-center justify-between shadow-xs">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-circle-check text-emerald-600 text-sm"></i>
+                    <span>{{ session('success') }}</span>
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-emerald-600 hover:text-emerald-800 text-sm cursor-pointer">&times;</button>
+            </div>
+        @endif
+
+        @if($errors->any())
+            <div class="mb-5 bg-rose-50 border border-rose-200 text-rose-800 p-4 rounded-2xl text-xs font-bold flex items-center justify-between shadow-xs">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-circle-exclamation text-rose-600 text-sm"></i>
+                    <span>{{ $errors->first() }}</span>
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-rose-600 hover:text-rose-800 text-sm cursor-pointer">&times;</button>
+            </div>
+        @endif
+
         <!-- Orders List -->
         <div class="space-y-4">
             @forelse($orders as $order)
@@ -127,6 +148,25 @@
                             @endif
 
                             @if($order->order_status === 'completed')
+                                @php
+                                    $hasReviewed = $order->reviews && $order->reviews->isNotEmpty();
+                                    $reviewedRating = $hasReviewed ? $order->reviews->first()->rating : 5;
+                                    $dishesSummary = $order->orderItems->map(function($oi) {
+                                        return ($oi->dish->dish_name ?? 'Món') . ' (x' . $oi->quantity . ')';
+                                    })->join(', ');
+                                @endphp
+
+                                @if($hasReviewed)
+                                    <span class="px-3.5 py-1.5 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold inline-flex items-center gap-1.5 shadow-2xs">
+                                        <i class="fas fa-star text-amber-500"></i> Đã đánh giá ({{ $reviewedRating }}★)
+                                    </span>
+                                @else
+                                    <a href="{{ route('donhang.danhgia', $order->id) }}" 
+                                       class="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 hover:brightness-110 text-white text-xs font-black transition-all flex items-center gap-1.5 shadow-xs cursor-pointer">
+                                        <i class="fas fa-star text-amber-200"></i> Đánh giá món ăn
+                                    </a>
+                                @endif
+
                                 <a href="{{ route('yeucauhoan') }}" class="px-3.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all">
                                     <i class="fas fa-rotate-left mr-1"></i> Yêu cầu hoàn tiền
                                 </a>
@@ -150,10 +190,131 @@
 
     </div>
 </div>
+
+<!-- Modal Đánh Giá Món Ăn Sau Khi Đặt Đơn -->
+<div id="reviewOrderModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 space-y-5 animate-in fade-in zoom-in duration-200">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center font-black">
+                    <i class="fas fa-star text-base"></i>
+                </div>
+                <div>
+                    <h3 class="font-black text-slate-900 text-sm sm:text-base">Đánh Giá Món Ăn</h3>
+                    <p class="text-xs text-slate-400 font-medium" id="modal-order-title">Đơn hàng #FDL-</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeReviewModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 font-bold flex items-center justify-center cursor-pointer transition-colors">&times;</button>
+        </div>
+
+        <form action="{{ route('order.review') }}" method="POST" class="space-y-4">
+            @csrf
+            <input type="hidden" name="order_id" id="modal-order-id" value="">
+            <input type="hidden" name="rating_stars" id="modal-rating-input" value="5">
+
+            <!-- Summary of dishes being reviewed -->
+            <div class="bg-amber-50/70 p-3 rounded-2xl border border-amber-200/80 space-y-1">
+                <span class="text-[11px] font-black uppercase text-amber-800 tracking-wider flex items-center gap-1">
+                    <i class="fas fa-utensils text-[10px]"></i> Các món bạn đã thưởng thức:
+                </span>
+                <p class="text-xs font-semibold text-slate-700 leading-relaxed" id="modal-dishes-summary">
+                    ...
+                </p>
+            </div>
+
+            <!-- Star Rating Selection -->
+            <div class="text-center space-y-2 py-1">
+                <label class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider">Hương vị món ăn thế nào?</label>
+                <div class="flex items-center justify-center gap-2" id="star-rating-container">
+                    @for($s = 1; $s <= 5; $s++)
+                        <button type="button" 
+                                onclick="selectModalRating({{ $s }})" 
+                                onmouseover="previewModalRating({{ $s }})"
+                                onmouseout="resetModalRatingPreview()"
+                                class="text-3xl text-amber-400 transition-transform hover:scale-125 cursor-pointer modal-star-btn" 
+                                data-star="{{ $s }}">
+                            <i class="fas fa-star"></i>
+                        </button>
+                    @endfor
+                </div>
+                <div class="text-xs font-black text-amber-600" id="rating-text-label">⭐⭐⭐⭐⭐ Tuyệt vời! Rất hài lòng</div>
+            </div>
+
+            <!-- Comment Input -->
+            <div class="space-y-1.5">
+                <label class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider">Nhận xét chi tiết:</label>
+                <textarea name="review_comment" rows="3" required
+                          placeholder="Hãy chia sẻ cảm nhận của bạn về độ tươi ngon, hương vị món ăn và phục vụ..."
+                          class="w-full p-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-800 outline-none focus:border-[#ee4d2d] focus:bg-white transition-all"></textarea>
+            </div>
+
+            <!-- Submit buttons -->
+            <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+                <button type="button" onclick="closeReviewModal()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs cursor-pointer transition-colors">
+                    Hủy bỏ
+                </button>
+                <button type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-black text-xs shadow-md transition-all cursor-pointer flex items-center gap-1.5">
+                    <i class="fas fa-paper-plane text-xs"></i> Gửi đánh giá món ăn
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection
 
 @section('scripts')
 <script>
+    let currentModalRating = 5;
+    const ratingLabels = {
+        1: '⭐ Rất tệ! Không hài lòng',
+        2: '⭐⭐ Tệ! Cần cải thiện nhiều',
+        3: '⭐⭐⭐ Bình thường! Tạm ổn',
+        4: '⭐⭐⭐⭐ Ngon! Khá hài lòng',
+        5: '⭐⭐⭐⭐⭐ Tuyệt vời! Rất thơm ngon'
+    };
+
+    function openReviewModal(orderId, dishesSummary) {
+        document.getElementById('modal-order-id').value = orderId;
+        document.getElementById('modal-order-title').innerText = 'Đơn hàng #FDL-' + orderId;
+        document.getElementById('modal-dishes-summary').innerText = dishesSummary || 'Các món ăn trong đơn hàng';
+        selectModalRating(5);
+        document.getElementById('reviewOrderModal').classList.remove('hidden');
+    }
+
+    function closeReviewModal() {
+        document.getElementById('reviewOrderModal').classList.add('hidden');
+    }
+
+    function selectModalRating(stars) {
+        currentModalRating = stars;
+        document.getElementById('modal-rating-input').value = stars;
+        updateStarDisplay(stars);
+        document.getElementById('rating-text-label').innerText = ratingLabels[stars] || '';
+    }
+
+    function previewModalRating(stars) {
+        updateStarDisplay(stars);
+        document.getElementById('rating-text-label').innerText = ratingLabels[stars] || '';
+    }
+
+    function resetModalRatingPreview() {
+        updateStarDisplay(currentModalRating);
+        document.getElementById('rating-text-label').innerText = ratingLabels[currentModalRating] || '';
+    }
+
+    function updateStarDisplay(stars) {
+        document.querySelectorAll('.modal-star-btn').forEach(btn => {
+            const s = parseInt(btn.getAttribute('data-star'));
+            if (s <= stars) {
+                btn.classList.add('text-amber-400');
+                btn.classList.remove('text-slate-200');
+            } else {
+                btn.classList.remove('text-amber-400');
+                btn.classList.add('text-slate-200');
+            }
+        });
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
         let orderStates = {};
 
@@ -181,7 +342,14 @@
                                 else if (o.order_status === 'completed') statusText = 'Đã giao thành công';
                                 else if (o.order_status === 'cancelled') statusText = 'Đã hủy';
 
-                                alert(`🔔 [FOODDAILY Notification] Đơn hàng #FDL-${o.id} của bạn vừa chuyển sang trạng thái: ${statusText}!`);
+                                if (o.order_status === 'completed') {
+                                    if (confirm(`🎉 [FOODDAILY Notification]\n\nĐơn hàng #FDL-${o.id} của bạn vừa được giao thành công!\n\nBạn có muốn mở trang đánh giá món ăn ngay không? (Bạn cũng có thể xem và chọn không đánh giá)`)) {
+                                        window.location.href = "{{ url('/donhang') }}/" + o.id + "/danhgia";
+                                        return;
+                                    }
+                                } else {
+                                    alert(`🔔 [FOODDAILY Notification] Đơn hàng #FDL-${o.id} của bạn vừa chuyển sang trạng thái: ${statusText}!`);
+                                }
                                 window.location.reload();
                             }
                             orderStates[o.id] = o.order_status;

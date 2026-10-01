@@ -20,6 +20,10 @@
 **Nền tảng**: Laravel 13, PHP 8.3, MySQL, Blade Template Engine, TailwindCSS  
 **Thời gian bảo vệ / Thuyết trình**: Năm học 2026  
 
+> 🌐 **GIAO DIỆN TRÌNH CHIẾU THỰC TẾ (WEB UI PRESENTATION)**:
+> - **Truy cập trực tiếp qua Website**: [`http://localhost/CDPHP/public/baocao`](http://localhost/CDPHP/public/baocao)
+> - **File HTML độc lập (Offline / File Explorer)**: [`baocao.html`](file:///c:/laragon/www/CDPHP/baocao.html)
+
 </div>
 
 ---

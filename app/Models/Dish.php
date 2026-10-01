@@ -54,10 +54,23 @@ class Dish extends Model
     }
 
     /**
+     * Quan hệ lấy danh sách các đánh giá của món ăn này
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class)->with('user')->latest();
+    }
+
+    /**
      * Statically cached reviews summary across requests/models
      * @var array<int, array{avg: float, count: int}>|null
      */
     protected static ?array $reviewsSummaryCache = null;
+
+    public static function clearReviewsSummaryCache(): void
+    {
+        self::$reviewsSummaryCache = null;
+    }
 
     protected static function loadReviewsSummary(): void
     {
@@ -67,7 +80,27 @@ class Dish extends Model
 
         self::$reviewsSummaryCache = [];
         try {
+            // 1. Ưu tiên các đánh giá trực tiếp gắn theo dish_id
+            $directReviews = \Illuminate\Support\Facades\DB::table('reviews')
+                ->whereNotNull('dish_id')
+                ->select(
+                    'dish_id',
+                    \Illuminate\Support\Facades\DB::raw('AVG(rating) as avg_rating'),
+                    \Illuminate\Support\Facades\DB::raw('COUNT(id) as total_reviews')
+                )
+                ->groupBy('dish_id')
+                ->get();
+
+            foreach ($directReviews as $row) {
+                self::$reviewsSummaryCache[(int) $row->dish_id] = [
+                    'avg' => round((float) $row->avg_rating, 1),
+                    'count' => (int) $row->total_reviews,
+                ];
+            }
+
+            // 2. Kế thừa đánh giá qua đơn hàng nếu món chưa có đánh giá trực tiếp
             $summaries = \Illuminate\Support\Facades\DB::table('reviews')
+                ->whereNull('reviews.dish_id')
                 ->join('orders', 'reviews.order_id', '=', 'orders.id')
                 ->join('order_items', 'orders.id', '=', 'order_items.order_id')
                 ->select(
@@ -79,10 +112,12 @@ class Dish extends Model
                 ->get();
 
             foreach ($summaries as $row) {
-                self::$reviewsSummaryCache[(int) $row->dish_id] = [
-                    'avg' => round((float) $row->avg_rating, 1),
-                    'count' => (int) $row->total_reviews,
-                ];
+                if (!isset(self::$reviewsSummaryCache[(int) $row->dish_id])) {
+                    self::$reviewsSummaryCache[(int) $row->dish_id] = [
+                        'avg' => round((float) $row->avg_rating, 1),
+                        'count' => (int) $row->total_reviews,
+                    ];
+                }
             }
         } catch (\Throwable $e) {
             // Silently continue with fallbacks if tables don't exist yet

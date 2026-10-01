@@ -189,23 +189,6 @@ class CustomerOrderHistorySeeder extends Seeder
                     $paymentMethod = $paymentMethods[array_rand($paymentMethods)];
                     $note = $orderNotesList[array_rand($orderNotesList)];
 
-                    // Tạo mẫu một số đơn có khiếu nại hoàn tiền
-                    $isRefundSample = ($orderStatus === 'cancelled' || ($orderIndex === 0 && $i % 10 === 0));
-                    if ($isRefundSample) {
-                        $refundReasons = [
-                            'Giao hàng trễ hơn 45 phút so với dự kiến do mưa lớn',
-                            'Đặt nhầm số lượng món ăn và cần hoàn tiền',
-                            'Món ăn bị tràn trong quá trình tài xế vận chuyển',
-                            'Không liên hệ được với khách do sự cố mạng viễn thông',
-                            'Khách bận họp đột xuất nên yêu cầu hủy và hoàn trả tiền',
-                        ];
-                        $refundReason = $refundReasons[array_rand($refundReasons)];
-                        $note .= "\n[Yêu cầu hoàn tiền: Lý do: {$refundReason}, Số tiền yêu cầu: ".number_format($finalAmount, 0, ',', '.')." đ]";
-                        if ($paymentStatus === 'refunded') {
-                            $note .= "\n[Admin Phản hồi: Đã đối soát và duyệt hoàn trả dòng tiền cho khách. (Đã duyệt hoàn tiền)]";
-                        }
-                    }
-
                     // Chọn từ 2 đến 6 món khác nhau cho đơn hàng này
                     $numItems = mt_rand(2, 6);
                     $selectedDishes = collect();
@@ -238,6 +221,23 @@ class CustomerOrderHistorySeeder extends Seeder
                     }
 
                     $finalAmount = $totalAmount;
+
+                    // Tạo mẫu một số đơn có khiếu nại hoàn tiền
+                    $isRefundSample = ($orderStatus === 'cancelled' || ($orderIndex === 0 && $i % 10 === 0));
+                    if ($isRefundSample) {
+                        $refundReasons = [
+                            'Giao hàng trễ hơn 45 phút so với dự kiến do mưa lớn',
+                            'Đặt nhầm số lượng món ăn và cần hoàn tiền',
+                            'Món ăn bị tràn trong quá trình tài xế vận chuyển',
+                            'Không liên hệ được với khách do sự cố mạng viễn thông',
+                            'Khách bận họp đột xuất nên yêu cầu hủy và hoàn trả tiền',
+                        ];
+                        $refundReason = $refundReasons[array_rand($refundReasons)];
+                        $note .= "\n[Yêu cầu hoàn tiền: Lý do: {$refundReason}, Số tiền yêu cầu: ".number_format($finalAmount, 0, ',', '.')." đ]";
+                        if ($paymentStatus === 'refunded') {
+                            $note .= "\n[Admin Phản hồi: Đã đối soát và duyệt hoàn trả dòng tiền cho khách. (Đã duyệt hoàn tiền)]";
+                        }
+                    }
 
                     // Tạo đơn hàng mới
                     $order = new Order();

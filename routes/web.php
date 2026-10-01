@@ -30,6 +30,7 @@ Route::get('/', [ShopController::class, 'index'])->name('trangchu');
 Route::get('/trangchu', [ShopController::class, 'index']);
 Route::get('/trangchu_dangnhap', [ShopController::class, 'shopLogged'])->name('trangchu_dangnhap');
 Route::get('/mon/{id}', [ShopController::class, 'dishDetail'])->name('dish.detail');
+Route::post('/mon/{id}/danhgia', [ShopController::class, 'submitDishReview'])->name('dish.review');
 
 // Đặt đơn theo nhóm
 Route::post('/nhom/tao', [GroupOrderController::class, 'create'])->name('nhom.create');
@@ -49,11 +50,17 @@ Route::post('/api/payos/webhook', [CartController::class, 'payosWebhook'])->name
 Route::get('/api/orders/track/poll', [ShopController::class, 'pollTrackedOrder'])->name('api.orders.track.poll');
 Route::get('/api/settings/poll', [ShopController::class, 'pollSettings'])->name('api.settings.poll');
 Route::post('/api/coupon/validate', [CartController::class, 'validateCoupon'])->name('api.coupon.validate');
+Route::post('/api/coupon/best', [CartController::class, 'getBestAvailableCoupon'])->name('api.coupon.best');
+Route::post('/api/coupons/save', [ShopController::class, 'saveCoupon'])->name('api.coupons.save');
+Route::post('/api/coupons/save-all', [ShopController::class, 'saveAllCoupons'])->name('api.coupons.save_all');
+Route::get('/api/coupons/my', [ShopController::class, 'getMyCoupons'])->name('api.coupons.my');
 Route::post('/api/gemini/chat', [ShopController::class, 'geminiChat'])->name('api.gemini.chat');
 Route::get('/api/geocode', [ShopController::class, 'geocodeAddress'])->name('api.geocode');
+Route::post('/api/recently-viewed/clear', [ShopController::class, 'clearRecentlyViewed'])->name('api.recently_viewed.clear');
 
 // Tra cứu đơn hàng dành cho khách vãng lai
 Route::get('/tracuu', [ShopController::class, 'trackOrder'])->name('tracuu');
+
 
 // Đăng nhập / Đăng xuất / Đăng ký dùng chung
 Route::get('/trangchu/dangnhap', function () {
@@ -110,6 +117,8 @@ Route::get('/thanhtoan_hoantat/{id}', [CartController::class, 'completePayment']
 Route::post('/order/cancel', [CartController::class, 'cancelOrder'])->name('order.cancel');
 Route::get('/yeucauhoan', [CartController::class, 'refundsList'])->name('yeucauhoan');
 Route::post('/order/refund', [CartController::class, 'refundOrder'])->name('order.refund');
+Route::get('/donhang/{id}/danhgia', [CartController::class, 'showOrderReviewPage'])->name('donhang.danhgia');
+Route::get('/order/{id}/review', [CartController::class, 'showOrderReviewPage'])->name('order.review.page');
 Route::post('/order/review', [CartController::class, 'reviewOrder'])->name('order.review');
 
 // Dynamic Realtime Orders Polling API
@@ -158,6 +167,14 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::post('/nhanvien_chinhsua/{id}', [AdminUserController::class, 'employeeUpdate'])->name('nhanvien_chinhsua.post');
         Route::post('/nhanvien_xoa/{id}', [AdminUserController::class, 'employeeDestroy'])->name('nhanvien_xoa');
 
+        // Quản lý Vai trò & Phân quyền RBAC
+        Route::get('/quanly_vaitro', [\App\Http\Controllers\AdminRoleController::class, 'index'])->name('quanly_vaitro');
+        Route::get('/vaitro_them', [\App\Http\Controllers\AdminRoleController::class, 'create'])->name('vaitro_them');
+        Route::post('/vaitro_them', [\App\Http\Controllers\AdminRoleController::class, 'store'])->name('vaitro_them.post');
+        Route::get('/vaitro_chinhsua/{id}', [\App\Http\Controllers\AdminRoleController::class, 'edit'])->name('vaitro_chinhsua');
+        Route::post('/vaitro_chinhsua/{id}', [\App\Http\Controllers\AdminRoleController::class, 'update'])->name('vaitro_chinhsua.post');
+        Route::post('/vaitro_xoa/{id}', [\App\Http\Controllers\AdminRoleController::class, 'destroy'])->name('vaitro_xoa');
+
         // Quản lý Mã Khuyến mãi
         Route::get('/quanly_khuyenmai', [AdminPromotionController::class, 'index'])->name('quanly_khuyenmai');
         Route::get('/khuyenmai_them', [AdminPromotionController::class, 'create'])->name('khuyenmai_them');
@@ -166,6 +183,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::get('/khuyenmai_chinhsua/{id}', [AdminPromotionController::class, 'edit'])->name('khuyenmai_chinhsua');
         Route::post('/khuyenmai_chinhsua/{id}', [AdminPromotionController::class, 'update'])->name('khuyenmai_chinhsua.post');
         Route::post('/khuyenmai_xoa/{id}', [AdminPromotionController::class, 'destroy'])->name('khuyenmai_xoa');
+        Route::post('/khuyenmai_guimail/{id}', [AdminPromotionController::class, 'broadcastCoupon'])->name('khuyenmai_guimail');
 
         // Gửi mã coupon
         Route::get('/quanly_guima', [AdminPromotionController::class, 'showSendCoupon'])->name('quanly_guima');

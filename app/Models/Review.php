@@ -13,6 +13,7 @@ class Review extends Model
     protected $fillable = [
         'user_id',
         'order_id',
+        'dish_id',
         'rating',
         'comment',
         'image_url',
@@ -36,5 +37,13 @@ class Review extends Model
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
+    }
+
+    /**
+     * Get the dish being reviewed.
+     */
+    public function dish(): BelongsTo
+    {
+        return $this->belongsTo(Dish::class);
     }
 }

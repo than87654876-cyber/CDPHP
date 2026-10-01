@@ -320,7 +320,13 @@ class AdminUserController extends Controller
     // Danh sách nhân viên & ban quản trị
     public function employeesList()
     {
-        $employees = User::whereIn('role', ['staff', 'admin', 'superadmin'])->orderBy('created_at', 'desc')->get();
+        $employees = User::where('role', '!=', 'customer')
+            ->orWhereHas('roles', function ($q) {
+                $q->where('name', '!=', 'customer');
+            })
+            ->with('roles')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return view('admin.employees', compact('employees'));
     }
@@ -328,29 +334,49 @@ class AdminUserController extends Controller
     // Form thêm mới nhân viên
     public function employeeCreate()
     {
-        return view('admin.employees_add');
+        $rolesQuery = \Spatie\Permission\Models\Role::where('name', '!=', 'customer');
+        if (auth()->user()->role !== 'superadmin') {
+            $rolesQuery->whereNotIn('name', ['superadmin', 'admin']);
+        }
+        $roles = $rolesQuery->get();
+
+        if ($roles->isEmpty()) {
+            $defaults = auth()->user()->role === 'superadmin' 
+                ? ['superadmin', 'admin', 'staff', 'kitchen', 'shipper']
+                : ['staff', 'kitchen', 'shipper'];
+            foreach ($defaults as $rName) {
+                \Spatie\Permission\Models\Role::findOrCreate($rName, 'web');
+            }
+            $roles = $rolesQuery->get();
+        }
+
+        return view('admin.employees_add', compact('roles'));
     }
 
     // Lưu nhân viên mới
     public function employeeStore(Request $request)
     {
-        $allowedRoles = auth()->user()->role === 'superadmin' 
-            ? 'in:staff,admin,superadmin' 
-            : 'in:staff';
+        $dbRoles = \Spatie\Permission\Models\Role::where('name', '!=', 'customer')->pluck('name')->toArray();
+        $defaultRoles = ['superadmin', 'admin', 'staff', 'kitchen', 'shipper'];
+        $validRoles = !empty($dbRoles) ? array_unique(array_merge($dbRoles, $defaultRoles)) : $defaultRoles;
+
+        if (auth()->user()->role !== 'superadmin') {
+            $validRoles = array_diff($validRoles, ['superadmin', 'admin']);
+        }
 
         $request->validate([
             'fullname' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6',
-            'role' => 'required|string|' . $allowedRoles,
+            'role' => 'required|string|in:' . implode(',', $validRoles),
             'status' => 'required|integer|in:0,1',
             'notes' => 'nullable|string',
         ], [
-            'role.in' => 'Chỉ Quản trị viên tối cao (Super Admin) mới có quyền phân quyền cấp Quản trị viên.',
+            'role.in' => 'Vai trò không hợp lệ hoặc bạn không có quyền cấp vai trò này.',
         ]);
 
-        User::create([
+        $user = User::create([
             'fullname' => $request->fullname,
             'email' => $request->email,
             'phone' => $request->phone,
@@ -360,13 +386,16 @@ class AdminUserController extends Controller
             'notes' => $request->notes,
         ]);
 
+        \Spatie\Permission\Models\Role::findOrCreate($request->role, 'web');
+        $user->syncRoles([$request->role]);
+
         return redirect()->route('quanly_nhanvien')->with('success', 'Thêm mới và phân quyền nhân sự thành công!');
     }
 
     // Chi tiết nhân viên
     public function employeeShow($id)
     {
-        $employee = User::whereIn('role', ['staff', 'admin', 'superadmin'])->findOrFail($id);
+        $employee = User::with('roles.permissions')->findOrFail($id);
 
         return view('admin.employees_detail', compact('employee'));
     }
@@ -374,40 +403,60 @@ class AdminUserController extends Controller
     // Form chỉnh sửa thông tin nhân viên
     public function employeeEdit($id)
     {
-        $employee = User::whereIn('role', ['staff', 'admin', 'superadmin'])->findOrFail($id);
+        $employee = User::with('roles')->findOrFail($id);
 
         // Quản trị viên cấp dưới không được chỉnh sửa tài khoản của Admin khác hoặc Super Admin
         if (auth()->user()->role !== 'superadmin' && in_array($employee->role, ['admin', 'superadmin'])) {
             return redirect()->route('quanly_nhanvien')->with('error', 'Chỉ Quản trị viên tối cao mới có quyền chỉnh sửa tài khoản Quản trị viên.');
         }
 
-        return view('admin.employees_edit', compact('employee'));
+        $rolesQuery = \Spatie\Permission\Models\Role::where('name', '!=', 'customer');
+        if (auth()->user()->role !== 'superadmin') {
+            $rolesQuery->whereNotIn('name', ['superadmin', 'admin']);
+        }
+        $roles = $rolesQuery->get();
+
+        if ($roles->isEmpty()) {
+            $defaults = auth()->user()->role === 'superadmin' 
+                ? ['superadmin', 'admin', 'staff', 'kitchen', 'shipper']
+                : ['staff', 'kitchen', 'shipper'];
+            foreach ($defaults as $rName) {
+                \Spatie\Permission\Models\Role::findOrCreate($rName, 'web');
+            }
+            $roles = $rolesQuery->get();
+        }
+
+        return view('admin.employees_edit', compact('employee', 'roles'));
     }
 
     // Cập nhật thông tin nhân viên
     public function employeeUpdate(Request $request, $id)
     {
-        $employee = User::whereIn('role', ['staff', 'admin', 'superadmin'])->findOrFail($id);
+        $employee = User::findOrFail($id);
 
         // Quản trị viên cấp dưới không được sửa tài khoản của Admin khác hoặc Super Admin
         if (auth()->user()->role !== 'superadmin' && in_array($employee->role, ['admin', 'superadmin'])) {
             return redirect()->route('quanly_nhanvien')->with('error', 'Chỉ Quản trị viên tối cao mới có quyền phân quyền Quản trị viên.');
         }
 
-        $allowedRoles = auth()->user()->role === 'superadmin' 
-            ? 'in:staff,admin,superadmin' 
-            : 'in:staff';
+        $dbRoles = \Spatie\Permission\Models\Role::where('name', '!=', 'customer')->pluck('name')->toArray();
+        $defaultRoles = ['superadmin', 'admin', 'staff', 'kitchen', 'shipper'];
+        $validRoles = !empty($dbRoles) ? array_unique(array_merge($dbRoles, $defaultRoles)) : $defaultRoles;
+
+        if (auth()->user()->role !== 'superadmin') {
+            $validRoles = array_diff($validRoles, ['superadmin', 'admin']);
+        }
 
         $request->validate([
             'fullname' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'email' => 'required|email|unique:users,email,'.$employee->id,
             'password' => 'nullable|string|min:6',
-            'role' => 'required|string|' . $allowedRoles,
+            'role' => 'required|string|in:' . implode(',', $validRoles),
             'status' => 'required|integer|in:0,1',
             'notes' => 'nullable|string',
         ], [
-            'role.in' => 'Chỉ Quản trị viên tối cao (Super Admin) mới có quyền phân quyền cấp Quản trị viên.',
+            'role.in' => 'Vai trò không hợp lệ hoặc bạn không có quyền cấp vai trò này.',
         ]);
 
         // Bảo vệ: Không cho phép hạ quyền tài khoản Quản trị viên tối cao
@@ -422,13 +471,16 @@ class AdminUserController extends Controller
 
         $employee->update($data);
 
+        \Spatie\Permission\Models\Role::findOrCreate($request->role, 'web');
+        $employee->syncRoles([$request->role]);
+
         return redirect()->route('quanly_nhanvien')->with('success', 'Cập nhật thông tin và phân quyền thành công!');
     }
 
     // Xóa nhân viên
     public function employeeDestroy($id)
     {
-        $employee = User::whereIn('role', ['staff', 'admin', 'superadmin'])->findOrFail($id);
+        $employee = User::findOrFail($id);
 
         if ($employee->role === 'superadmin') {
             return redirect()->route('quanly_nhanvien')->with('error', 'Không thể xóa tài khoản của Quản trị viên tối cao.');

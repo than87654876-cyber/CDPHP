@@ -16,8 +16,14 @@ class SuperAdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && in_array(Auth::user()->role, ['superadmin', 'admin'])) {
-            return $next($request);
+        if (Auth::check()) {
+            $user = Auth::user();
+            if (in_array($user->role, ['superadmin', 'admin']) 
+                || (method_exists($user, 'hasAnyRole') && $user->hasAnyRole(['superadmin', 'admin']))
+                || (method_exists($user, 'can') && $user->can('roles.manage'))
+            ) {
+                return $next($request);
+            }
         }
 
         return redirect()->route('quanly_banlamviec')->withErrors(['role' => 'Bạn không có quyền truy cập vào chức năng này.']);
