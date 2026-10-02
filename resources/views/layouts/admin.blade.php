@@ -69,7 +69,6 @@
             $pendingOrdersCount = \App\Models\Order::where('order_status', 'preparing')->count();
             $deliveringOrdersCount = \App\Models\Order::where('order_status', 'delivering')->count();
             $kitchenCount = \App\Models\Order::whereIn('order_status', ['confirmed', 'preparing'])->count();
-            $refundCount = \App\Models\Order::where('health_notes', 'like', '%[Yêu cầu hoàn tiền%')->where('payment_status', '!=', 'refunded')->count();
             $lowStockInventoryCount = \App\Models\InventoryItem::where('current_stock', '<=', \Illuminate\Support\Facades\DB::raw('min_stock'))->count();
         @endphp
 
@@ -157,18 +156,6 @@
                         @if($pendingOrdersCount > 0)
                             <span class="px-2 py-0.5 rounded-full bg-[#ee4d2d] text-white text-[10px] font-black shadow-xs">
                                 {{ $pendingOrdersCount }}
-                            </span>
-                        @endif
-                    </a>
-
-                    <a href="{{ route('quanly_yeucauhoan') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_yeucauhoan') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-rotate-left w-5 text-center"></i>
-                            <span>Yêu cầu hoàn tiền</span>
-                        </div>
-                        @if($refundCount > 0)
-                            <span class="px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black">
-                                {{ $refundCount }}
                             </span>
                         @endif
                     </a>
@@ -370,7 +357,7 @@
                         if (data.updates && data.updates.length > 0) {
                             data.updates.forEach(e => {
                                 const path = window.location.pathname;
-                                const isManagerPage = path.includes('quanly') || path.includes('donhang') || path.includes('yeucauhoan') || path.includes('goidangky') || path.includes('bep');
+                                const isManagerPage = path.includes('quanly') || path.includes('donhang') || path.includes('goidangky') || path.includes('bep') || path.includes('kho');
                                 
                                 if (e.action === 'created') {
                                     alert(`🔔 [Realtime Notification] Có đơn hàng mới #${e.order.id}! Vui lòng kiểm tra!`);

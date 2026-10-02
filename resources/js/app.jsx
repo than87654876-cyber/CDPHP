@@ -11,7 +11,6 @@ import OrderHistoryApp from './components/client/OrderHistoryApp';
 import TrackOrderApp from './components/client/TrackOrderApp';
 import GroupOrderApp from './components/client/GroupOrderApp';
 import SubscriptionApp from './components/client/SubscriptionApp';
-import RefundApp from './components/client/RefundApp';
 import AuthApp from './components/client/AuthApp';
 
 // Admin Components (Bootstrap 5)
@@ -22,7 +21,6 @@ import AdminCategoriesApp from './components/admin/AdminCategoriesApp';
 import AdminPackagesApp from './components/admin/AdminPackagesApp';
 import AdminSubscriptionsApp from './components/admin/AdminSubscriptionsApp';
 import AdminUsersApp from './components/admin/AdminUsersApp';
-import AdminRefundsApp from './components/admin/AdminRefundsApp';
 import AdminCouponsApp from './components/admin/AdminCouponsApp';
 import AdminKitchenApp from './components/admin/AdminKitchenApp';
 import CustomerBackupsApp from './components/admin/CustomerBackupsApp';
@@ -40,7 +38,6 @@ const components = {
     TrackOrderApp,
     GroupOrderApp,
     SubscriptionApp,
-    RefundApp,
     AuthApp,
 
     // Admin
@@ -51,7 +48,6 @@ const components = {
     AdminPackagesApp,
     AdminSubscriptionsApp,
     AdminUsersApp,
-    AdminRefundsApp,
     AdminCouponsApp,
     AdminKitchenApp,
     CustomerBackupsApp,

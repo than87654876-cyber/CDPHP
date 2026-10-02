@@ -337,7 +337,7 @@
                         <span>ĐẶT HÀNG NGAY</span>
                     </button>
                     <p class="text-[10px] text-center text-slate-400 font-medium">
-                        Cam kết giao hàng đúng hẹn & hoàn tiền nếu có sự cố
+                        Cam kết giao hàng đúng hẹn & đảm bảo chất lượng món ăn
                     </p>
                 </form>
             </div>

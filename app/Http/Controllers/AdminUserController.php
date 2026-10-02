@@ -41,11 +41,6 @@ class AdminUserController extends Controller
             $query->whereHas('subscriptions', function ($q) {
                 $q->where('status', 'active');
             });
-        } elseif ($filter === 'refunded') {
-            $query->whereHas('orders', function ($q) {
-                $q->where('payment_status', 'refunded')
-                  ->orWhere('health_notes', 'like', '%hoàn tiền%');
-            });
         } elseif ($filter === 'inactive_3m') {
             $threeMonthsAgo = now()->subMonths(3);
             $query->where('created_at', '<', $threeMonthsAgo)

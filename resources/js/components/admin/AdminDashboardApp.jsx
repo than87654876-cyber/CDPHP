@@ -31,8 +31,6 @@ export default function AdminDashboardApp({
                         <li><a className="dropdown-item small" href={routes.exportOrders || '#'}><i className="bi bi-file-earmark-excel text-success me-2"></i>Đơn hàng</a></li>
                         <li><a className="dropdown-item small" href={routes.exportCustomers || '#'}><i className="bi bi-people text-primary me-2"></i>Khách hàng</a></li>
                         <li><a className="dropdown-item small" href={routes.exportDishes || '#'}><i className="bi bi-cup-hot text-danger me-2"></i>Món bán chạy</a></li>
-                        <li><hr className="dropdown-divider" /></li>
-                        <li><a className="dropdown-item small" href={routes.exportRefunds || '#'}><i className="bi bi-arrow-counterclockwise text-warning me-2"></i>Lịch sử hoàn tiền</a></li>
                     </ul>
                 </div>
             </div>

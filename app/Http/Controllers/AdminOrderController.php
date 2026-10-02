@@ -177,7 +177,7 @@ class AdminOrderController extends Controller
     {
         $request->validate([
             'order_status' => 'required|string|in:pending,confirmed,preparing,delivering,completed,cancelled',
-            'payment_status' => 'required|string|in:pending,paid,failed,refunded',
+            'payment_status' => 'required|string|in:pending,paid,failed',
             'admin_notes' => 'nullable|string',
         ]);
 

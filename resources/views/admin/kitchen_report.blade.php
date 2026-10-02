@@ -1134,7 +1134,7 @@
                                 <i class="far fa-eye text-slate-400"></i> Xem chi tiết
                             </a>
 
-                            <!-- Nút Chỉnh sửa / Xử lý sự cố nếu khách có yêu cầu đổi/hủy/hoàn tiền -->
+                            <!-- Nút Chỉnh sửa / Xử lý sự cố đơn hàng -->
                             <a href="{{ url('/donhang_chinhsua') }}/${item.id}" target="_blank"
                                class="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-xs font-bold transition-all flex items-center gap-1.5"
                                title="Cập nhật trạng thái hoặc xử lý khiếu nại của khách">

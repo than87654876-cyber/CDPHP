@@ -69,7 +69,6 @@
                         <option value="pending" {{ $order->payment_status === 'pending' ? 'selected' : '' }}>⏳ Chờ thanh toán (Pending)</option>
                         <option value="paid" {{ $order->payment_status === 'paid' ? 'selected' : '' }}>✔ Đã thanh toán (Paid)</option>
                         <option value="failed" {{ $order->payment_status === 'failed' ? 'selected' : '' }}>✕ Thanh toán thất bại (Failed)</option>
-                        <option value="refunded" {{ $order->payment_status === 'refunded' ? 'selected' : '' }}>↺ Đã hoàn tiền (Refunded)</option>
                     </select>
                 </div>
 

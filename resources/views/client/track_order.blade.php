@@ -60,8 +60,6 @@
                                     <!-- Payment Badge -->
                                     @if($ord->payment_status === 'paid')
                                         <span class="px-2.5 py-0.5 bg-emerald-100 text-emerald-700 font-extrabold text-[10px] rounded-full">Đã thanh toán</span>
-                                    @elseif($ord->payment_status === 'refunded')
-                                        <span class="px-2.5 py-0.5 bg-rose-100 text-rose-700 font-extrabold text-[10px] rounded-full">Đã hoàn tiền</span>
                                     @else
                                         <span class="px-2.5 py-0.5 bg-amber-100 text-amber-700 font-extrabold text-[10px] rounded-full">Chờ thanh toán</span>
                                     @endif
@@ -191,8 +189,6 @@
                             <div class="mt-1">
                                 @if($selectedOrder->payment_status === 'paid')
                                     <span class="px-3 py-1 bg-emerald-100 text-emerald-700 font-extrabold text-xs rounded-full">Đã thanh toán</span>
-                                @elseif($selectedOrder->payment_status === 'refunded')
-                                    <span class="px-3 py-1 bg-rose-100 text-rose-700 font-extrabold text-xs rounded-full">Đã hoàn tiền</span>
                                 @else
                                     <span class="px-3 py-1 bg-amber-100 text-amber-700 font-extrabold text-xs rounded-full">Chờ thanh toán</span>
                                 @endif

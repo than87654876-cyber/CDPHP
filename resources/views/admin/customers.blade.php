@@ -28,9 +28,6 @@
         <a href="{{ route('quanly_khachhang', ['filter' => 'active_package']) }}" class="px-4 py-2 rounded-xl border transition-all {{ isset($filter) && $filter === 'active_package' ? 'bg-[#ee4d2d] text-white border-[#ee4d2d]' : 'bg-white text-slate-700 hover:bg-slate-100 border-slate-200' }}">
             Đang dùng gói combo
         </a>
-        <a href="{{ route('quanly_khachhang', ['filter' => 'refunded']) }}" class="px-4 py-2 rounded-xl border transition-all {{ isset($filter) && $filter === 'refunded' ? 'bg-[#ee4d2d] text-white border-[#ee4d2d]' : 'bg-white text-slate-700 hover:bg-slate-100 border-slate-200' }}">
-            Đã từng hoàn tiền
-        </a>
     </div>
 
     <!-- Data Table Card -->

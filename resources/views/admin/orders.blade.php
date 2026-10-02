@@ -88,7 +88,6 @@
                                     <option value="pending" {{ $order->payment_status === 'pending' ? 'selected' : '' }}>Chờ thanh toán</option>
                                     <option value="paid" {{ $order->payment_status === 'paid' ? 'selected' : '' }}>Đã thanh toán</option>
                                     <option value="failed" {{ $order->payment_status === 'failed' ? 'selected' : '' }}>Thất bại</option>
-                                    <option value="refunded" {{ $order->payment_status === 'refunded' ? 'selected' : '' }}>Đã hoàn tiền</option>
                                 </select>
                                 <div class="text-[10px] text-slate-400 font-bold mt-1 uppercase">Hình thức: {{ $paymentMethodText }}</div>
                             </td>

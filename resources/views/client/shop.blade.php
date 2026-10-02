@@ -1036,12 +1036,14 @@
 
 <!-- FLOATING ACTION BUTTON: KHO ƯU ĐÃI NỔI BẬT GÓC DƯỚI (Xếp trên nút Trợ lý AI) -->
 @if(isset($activeCoupons) && $activeCoupons->isNotEmpty())
-<div class="fixed bottom-[86px] right-6 z-40 group">
-    <button type="button" onclick="openVoucherModal()" class="relative flex items-center gap-2 px-4 py-2.5 rounded-full text-white font-black text-xs shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 border-white cursor-pointer" style="background: linear-gradient(135deg, #ee4d2d 0%, #ff5722 100%) !important;">
-        <span class="text-base animate-bounce">🎁</span>
-        <span>Kho Ưu Đãi</span>
-        <span class="px-2 py-0.5 rounded-full bg-white text-[#ee4d2d] font-black text-[10px] shadow-2xs">
-            {{ $activeCoupons->count() }} mã
+<div class="fixed bottom-20 right-6 z-40 group">
+    <button type="button" onclick="openVoucherModal()" 
+            class="relative w-12 h-12 rounded-full text-white shadow-xl hover:shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 border-2 border-white flex items-center justify-center cursor-pointer" 
+            style="background: linear-gradient(135deg, #ee4d2d 0%, #ff5722 100%) !important;"
+            title="Kho Ưu Đãi ({{ $activeCoupons->count() }} mã)">
+        <span class="text-xl animate-bounce">🎁</span>
+        <span class="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 rounded-full bg-white text-[#ee4d2d] font-black text-[10px] flex items-center justify-center shadow-md border border-rose-200">
+            {{ $activeCoupons->count() }}
         </span>
     </button>
 </div>

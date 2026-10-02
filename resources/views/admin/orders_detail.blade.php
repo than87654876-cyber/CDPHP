@@ -105,10 +105,6 @@
                             <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-xs border border-emerald-200">
                                 ✔ Đã thanh toán
                             </span>
-                        @elseif($order->payment_status === 'refunded')
-                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-rose-50 text-rose-700 font-extrabold text-xs border border-rose-200">
-                                ↺ Đã hoàn tiền
-                            </span>
                         @else
                             <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-50 text-amber-700 font-extrabold text-xs border border-amber-200">
                                 ⏳ Chờ thanh toán

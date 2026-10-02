@@ -425,96 +425,6 @@ class CartController extends Controller
         return redirect()->route('giohang')->with('success', 'Cảm ơn bạn đã gửi đánh giá cho đơn hàng FDL-'.$order->id.'!');
     }
 
-    // Xử lý yêu cầu hoàn trả tiền
-    public function refundOrder(Request $request)
-    {
-        $request->validate([
-            'order_id' => 'required|integer',
-            'refund_reason' => 'required|string',
-            'refund_method' => 'required|string|in:bank,momo',
-            'bank_name' => 'required_if:refund_method,bank|nullable|string',
-            'bank_account' => 'required_if:refund_method,bank|nullable|string',
-            'bank_user' => 'required_if:refund_method,bank|nullable|string',
-            'momo_phone' => 'required_if:refund_method,momo|nullable|string',
-            'momo_user' => 'required_if:refund_method,momo|nullable|string',
-            'refund_amount' => 'required|numeric|min:0',
-            'refund_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'refund_detail' => 'required|string',
-        ]);
-
-        $order = Order::where('id', $request->order_id)
-            ->where('user_id', Auth::id())
-            ->firstOrFail();
-
-        if ($order->order_status !== 'completed') {
-            return redirect()->route('giohang')->withErrors(['error' => 'Chỉ có thể yêu cầu hoàn tiền cho đơn hàng đã hoàn thành.']);
-        }
-
-        // Xử lý upload ảnh minh chứng hoàn tiền
-        $imageLink = 'Không có';
-        if ($request->hasFile('refund_image')) {
-            try {
-                $file = $request->file('refund_image');
-                $filename = 'refund_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('uploads'), $filename);
-                $imageLink = asset('uploads/' . $filename);
-            } catch (\Exception $uploadError) {
-                \Illuminate\Support\Facades\Log::warning('Refund image upload error: ' . $uploadError->getMessage());
-            }
-        }
-
-        $reqAmount = floatval($request->input('refund_amount', $order->final_amount));
-        if ($reqAmount > $order->final_amount) {
-            $reqAmount = $order->final_amount;
-        }
-
-        $refundInfo = '[Yêu cầu hoàn tiền - Số tiền yêu cầu: '.number_format($reqAmount, 0, ',', '.').'đ, Lý do: '.$request->refund_reason.', Hình ảnh minh chứng: '.$imageLink.', Phương thức: '.$request->refund_method;
-        if ($request->refund_method === 'bank') {
-            $refundInfo .= ' (Ngân hàng: '.$request->bank_name.', STK: '.$request->bank_account.', Chủ tài khoản: '.$request->bank_user.')';
-        } else {
-            $refundInfo .= ' (SĐT MoMo: '.$request->momo_phone.', Chủ tài khoản MoMo: '.$request->momo_user.')';
-        }
-        $refundInfo .= ', Chi tiết: '.$request->refund_detail.']';
-
-        $order->health_notes = ($order->health_notes ? $order->health_notes."\n" : '').$refundInfo;
-        $order->save();
-
-        try {
-            event(new \App\Events\OrderUpdated($order, 'refund_requested'));
-        } catch (\Exception $broadcastException) {
-            \Illuminate\Support\Facades\Log::warning('Broadcasting failed: ' . $broadcastException->getMessage());
-        }
-
-        return redirect()->route('giohang')->with('success', 'Yêu cầu hoàn tiền cho đơn hàng FDL-'.$order->id.' đã được gửi thành công. Ban quản lý sẽ thẩm định và phản hồi sớm nhất.');
-    }
-
-    // Danh sách yêu cầu hoàn tiền của khách hàng
-    public function refundsList(Request $request)
-    {
-        if (!Auth::check()) {
-            return redirect()->route('trangchu/dangnhap')->withErrors(['login_input' => 'Vui lòng đăng nhập để xem danh sách yêu cầu hoàn tiền.']);
-        }
-
-        $query = Order::with(['orderItems.dish'])
-            ->where('user_id', Auth::id())
-            ->where('health_notes', 'like', '%[Yêu cầu hoàn tiền%')
-            ->orderBy('updated_at', 'desc');
-
-        $search = $request->input('search');
-        if ($search) {
-            $query->where(function($q) use ($search) {
-                $cleanSearch = str_replace('FDL-', '', $search);
-                $q->where('id', 'like', "%{$cleanSearch}%")
-                  ->orWhere('health_notes', 'like', "%{$search}%");
-            });
-        }
-
-        $orders = $query->get();
-        $settings = \App\Models\Setting::pluck('value', 'key')->all();
-
-        return view('client.refunds', compact('orders', 'settings', 'search'));
-    }
-
     // Trang thanh toán / quét mã QR (VietQR / MoMo)
     public function momoMethod(Request $request)
     {
@@ -816,13 +726,10 @@ class CartController extends Controller
                 $action = 'reviewed';
             } elseif ($order->payment_status === 'paid' && $order->updated_at->gt($sinceDate)) {
                 $action = 'paid';
-            } elseif ($order->payment_status === 'refunded') {
-                $action = 'refund_processed';
             }
 
             $orderData = $order->toArray();
             $orderData['is_reviewed'] = \App\Models\Review::where('order_id', $order->id)->exists();
-            $orderData['has_refund_request'] = strpos($order->health_notes ?? '', '[Yêu cầu hoàn tiền') !== false;
 
             $updates[] = [
                 'order' => $orderData,

@@ -55,9 +55,9 @@ export default function StaffWorkspaceApp({
                                 <i className="bi bi-headset fs-2"></i>
                             </div>
                             <h5 className="fw-bold mb-2">Chăm Sóc Khách Hàng</h5>
-                            <p className="small text-muted mb-4">Tiếp nhận khiếu nại, phản hồi đánh giá và xử lý yêu cầu đổi trả</p>
-                            <a href="/admin/refunds" className="btn btn-outline-warning btn-sm fw-bold w-100">
-                                Xử Lý Khiếu Nại
+                            <p className="small text-muted mb-4">Hỗ trợ khách hàng, giải đáp thắc mắc và chăm sóc thành viên</p>
+                            <a href="/quanly_khachhang" className="btn btn-outline-warning btn-sm fw-bold w-100">
+                                Quản Lý Khách Hàng
                             </a>
                         </div>
                     </div>

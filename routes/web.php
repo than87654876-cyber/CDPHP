@@ -7,7 +7,6 @@ use App\Http\Controllers\AdminOrderController;
 use App\Http\Controllers\AdminPackageController;
 use App\Http\Controllers\AdminProcurementController;
 use App\Http\Controllers\AdminPromotionController;
-use App\Http\Controllers\AdminRefundController;
 use App\Http\Controllers\AdminSettingController;
 use App\Http\Controllers\AdminSubscriptionController;
 use App\Http\Controllers\AdminUserController;
@@ -116,10 +115,8 @@ Route::get('/thanhtoan_ATM', [CartController::class, 'atmMethod'])->name('thanht
 Route::get('/thanhtoan_momo', [CartController::class, 'momoMethod'])->name('thanhtoan_momo');
 Route::get('/thanhtoan_hoantat/{id}', [CartController::class, 'completePayment'])->name('thanhtoan_hoantat');
 
-// Hủy đơn hàng, Đổi/Hoàn tiền, Đánh giá sản phẩm
+// Hủy đơn hàng & Đánh giá sản phẩm
 Route::post('/order/cancel', [CartController::class, 'cancelOrder'])->name('order.cancel');
-Route::get('/yeucauhoan', [CartController::class, 'refundsList'])->name('yeucauhoan');
-Route::post('/order/refund', [CartController::class, 'refundOrder'])->name('order.refund');
 Route::get('/donhang/{id}/danhgia', [CartController::class, 'showOrderReviewPage'])->name('donhang.danhgia');
 Route::get('/order/{id}/review', [CartController::class, 'showOrderReviewPage'])->name('order.review.page');
 Route::post('/order/review', [CartController::class, 'reviewOrder'])->name('order.review');
@@ -228,7 +225,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/donhang_xem/{id}', [AdminOrderController::class, 'show'])->name('donhang_xem');
     Route::get('/donhang_chinhsua/{id}', [AdminOrderController::class, 'edit'])->name('donhang_chinhsua');
     Route::post('/donhang_chinhsua/{id}', [AdminOrderController::class, 'update'])->name('donhang_chinhsua.post');
-    Route::post('/donhang_refund/{id}', [AdminRefundController::class, 'processRefund'])->name('donhang_refund');
     Route::post('/donhang_xoa/{id}', [AdminOrderController::class, 'destroy'])->name('donhang_xoa');
 
     // Quản lý Đánh giá
@@ -246,11 +242,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/goidangky_xoa/{id}', [AdminSubscriptionController::class, 'destroy'])->name('goidangky_xoa');
     Route::post('/goidangky_tao_don/{id}', [AdminSubscriptionController::class, 'createDailyOrder'])->name('goidangky_tao_don');
 
-    // Quản lý Hoàn tiền
-    Route::get('/quanly_yeucauhoan', [AdminRefundController::class, 'refundsList'])->name('quanly_yeucauhoan');
-    Route::get('/yeucauhoan_xem/{id}', [AdminRefundController::class, 'refundShow'])->name('yeucauhoan_xem');
-    Route::post('/yeucauhoan_duyet/{id}', [AdminRefundController::class, 'refundApprove'])->name('yeucauhoan_duyet');
-
     // Quản lý Khách hàng
     Route::get('/quanly_khachhang', [AdminUserController::class, 'customersList'])->name('quanly_khachhang');
     Route::get('/khachhang_xem/{id}', [AdminUserController::class, 'customerShow'])->name('khachhang_xem');
@@ -263,7 +254,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/quanly/baocao/xuat-orders', [AdminOrderController::class, 'exportOrdersCsv'])->name('baocao_xuat_orders');
     Route::get('/quanly/baocao/xuat-customers', [AdminUserController::class, 'exportCustomersExcel'])->name('baocao_xuat_customers');
     Route::get('/quanly/baocao/xuat-dishes', [AdminDishController::class, 'exportDishesCsv'])->name('baocao_xuat_dishes');
-    Route::get('/quanly/baocao/xuat-refunds', [AdminRefundController::class, 'exportRefundsCsv'])->name('baocao_xuat_refunds');
 
     // --- Quản lý Kho, Nhà Cung Cấp & Nhập Hàng (Procurement & Inventory) ---
     // 1. Kho hàng & Hàng tồn thực tế

@@ -37,9 +37,6 @@
                     <a class="flex items-center px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-amber-600" href="{{ route('baocao_xuat_dishes') }}">
                         <i class="fas fa-hamburger mr-2 text-amber-500"></i>Xuất báo cáo món chạy
                     </a>
-                    <a class="flex items-center px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-rose-600" href="{{ route('baocao_xuat_refunds') }}">
-                        <i class="fas fa-rotate-left mr-2 text-rose-500"></i>Xuất lịch sử hoàn tiền
-                    </a>
                 </div>
             </div>
         </div>

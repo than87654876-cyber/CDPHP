@@ -206,36 +206,15 @@ class SubscriptionController extends Controller
         $subscription->remaining_days = 0;
         $subscription->save();
 
-        // Ghi nhận lý do hủy & yêu cầu hoàn tiền vào Order gốc
+        // Ghi nhận lý do hủy vào Order gốc
         if ($subscription->order) {
             $order = $subscription->order;
-
-            // Giả lập tính số tiền hoàn trả: còn bao nhiêu ngày nhân với đơn giá ngày
-            $refundAmount = round(($order->total_amount / max(1, $subscription->dailySchedules()->count())) * $remainingDays, 2);
-
-            $imageUrl = null;
-            if ($request->hasFile('cancel_image')) {
-                $file = $request->file('cancel_image');
-                $filename = time() . '_' . $file->getClientOriginalName();
-                if (!file_exists(public_path('uploads/cancels'))) {
-                    mkdir(public_path('uploads/cancels'), 0777, true);
-                }
-                $file->move(public_path('uploads/cancels'), $filename);
-                $imageUrl = 'uploads/cancels/' . $filename;
-            }
-
-            $imageLink = $imageUrl ? url($imageUrl) : 'Không có';
-            $refundText = '[Yêu cầu hoàn tiền - Lý do: Hủy gói (' . $request->cancel_reason . '), Hình ảnh minh chứng: ' . $imageLink . ', Phương thức: Chuyển khoản (Số tiền hoàn lại ước tính: ' . $refundAmount . ')';
-            if ($request->filled('bank_name')) {
-                $refundText .= ', Ngân hàng: ' . $request->bank_name . ', STK: ' . $request->bank_account . ', Chủ tài khoản: ' . $request->bank_user;
-            }
-            $refundText .= ']';
-
-            $order->health_notes = ($order->health_notes ? $order->health_notes . "\n" : '') . $refundText;
+            $cancelText = '[Hủy gói dịch vụ - Lý do: ' . ($request->cancel_reason ?? 'Khách yêu cầu hủy') . ']';
+            $order->health_notes = ($order->health_notes ? $order->health_notes . "\n" : '') . $cancelText;
             $order->save();
         }
 
-        return back()->with('success', 'Đã hủy gói dịch vụ thành công! Hệ thống sẽ xử lý hoàn lại tiền cho các ngày ăn chưa sử dụng.');
+        return back()->with('success', 'Đã hủy gói dịch vụ thành công!');
     }
 
     // Viết đánh giá chất lượng dịch vụ

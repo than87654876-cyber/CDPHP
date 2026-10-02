@@ -91,13 +91,14 @@
                     <a href="{{ route('tracuu') }}" class="h-full flex items-center {{ request()->routeIs('tracuu') ? 'border-b-2 border-[#ee4d2d] text-[#ee4d2d] font-extrabold' : 'hover:text-[#ee4d2d] transition-colors' }} px-1">
                         Tra cứu đơn
                     </a>
-                    <a href="{{ route('yeucauhoan') }}" class="h-full flex items-center {{ request()->routeIs('yeucauhoan') ? 'border-b-2 border-[#ee4d2d] text-[#ee4d2d] font-extrabold' : 'hover:text-[#ee4d2d] transition-colors' }} px-1">
-                        Đổi/Hoàn tiền
-                    </a>
                     <button type="button" onclick="openGlobalUserVoucherModal('all')" class="h-full flex items-center hover:text-[#ee4d2d] transition-colors px-1 cursor-pointer">
                         <i class="fas fa-ticket-alt text-[#ee4d2d] mr-1.5 text-xs"></i>
                         <span>Kho Ưu Đãi</span>
                         <span class="ml-1.5 px-1.5 py-0.2 bg-gradient-to-r from-red-500 to-amber-500 text-[9px] text-white font-black rounded-full animate-pulse">HOT</span>
+                    </button>
+                    <button type="button" onclick="openSpinWheelModal()" class="h-full flex items-center hover:text-[#ee4d2d] transition-colors px-1 cursor-pointer font-bold text-slate-600" title="Quay chọn món ngẫu nhiên">
+                        <span class="mr-1 text-sm">🎡</span>
+                        <span>Hôm nay ăn gì?</span>
                     </button>
                 </nav>
 
@@ -208,17 +209,15 @@
         @yield('content')
     </main>
 
-    <!-- ===== VÒNG QUAY HÔM NAY MÌNH ĂN GÌ – FLOATING BUTTON ===== -->
+    <!-- ===== VÒNG QUAY HÔM NAY MÌNH ĂN GÌ – FLOATING BUTTON (ĐẶT GÓC DƯỚI BÊN TRÁI ĐỂ TRÁNH ĐÈ LÊN MÃ KHUYẾN MÃI) ===== -->
     <button type="button" id="spin-wheel-fab"
             onclick="openSpinWheelModal()"
-            class="fixed z-50 flex items-center gap-2.5 px-4 py-3 rounded-full font-extrabold text-xs shadow-xl cursor-pointer transition-all duration-300 hover:scale-105 select-none"
-            style="bottom: 5rem; right: 1.5rem; background: linear-gradient(135deg, #f59e0b 0%, #ee4d2d 100%); color:#fff; box-shadow: 0 8px 28px rgba(238,77,45,0.45);">
-        <span class="relative flex h-2.5 w-2.5 shrink-0">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
-        </span>
+            class="fixed bottom-6 left-6 z-50 flex items-center gap-2 px-4 py-3 rounded-full font-black text-xs text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 select-none cursor-pointer border border-amber-300/40"
+            style="background: linear-gradient(135deg, #f59e0b 0%, #ee4d2d 100%); box-shadow: 0 8px 24px rgba(238, 77, 45, 0.35);"
+            title="Quay ngẫu nhiên chọn món ngon">
         <span class="text-base">🎡</span>
         <span>Hôm nay mình ăn gì?</span>
+        <span class="px-1.5 py-0.5 rounded-full bg-white/25 text-[10px] font-black uppercase tracking-wider">Quay</span>
     </button>
 
     <!-- ===== SPIN WHEEL MODAL ===== -->
@@ -551,13 +550,14 @@
     })();
     </script>
 
-    <!-- Floating AI Chatbot Widget -->
-    <button type="button" onclick="toggleChatbot()" class="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-full bg-[#ee4d2d] hover:bg-red-600 text-white font-extrabold text-xs shadow-xl shadow-rose-500/30 flex items-center gap-2.5 hover:scale-105 transition-all cursor-pointer">
-        <span class="relative flex h-2.5 w-2.5">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
+    <!-- Floating AI Chatbot Widget (Chỉ hiện icon tròn gọn gàng) -->
+    <button type="button" onclick="toggleChatbot()" 
+            class="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-[#ee4d2d] hover:bg-red-600 text-white shadow-xl shadow-rose-500/40 flex items-center justify-center text-xl hover:scale-110 active:scale-95 transition-all cursor-pointer border-2 border-white" 
+            title="Trợ lý AI FOODDAILY">
+        <span class="relative flex items-center justify-center">
+            <i class="fas fa-robot text-lg"></i>
+            <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#ee4d2d] animate-pulse"></span>
         </span>
-        <i class="fas fa-robot text-base"></i> <span>Trợ lý AI FOODDAILY</span>
     </button>
 
     <!-- Chatbot Modal Window -->
@@ -618,7 +618,7 @@
                 <div>
                     <h4 class="font-extrabold text-slate-900 uppercase text-[11px] mb-3">Trung tâm hỗ trợ</h4>
                     <ul class="space-y-2 text-slate-500">
-                        <li><a href="{{ route('yeucauhoan') }}" class="hover:text-[#ee4d2d]">Chính sách đổi trả / hoàn tiền</a></li>
+                        <li><a href="#" class="hover:text-[#ee4d2d]">Chính sách hỗ trợ khách hàng</a></li>
                         <li><a href="#" class="hover:text-[#ee4d2d]">Quy chế hoạt động</a></li>
                         <li><a href="#" class="hover:text-[#ee4d2d]">Giải quyết khiếu nại</a></li>
                     </ul>

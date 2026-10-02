@@ -167,9 +167,9 @@
                                     </a>
                                 @endif
 
-                                <a href="{{ route('yeucauhoan') }}" class="px-3.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all">
-                                    <i class="fas fa-rotate-left mr-1"></i> Yêu cầu hoàn tiền
-                                </a>
+                                <span class="px-3 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[11px] font-medium inline-flex items-center gap-1 border border-slate-200/60" title="Hotline hỗ trợ khách hàng">
+                                    <i class="fas fa-headset text-slate-400"></i> Hỗ trợ: 1900 6868
+                                </span>
                             @endif
                         </div>
                     </div>

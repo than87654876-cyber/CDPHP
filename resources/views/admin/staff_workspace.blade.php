@@ -73,33 +73,25 @@
                         </div>
                         <div>
                             <h3 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider">Xác Nhận & CSKH</h3>
-                            <p class="text-[11px] text-slate-400 font-medium">Hỗ trợ khách & Hoàn tiền</p>
+                            <p class="text-[11px] text-slate-400 font-medium">Hỗ trợ khách & Đơn hàng mới</p>
                         </div>
                     </div>
                     <span class="px-3 py-1 bg-rose-50 text-[#ee4d2d] rounded-full text-xs font-extrabold border border-rose-200">
-                        {{ $cskhPendingOrders + $cskhPendingRefunds }} việc
+                        {{ $cskhPendingOrders }} đơn
                     </span>
                 </div>
 
                 <p class="text-xs text-slate-500 leading-relaxed font-medium">
-                    Theo dõi đơn hàng đang chuẩn bị món và xử lý các yêu cầu hỗ trợ từ khách hàng.
+                    Theo dõi đơn hàng đang chuẩn bị món và xử lý kịp thời các đơn hàng mới phát sinh.
                 </p>
 
                 <div class="space-y-3">
                     <a href="{{ route('quanly_donhang') }}" class="p-3.5 rounded-2xl bg-slate-50 hover:bg-rose-50/50 border border-slate-100 flex items-center justify-between transition-colors block">
                         <div>
-                            <p class="text-xs font-bold text-slate-800">Đơn hàng đang chuẩn bị</p>
-                            <p class="text-[10px] text-slate-400">Hệ thống chuyển tự động</p>
+                            <p class="text-xs font-bold text-slate-800">Đơn hàng đang chuẩn bị món</p>
+                            <p class="text-[10px] text-slate-400">Tiếp nhận và chuyển sang Bếp</p>
                         </div>
                         <span class="px-3 py-1 bg-[#ee4d2d] text-white rounded-xl text-xs font-black">{{ $cskhPendingOrders }} đơn</span>
-                    </a>
-
-                    <a href="{{ route('quanly_yeucauhoan') }}" class="p-3.5 rounded-2xl bg-slate-50 hover:bg-rose-50/50 border border-slate-100 flex items-center justify-between transition-colors block">
-                        <div>
-                            <p class="text-xs font-bold text-slate-800">Yêu cầu đổi / hoàn tiền</p>
-                            <p class="text-[10px] text-slate-400">Chờ duyệt từ khách</p>
-                        </div>
-                        <span class="px-3 py-1 bg-rose-600 text-white rounded-xl text-xs font-black">{{ $cskhPendingRefunds }} đơn</span>
                     </a>
                 </div>
             </div>

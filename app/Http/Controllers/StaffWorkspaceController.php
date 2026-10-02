@@ -26,12 +26,8 @@ class StaffWorkspaceController extends Controller
 
         $kitchenTotal = $kitchenSingleQty + $kitchenSubQty;
 
-        // 2. Thống kê Chăm sóc Khách hàng (CSKH)
+        // 2. Thống kê Chăm sóc Khách hàng (CSKH) & Đơn hàng mới
         $cskhPendingOrders = Order::where('order_status', 'pending')->count();
-
-        $cskhPendingRefunds = Order::where('health_notes', 'like', '%[Yêu cầu hoàn tiền%')
-            ->where('payment_status', '!=', 'refunded')
-            ->count();
 
         // 3. Thống kê Vận chuyển (Shipper)
         $shipDeliveringOrders = Order::where('order_status', 'delivering')->count();
@@ -49,7 +45,6 @@ class StaffWorkspaceController extends Controller
             'kitchenSubQty',
             'kitchenTotal',
             'cskhPendingOrders',
-            'cskhPendingRefunds',
             'shipDeliveringOrders',
             'shipTodaySubscriptions',
             'shipperDeliveringOrders',
