@@ -28,7 +28,7 @@ class AdminUserController extends Controller
         $query = $this->applyCustomerFilter($query, $filter);
         $query = $this->applyAdvancedCustomerFilters($query, $request);
 
-        $customers = $query->get();
+        $customers = $query->paginate(20)->withQueryString();
 
         return view('admin.customers', compact('customers', 'filter'));
     }
@@ -66,7 +66,7 @@ class AdminUserController extends Controller
         if ($request->filled('membership')) {
             $query->where('membership', $request->input('membership'));
         }
-        if ($request->filled('gender')) {
+        if ($request->filled('gender') && \Illuminate\Support\Facades\Schema::hasColumn('users', 'gender')) {
             if (in_array($request->input('gender'), ['male', 'female', 'other'], true)) {
                 $query->where('gender', $request->input('gender'));
             }
@@ -205,7 +205,7 @@ class AdminUserController extends Controller
         foreach ($users as $index => $user) {
             $gender = $this->formatGender($user->gender ?? null);
             $birthday = $user->birthday ? $user->birthday->format('d/m/Y') : '';
-            $address = $this->extractAddressFromNotes($user->notes);
+            $address = $user->resolved_address;
             $statusText = $user->status ? 'Hoạt động' : 'Khóa';
             $totalOrders = $user->orders->count();
             $totalSpent = $user->orders->whereIn('payment_status', ['paid', 'completed'])->sum('final_amount');
@@ -275,20 +275,6 @@ class AdminUserController extends Controller
         ]);
     }
 
-    private function extractAddressFromNotes(?string $notes): string
-    {
-        if (empty($notes)) {
-            return '';
-        }
-
-        if (str_contains($notes, 'Địa chỉ:')) {
-            $parts = explode('Địa chỉ:', $notes, 2);
-            return trim($parts[1]);
-        }
-
-        return trim($notes);
-    }
-
     private function formatGender(?string $gender): string
     {
         return match ($gender) {
@@ -329,22 +315,7 @@ class AdminUserController extends Controller
     // Form thêm mới nhân viên
     public function employeeCreate()
     {
-        $rolesQuery = \Spatie\Permission\Models\Role::where('name', '!=', 'customer');
-        if (auth()->user()->role !== 'superadmin') {
-            $rolesQuery->whereNotIn('name', ['superadmin', 'admin']);
-        }
-        $roles = $rolesQuery->get();
-
-        if ($roles->isEmpty()) {
-            $defaults = auth()->user()->role === 'superadmin' 
-                ? ['superadmin', 'admin', 'staff', 'kitchen', 'shipper']
-                : ['staff', 'kitchen', 'shipper'];
-            foreach ($defaults as $rName) {
-                \Spatie\Permission\Models\Role::findOrCreate($rName, 'web');
-            }
-            $roles = $rolesQuery->get();
-        }
-
+        $roles = $this->getAssignableRoles();
         return view('admin.employees_add', compact('roles'));
     }
 
@@ -405,14 +376,21 @@ class AdminUserController extends Controller
             return redirect()->route('quanly_nhanvien')->with('error', 'Chỉ Quản trị viên tối cao mới có quyền chỉnh sửa tài khoản Quản trị viên.');
         }
 
+        $roles = $this->getAssignableRoles();
+        return view('admin.employees_edit', compact('employee', 'roles'));
+    }
+
+    private function getAssignableRoles()
+    {
+        $isSuperadmin = auth()->user()->role === 'superadmin';
         $rolesQuery = \Spatie\Permission\Models\Role::where('name', '!=', 'customer');
-        if (auth()->user()->role !== 'superadmin') {
+        if (!$isSuperadmin) {
             $rolesQuery->whereNotIn('name', ['superadmin', 'admin']);
         }
         $roles = $rolesQuery->get();
 
         if ($roles->isEmpty()) {
-            $defaults = auth()->user()->role === 'superadmin' 
+            $defaults = $isSuperadmin 
                 ? ['superadmin', 'admin', 'staff', 'kitchen', 'shipper']
                 : ['staff', 'kitchen', 'shipper'];
             foreach ($defaults as $rName) {
@@ -421,7 +399,7 @@ class AdminUserController extends Controller
             $roles = $rolesQuery->get();
         }
 
-        return view('admin.employees_edit', compact('employee', 'roles'));
+        return $roles;
     }
 
     // Cập nhật thông tin nhân viên

@@ -13,7 +13,7 @@ class AdminSubscriptionController extends Controller
     // Danh sách các gói đăng ký
     public function index()
     {
-        $subscriptions = Subscription::with(['user', 'package', 'order'])->orderBy('created_at', 'desc')->get();
+        $subscriptions = Subscription::with(['user', 'package', 'order'])->orderBy('created_at', 'desc')->paginate(20)->withQueryString();
 
         return view('admin.sub_packages', compact('subscriptions'));
     }
@@ -23,8 +23,8 @@ class AdminSubscriptionController extends Controller
     {
         $subscription = Subscription::with(['user', 'package', 'order', 'dailySchedules.dish'])->findOrFail($id);
 
-        // Sắp xếp nhật ký thực đơn theo ngày giao thực tế
-        $schedules = $subscription->dailySchedules()->orderBy('delivery_date', 'asc')->get();
+        // Sắp xếp nhật ký thực đơn theo ngày giao thực tế từ quan hệ đã nạp sẵn
+        $schedules = $subscription->dailySchedules->sortBy('delivery_date')->values();
 
         return view('admin.sub_packages_detail', compact('subscription', 'schedules'));
     }
@@ -32,8 +32,8 @@ class AdminSubscriptionController extends Controller
     // Giao diện chỉnh sửa trạng thái/phân bổ món
     public function edit($id)
     {
-        $subscription = Subscription::with(['user', 'package', 'order'])->findOrFail($id);
-        $schedules = $subscription->dailySchedules()->orderBy('delivery_date', 'asc')->get();
+        $subscription = Subscription::with(['user', 'package', 'order', 'dailySchedules.dish'])->findOrFail($id);
+        $schedules = $subscription->dailySchedules->sortBy('delivery_date')->values();
 
         return view('admin.sub_packages_edit', compact('subscription', 'schedules'));
     }

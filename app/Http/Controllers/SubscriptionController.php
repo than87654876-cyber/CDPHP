@@ -21,9 +21,11 @@ class SubscriptionController extends Controller
     {
         $user = Auth::user();
 
-        // Lấy danh sách các subscription của người dùng
+        // Lấy danh sách các subscription của người dùng kèm dailySchedules (giải quyết N+1 query)
         $subscriptions = Subscription::where('user_id', $user->id)
-            ->with(['package', 'order'])
+            ->with(['package', 'order', 'dailySchedules' => function ($q) {
+                $q->orderBy('delivery_date', 'asc');
+            }])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -32,7 +34,7 @@ class SubscriptionController extends Controller
 
         // Xử lý thông tin hiển thị động cho từng subscription
         foreach ($subscriptions as $subscription) {
-            $schedules = $subscription->dailySchedules()->orderBy('delivery_date', 'asc')->get();
+            $schedules = $subscription->dailySchedules;
 
             // Tìm ngày hiện tại dựa trên số ngày đã giao (số record có trạng thái delivered)
             $completedDays = $schedules->where('delivery_status', 'delivered')->count();
@@ -201,15 +203,25 @@ class SubscriptionController extends Controller
         }
 
         // Hủy gói dịch vụ
-        $remainingDays = $subscription->remaining_days;
+        $remainingDays = (int) $subscription->remaining_days;
         $subscription->status = 'cancelled';
         $subscription->remaining_days = 0;
         $subscription->save();
 
-        // Ghi nhận lý do hủy vào Order gốc
+        if ($request->hasFile('cancel_image')) {
+            $request->file('cancel_image')->store('subscription_cancels', 'public');
+        }
+
+        // Ghi nhận lý do hủy & số tiền hoàn dự kiến vào Order gốc
         if ($subscription->order) {
             $order = $subscription->order;
-            $cancelText = '[Hủy gói dịch vụ - Lý do: ' . ($request->cancel_reason ?? 'Khách yêu cầu hủy') . ']';
+            $refundAmount = 0;
+            if ($subscription->package && $subscription->package->duration_days > 0) {
+                $baseAmount = $order->final_amount ?: $subscription->package->price;
+                $refundAmount = round(($baseAmount / $subscription->package->duration_days) * $remainingDays);
+            }
+            $refundNote = $refundAmount > 0 ? " | Hoàn tiền dự kiến ({$remainingDays} ngày): {$refundAmount} VNĐ" : '';
+            $cancelText = '[Hủy gói dịch vụ - Lý do: ' . ($request->cancel_reason ?? 'Khách yêu cầu hủy') . $refundNote . ']';
             $order->health_notes = ($order->health_notes ? $order->health_notes . "\n" : '') . $cancelText;
             $order->save();
         }

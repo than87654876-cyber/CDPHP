@@ -14,31 +14,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-    <!-- Vite Assets & Tailwind CDN -->
+    <!-- Vite Assets -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                    },
-                    colors: {
-                        shopee: {
-                            DEFAULT: '#ee4d2d',
-                            hover: '#d73211',
-                            orange: '#ff4726',
-                            blue: '#0099ff'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
 
     @php
-        $globalSettings = \App\Models\Setting::pluck('value', 'key')->all();
+        $globalSettings = \Illuminate\Support\Facades\Cache::remember('site_global_settings', 3600, function() {
+            return \App\Models\Setting::pluck('value', 'key')->all();
+        });
         $siteBgUrl = isset($globalSettings['site_background']) && $globalSettings['site_background'] 
             ? (\Illuminate\Support\Str::startsWith($globalSettings['site_background'], 'http') ? $globalSettings['site_background'] : asset($globalSettings['site_background']))
             : asset('uploads/cf1a02d49dc2b801e809fcb9adefd77e.jpg');

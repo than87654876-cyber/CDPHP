@@ -265,7 +265,8 @@
                     <label for="message_body" class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider">
                         Nội dung chi tiết <span class="text-[#ee4d2d]">*</span>
                     </label>
-                    <textarea id="message_body" name="message_body" rows="4" required class="w-full p-4 rounded-2xl border border-slate-200 text-xs font-medium text-slate-900 focus:border-[#ee4d2d] outline-none shadow-xs leading-relaxed">Chào bạn thân mến, FOODDAILY gửi tặng riêng bạn mã ưu đãi giảm giá độc quyền tự sinh: [MÃ_TỰ_SINH]. Mã áp dụng cho mọi đơn hàng trong vòng [SỐ_NGÀY] ngày tới. Đừng bỏ lỡ nhé!</textarea>
+                    <textarea id="message_body" name="message_body" rows="4" required class="w-full p-4 rounded-2xl border border-slate-200 text-xs font-medium text-slate-900 focus:border-[#ee4d2d] outline-none shadow-xs leading-relaxed">Chào bạn thân mến, FOODDAILY gửi tặng riêng bạn mã ưu đãi giảm giá độc quyền tự sinh: [MÃ_TỰ_SINH]. Mã áp dụng cho mọi đơn hàng trong vòng [SỐ_NGÀY] ngày tới. Đặt món và áp mã ngay tại: [LINK_WEBSITE]! Đừng bỏ lỡ nhé!</textarea>
+                    <p class="text-[11px] text-slate-400">Từ khóa hỗ trợ: <code class="text-rose-500 font-bold">[MÃ_TỰ_SINH]</code>, <code class="text-rose-500 font-bold">[SỐ_NGÀY]</code>, <code class="text-rose-500 font-bold">[LINK_WEBSITE]</code> (hệ thống tự động chèn link web nếu thiếu).</p>
                 </div>
             </div>
 

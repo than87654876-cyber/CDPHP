@@ -53,13 +53,18 @@ class AdminProcurementController extends Controller
             }
         }
 
-        // Thống kê tổng quan kho
-        $totalItems = InventoryItem::count();
-        $outOfStockCount = InventoryItem::where('current_stock', '<=', 0)->count();
-        $lowStockCount = InventoryItem::where('current_stock', '>', 0)
-            ->whereColumn('current_stock', '<=', 'min_stock')
-            ->count();
-        $totalInventoryValue = InventoryItem::sum(DB::raw('current_stock * cost_price'));
+        // Thống kê tổng quan kho (Gộp 4 câu truy vấn thành 1 câu aggregate duy nhất)
+        $stats = InventoryItem::selectRaw('
+            COUNT(*) as total_items,
+            SUM(CASE WHEN current_stock <= 0 THEN 1 ELSE 0 END) as out_of_stock,
+            SUM(CASE WHEN current_stock > 0 AND current_stock <= min_stock THEN 1 ELSE 0 END) as low_stock,
+            COALESCE(SUM(current_stock * cost_price), 0) as total_value
+        ')->first();
+
+        $totalItems = (int) ($stats->total_items ?? 0);
+        $outOfStockCount = (int) ($stats->out_of_stock ?? 0);
+        $lowStockCount = (int) ($stats->low_stock ?? 0);
+        $totalInventoryValue = (float) ($stats->total_value ?? 0);
 
         $items = $query->orderByRaw("
             CASE 

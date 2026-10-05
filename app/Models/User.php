@@ -12,8 +12,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['fullname', 'email', 'phone', 'password', 'status', 'role', 'points', 'membership', 'notes', 'password_reset_token', 'password_reset_expires_at'])]
-#[Hidden(['password', 'remember_token'])]
+#[Fillable(['fullname', 'email', 'phone', 'address', 'gender', 'birthday', 'last_login', 'password', 'status', 'role', 'points', 'membership', 'notes', 'password_reset_token', 'password_reset_expires_at'])]
+#[Hidden(['password', 'remember_token', 'password_reset_token', 'password_reset_expires_at'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -23,6 +23,10 @@ class User extends Authenticatable
         'fullname',
         'email',
         'phone',
+        'address',
+        'gender',
+        'birthday',
+        'last_login',
         'password',
         'status',
         'role',
@@ -33,6 +37,28 @@ class User extends Authenticatable
         'password_reset_token',
         'password_reset_expires_at',
     ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+        'password_reset_token',
+        'password_reset_expires_at',
+    ];
+
+    /**
+     * Get user address with fallback to notes
+     */
+    public function getResolvedAddressAttribute(): string
+    {
+        if (!empty($this->address)) {
+            return $this->address;
+        }
+        if (!empty($this->notes) && str_contains($this->notes, 'Địa chỉ:')) {
+            $parts = explode('Địa chỉ:', $this->notes, 2);
+            return trim($parts[1]);
+        }
+        return $this->notes ?? '';
+    }
 
     /**
      * Get the attributes that should be cast.

@@ -73,6 +73,7 @@ Route::get('/dangnhap', [AuthController::class, 'showLogin'])->name('dangnhap');
 Route::post('/dangnhap', [AuthController::class, 'login'])->name('dangnhap.post');
 Route::post('/trangchu/dangnhap', [AuthController::class, 'login'])->name('trangchu/dangnhap.post');
 Route::get('/dangxuat', [AuthController::class, 'logout'])->name('dangxuat');
+Route::post('/dangxuat', [AuthController::class, 'logout'])->name('dangxuat.post');
 
 // OAuth Đăng nhập bằng Google
 Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
@@ -91,9 +92,9 @@ Route::get('/trangchu/quenmatkhau', function () {
     return view('client.forget_password');
 })->name('trangchu/quenmatkhau');
 
-Route::post('/trangchu/quenmatkhau', [AuthController::class, 'sendClientResetLinkEmail'])->name('trangchu/quenmatkhau.post');
+Route::post('/trangchu/quenmatkhau', [AuthController::class, 'sendClientResetLinkEmail'])->middleware('throttle:5,1')->name('trangchu/quenmatkhau.post');
 Route::get('/trangchu/quenmatkhau/xacnhan', [AuthController::class, 'showClientOtpVerify'])->name('trangchu/quenmatkhau/xacnhan');
-Route::post('/trangchu/quenmatkhau/xacnhan', [AuthController::class, 'verifyClientOtpAndResetPassword'])->name('trangchu/quenmatkhau/xacnhan.post');
+Route::post('/trangchu/quenmatkhau/xacnhan', [AuthController::class, 'verifyClientOtpAndResetPassword'])->middleware('throttle:10,1')->name('trangchu/quenmatkhau/xacnhan.post');
 Route::get('/trangchu/doimatkhau/{token}', [AuthController::class, 'showClientResetPassword'])->name('trangchu/doimatkhau');
 Route::get('/doimatkhau/{token}', [AuthController::class, 'showClientResetPassword'])->name('doimatkhau');
 Route::post('/trangchu/doimatkhau', [AuthController::class, 'resetClientPassword'])->name('trangchu/doimatkhau.post');

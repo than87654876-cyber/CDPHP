@@ -53,6 +53,7 @@ class AuthController extends Controller
                 return back()->withErrors(['login_input' => 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ hỗ trợ.']);
             }
 
+            $user->update(['last_login' => now()]);
             Auth::login($user, $remember);
             return $this->redirectBasedOnRole($user);
         }
@@ -170,6 +171,7 @@ class AuthController extends Controller
                 'fullname' => $request->fullname,
                 'email' => $request->email,
                 'phone' => $request->phone,
+                'address' => $request->address,
                 'password' => Hash::make($request->password),
                 'role' => 'customer',
                 'status' => true,
@@ -181,6 +183,7 @@ class AuthController extends Controller
                 'fullname' => $request->fullname,
                 'email' => $request->email,
                 'phone' => $request->phone,
+                'address' => $request->address,
                 'password' => Hash::make($request->password),
                 'role' => 'customer',
                 'status' => true,
@@ -284,9 +287,26 @@ class AuthController extends Controller
         if (!$user) {
             return back()->withErrors(['email' => 'Không tìm thấy tài khoản thành viên.'])->withInput();
         }
+
+        $attemptsKey = 'otp_attempts_' . md5($user->email);
+        $attempts = session($attemptsKey, 0) + 1;
+        session([$attemptsKey => $attempts]);
+
+        if ($attempts > 5) {
+            $user->update([
+                'password_reset_token' => null,
+                'password_reset_expires_at' => null,
+            ]);
+            session()->forget($attemptsKey);
+            return back()->withErrors(['otp' => 'Bạn đã nhập sai mã OTP quá 5 lần. Vì lý do bảo mật, mã đã bị hủy. Vui lòng yêu cầu mã mới.'])->withInput();
+        }
         
-        if ($user->password_reset_token !== $request->otp) {
-            return back()->withErrors(['otp' => 'Mã OTP xác thực không chính xác.'])->withInput();
+        $isMatch = hash_equals((string) $user->password_reset_token, hash('sha256', $request->otp))
+            || ($user->password_reset_token === $request->otp);
+
+        if (!$isMatch) {
+            $remaining = max(0, 5 - $attempts);
+            return back()->withErrors(['otp' => "Mã OTP xác thực không chính xác. Bạn còn {$remaining} lần thử."])->withInput();
         }
         
         if ($user->password_reset_expires_at && now()->isAfter($user->password_reset_expires_at)) {
@@ -299,6 +319,7 @@ class AuthController extends Controller
             'password_reset_token' => null,
             'password_reset_expires_at' => null,
         ]);
+        session()->forget($attemptsKey);
         
         return redirect()->route('dangnhap')->with('success', 'Đổi mật khẩu thành công! Hãy đăng nhập bằng mật khẩu mới.');
     }

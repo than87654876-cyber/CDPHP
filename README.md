@@ -1,58 +1,131 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🍽️ FOODDAILY - Nền tảng Đặt & Giao Đồ Ăn Trực Tuyến Tích Hợp AI & Realtime
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="public/logo.jpg" alt="FOODDAILY Logo" width="120" style="border-radius: 50%;">
 </p>
 
-## About Laravel
+FOODDAILY là hệ sinh thái thương mại điện tử F&B toàn diện được xây dựng trên nền tảng **Laravel 13**, kết hợp công nghệ thời gian thực (**Laravel Reverb / WebSockets**), trí tuệ nhân tạo tư vấn thực đơn (**Google Gemini AI**), cổng thanh toán tự động đối soát (**PayOS VietQR**), và phân hệ quản lý kho vận - nhà cung cấp - điều phối bếp thông minh.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🚀 Tính năng cốt lõi
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 1. Phân hệ Khách hàng (Client Portal)
+- **Đặt món ăn linh hoạt:** Tìm kiếm theo danh mục, mức giá, gợi ý món hay ăn theo thói quen.
+- **Vòng quay may mắn:** "Hôm nay mình ăn gì?" gợi ý ngẫu nhiên các món theo ngân sách cài đặt.
+- **Trợ lý AI Gemini:** Tư vấn món ăn thông minh dựa theo tâm trạng, sở thích và thực đơn có sẵn.
+- **Đặt đơn theo nhóm (Group Order):** Tạo phòng đặt món chung qua mã phòng/QR code, tự động tổng hợp đơn hàng.
+- **Gói ăn định kỳ (Meal Subscriptions):** Mua combo theo tuần/tháng, tùy chọn đổi món từng ngày trước giờ nấu.
+- **Thanh toán VietQR PayOS & MoMo:** Thanh toán quét mã QR tự động xác nhận qua webhook thời gian thực.
+- **Theo dõi đơn hàng Realtime:** Tra cứu đơn hàng cho cả thành viên và khách vãng lai.
 
-## Learning Laravel
+### 2. Phân hệ Vận hành Bếp & Bàn làm việc (Kitchen & Staff Portal)
+- **Điều phối Bếp FIFO:** Hàng đợi chế biến ưu tiên đơn đặt trước làm trước, gom nhóm số lượng theo từng món.
+- **Bàn làm việc nhân viên (Staff Workspace):** Thống kê nhanh đơn chờ xử lý, lịch gói ăn trong ngày, cảnh báo nguyên liệu tồn kho thấp.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 3. Phân hệ Quản trị Cấp cao (Admin Portal)
+- **Phân quyền đa tầng (RBAC):** Super Admin, Admin, Staff, Kitchen, Shipper quản lý qua Spatie Permission.
+- **Quản lý Kho & Nhập hàng (Procurement & Inventory):** Theo dõi nguyên liệu, tồn kho, nhà cung cấp và lập phiếu nhập kho.
+- **Chiến dịch Khuyến mãi & Ví Voucher:** Phát hành mã giảm giá, tự động lưu vào ví thành viên và gửi email thông báo.
+- **Sao lưu & Phục hồi dữ liệu (Customer Backup):** Xuất file zip sao lưu định kỳ, hỗ trợ khôi phục an toàn.
+- **Thông báo Telegram Bot:** Tự động gửi cảnh báo đơn hàng mới, thanh toán thành công và doanh thu đến nhóm Telegram.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## 🛠️ Công nghệ sử dụng
 
-## Agentic Development
+- **Backend:** PHP 8.3+, Laravel 13, Eloquent ORM, Spatie Laravel Permission
+- **Frontend:** Laravel Blade Template Engine, Tailwind CSS v4, JavaScript Modern Fetch API
+- **Realtime:** Laravel Reverb / WebSockets
+- **Database:** MySQL 8.0+ / SQLite (Testing)
+- **AI & Third-party Services:**
+  - Google Gemini 1.5 Flash (Trợ lý ảo tư vấn)
+  - PayOS (Cổng thanh toán tự động VietQR)
+  - Cloudinary (Lưu trữ hình ảnh Cloud)
+  - Telegram Bot API (Thông báo nội bộ)
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+---
+
+## ⚙️ Hướng dẫn cài đặt & Triển khai
+
+### 1. Yêu cầu hệ thống
+- PHP >= 8.3 (với các extensions: `pdo_mysql`, `gd`, `zip`, `fileinfo`, `curl`)
+- MySQL >= 8.0 hoặc MariaDB
+- Composer 2.x
+- Node.js >= 20.x & npm
+
+### 2. Các bước cài đặt
 
 ```bash
-composer require laravel/boost --dev
+# 1. Clone repository hoặc giải nén mã nguồn vào thư mục web server (Laragon, XAMPP, v.v.)
+cd c:\laragon\www\CDPHP
 
-php artisan boost:install
+# 2. Cài đặt các gói phụ thuộc PHP
+composer install
+
+# 3. Tạo file cấu hình môi trường
+copy .env.example .env
+php artisan key:generate
+
+# 4. Cấu hình thông tin Database trong file .env
+# DB_CONNECTION=mysql
+# DB_HOST=127.0.0.1
+# DB_PORT=3306
+# DB_DATABASE=CDPHP
+# DB_USERNAME=root
+# DB_PASSWORD=
+
+# 5. Chạy migration và seed dữ liệu mẫu
+php artisan migrate --seed
+
+# 6. Cài đặt và build assets giao diện
+npm install
+npm run build
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 3. Khởi động môi trường phát triển (Development)
 
-## Contributing
+Bạn có thể chạy toàn bộ hệ thống cùng lúc thông qua Composer script:
+```bash
+composer run dev
+```
+Hoặc chạy thủ công các tiến trình:
+```bash
+# Web Server
+php artisan serve
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# Queue Worker (gửi mail, thông báo)
+php artisan queue:listen --tries=1
 
-## Code of Conduct
+# Realtime WebSocket Server (Laravel Reverb)
+php artisan reverb:start
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## ⏰ Các lệnh Artisan tự động (Cronjobs & Schedule)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Hệ thống đã cấu hình sẵn trong `routes/console.php`:
 
-## License
+| Lệnh | Tần suất | Chức năng |
+| :--- | :--- | :--- |
+| `php artisan orders:cancel-overdue` | Mỗi 1 phút | Tự động hủy đơn hàng quá 15 phút chưa xác nhận/chưa thanh toán |
+| `php artisan subscription:dispatch-daily` | 05:00 sáng | Chuẩn bị lịch giao món ăn gói combo của các hội viên trong ngày |
+| `php artisan backup:customers` | 00:00 đêm | Tự động tạo bản sao lưu dữ liệu khách hàng |
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Để kích hoạt hệ thống chạy tự động, cấu hình Cron / Task Scheduler gọi:
+```bash
+* * * * * php c:\laragon\www\CDPHP\artisan schedule:run >> /dev/null 2>&1
+```
+
+---
+
+## 🔒 Kiểm thử (Testing)
+
+Dự án có đầy đủ bộ kiểm thử Feature & Unit:
+```bash
+php artisan test
+```
+
+---
+*Phát triển bởi Trần Lê Thân - Đồ án tốt nghiệp Công nghệ Thông tin.*

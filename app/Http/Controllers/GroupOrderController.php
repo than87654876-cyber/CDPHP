@@ -32,6 +32,8 @@ class GroupOrderController extends Controller
             'status' => 'active',
         ]);
 
+        session(['group_host_' . $code => true]);
+
         return redirect()->route('nhom.show', ['code' => $groupOrder->code]);
     }
 
@@ -60,13 +62,15 @@ class GroupOrderController extends Controller
             return back()->with('error', 'Nhóm đặt đơn này đã bị đóng hoặc đã chốt đơn!');
         }
 
-        GroupOrderItem::create([
+        $createdItem = GroupOrderItem::create([
             'group_order_id' => $groupOrder->id,
             'member_name' => trim($request->member_name),
             'dish_id' => $request->dish_id,
             'quantity' => $request->quantity,
             'note' => $request->note,
         ]);
+
+        session()->push('group_member_items_' . $code, $createdItem->id);
 
         if ($request->wantsJson()) {
             return response()->json(['success' => true, 'message' => 'Đã thêm món vào nhóm thành công!']);
@@ -80,6 +84,15 @@ class GroupOrderController extends Controller
     {
         $groupOrder = GroupOrder::where('code', $code)->firstOrFail();
         
+        $isHost = (auth()->check() && auth()->id() === $groupOrder->host_id) 
+            || session('group_host_' . $code, false);
+
+        $myItems = session('group_member_items_' . $code, []);
+
+        if (!$isHost && !in_array($itemId, $myItems)) {
+            return back()->with('error', 'Bạn chỉ có quyền xóa món do chính mình đã chọn.');
+        }
+
         $item = GroupOrderItem::where('group_order_id', $groupOrder->id)->where('id', $itemId)->first();
         if ($item) {
             $item->delete();
@@ -91,6 +104,10 @@ class GroupOrderController extends Controller
     // API lấy dữ liệu món ăn trong nhóm realtime
     public function pollItems($code)
     {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_write_close();
+        }
+
         $groupOrder = GroupOrder::where('code', $code)->with(['items.dish'])->first();
         if (!$groupOrder) {
             return response()->json(['error' => 'Group not found'], 404);
@@ -109,6 +126,17 @@ class GroupOrderController extends Controller
     public function checkout(Request $request, $code)
     {
         $groupOrder = GroupOrder::where('code', $code)->with(['items.dish'])->firstOrFail();
+
+        $isHost = (auth()->check() && auth()->id() === $groupOrder->host_id) 
+            || session('group_host_' . $code, false);
+
+        if (!$isHost) {
+            return back()->with('error', 'Chỉ có trưởng nhóm mới có quyền chốt đơn!');
+        }
+
+        if ($groupOrder->status !== 'active') {
+            return back()->with('error', 'Đơn nhóm này đã được chốt hoặc đóng trước đó!');
+        }
 
         if ($groupOrder->items->isEmpty()) {
             return back()->with('error', 'Đơn nhóm chưa có món ăn nào! Vui lòng chọn món trước khi chốt đơn.');

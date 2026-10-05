@@ -65,6 +65,7 @@ class AdminSettingController extends Controller
 
         // Xóa cache view để trang chủ nhận ngay ảnh mới
         try {
+            \Illuminate\Support\Facades\Cache::forget('site_global_settings');
             \Illuminate\Support\Facades\Artisan::call('view:clear');
             \Illuminate\Support\Facades\Artisan::call('cache:clear');
         } catch (\Exception $e) {

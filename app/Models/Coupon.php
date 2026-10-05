@@ -28,6 +28,23 @@ class Coupon extends Model
     ];
 
     /**
+     * Scope a query to only include active coupons.
+     */
+    public function scopeActive($query)
+    {
+        $now = now()->format('Y-m-d');
+        return $query->where(function($q) use ($now) {
+                $q->whereNull('start_date')->orWhere('start_date', '<=', $now);
+            })
+            ->where(function($q) use ($now) {
+                $q->whereNull('end_date')->orWhere('end_date', '>=', $now);
+            })
+            ->where(function($q) {
+                $q->whereNull('usage_limit')->orWhere('usage_limit', '>', 0);
+            });
+    }
+
+    /**
      * Get the orders that use this coupon.
      */
     public function orders(): HasMany

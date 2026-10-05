@@ -223,20 +223,18 @@ class CartController extends Controller
             }
 
             // Map payment methods: cod -> cash, atm -> bank_transfer, momo -> momo
-            $paymentMethod = 'cash';
-            if ($request->cart_payment === 'atm') {
-                $paymentMethod = 'bank_transfer';
-            } elseif ($request->cart_payment === 'momo') {
-                $paymentMethod = 'momo';
-            }
+            $paymentMethod = match ($request->cart_payment) {
+                'atm' => 'bank_transfer',
+                'momo' => 'momo',
+                default => 'cash',
+            };
             $order->payment_method = $paymentMethod;
             $order->payment_status = 'pending';
-            if ($paymentMethod === 'cash') {
-                $order->order_status = 'pending';
-            } else {
-                $order->order_status = 'pending';
-            }
+            $order->order_status = 'pending';
             $order->health_notes = 'Giao hàng: '.$request->cart_time.'. SĐT: '.$request->cart_phone.'. Địa chỉ: '.$request->cart_address;
+            $order->delivery_address = $request->cart_address;
+            $order->delivery_phone = $request->cart_phone;
+            $order->delivery_time = $request->cart_time;
             $order->save();
 
             // Lưu danh sách sản phẩm của đơn hàng
@@ -250,6 +248,8 @@ class CartController extends Controller
             }
 
             DB::commit();
+
+            $request->session()->push('placed_order_ids', $order->id);
 
             try {
                 event(new \App\Events\OrderUpdated($order, 'created'));
@@ -293,18 +293,7 @@ class CartController extends Controller
         $currentDish = $selectedDishId ? Dish::with('category')->find($selectedDishId) : null;
         $relatedDishes = $currentDish ? $currentDish->getRelatedDishes(6) : collect();
 
-        $now = now()->format('Y-m-d');
-        $availableCoupons = \App\Models\Coupon::where(function($q) use ($now) {
-                $q->whereNull('start_date')->orWhere('start_date', '<=', $now);
-            })
-            ->where(function($q) use ($now) {
-                $q->whereNull('end_date')->orWhere('end_date', '>=', $now);
-            })
-            ->where(function($q) {
-                $q->whereNull('usage_limit')->orWhere('usage_limit', '>', 0);
-            })
-            ->orderBy('discount_value', 'desc')
-            ->get();
+        $availableCoupons = \App\Models\Coupon::active()->orderByDesc('discount_value')->get();
 
         $savedCouponIds = [];
         if (Auth::check()) {
@@ -351,8 +340,15 @@ class CartController extends Controller
     {
         $order = Order::with(['orderItems.dish.category', 'reviews.user', 'user'])->findOrFail($id);
 
-        if (Auth::check() && $order->user_id !== Auth::id()) {
-            abort(403, 'Bạn không có quyền truy cập trang đánh giá của đơn hàng này.');
+        if (Auth::check()) {
+            if ($order->user_id !== Auth::id()) {
+                abort(403, 'Bạn không có quyền truy cập trang đánh giá của đơn hàng này.');
+            }
+        } else {
+            $placedIds = session('placed_order_ids', []);
+            if (!in_array($order->id, $placedIds)) {
+                return redirect()->route('dangnhap')->withErrors(['email' => 'Vui lòng đăng nhập để đánh giá đơn hàng.']);
+            }
         }
 
         $existingReview = $order->reviews->whereNull('dish_id')->first() ?? $order->reviews->first();
@@ -369,13 +365,17 @@ class CartController extends Controller
             'review_comment' => 'required|string',
         ]);
 
-        $order = Order::with('orderItems')->where('id', $request->order_id)
-            ->where(function($q) {
-                if (Auth::check()) {
-                    $q->where('user_id', Auth::id());
-                }
-            })
-            ->firstOrFail();
+        if (Auth::check()) {
+            $order = Order::with('orderItems')->where('id', $request->order_id)
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
+        } else {
+            $placedIds = session('placed_order_ids', []);
+            if (!in_array($request->order_id, $placedIds)) {
+                return redirect()->route('dangnhap')->withErrors(['email' => 'Vui lòng đăng nhập để đánh giá đơn hàng.']);
+            }
+            $order = Order::with('orderItems')->where('id', $request->order_id)->firstOrFail();
+        }
 
         $redirectTo = $request->input('redirect_to', 'giohang');
 
@@ -487,9 +487,24 @@ class CartController extends Controller
     public function confirmCod(Request $request, $id)
     {
         $order = Order::where('id', $id)
-            ->where('user_id', Auth::id())
+            ->where(function($q) {
+                if (Auth::check()) {
+                    $q->where('user_id', Auth::id());
+                } else {
+                    $q->whereIn('id', session('placed_order_ids', []));
+                }
+            })
             ->where('payment_method', 'cash')
             ->firstOrFail();
+
+        $order->order_status = 'confirmed';
+        $order->save();
+
+        try {
+            event(new \App\Events\OrderUpdated($order, 'status_updated'));
+        } catch (\Exception $broadcastException) {
+            \Illuminate\Support\Facades\Log::warning('Broadcasting failed: ' . $broadcastException->getMessage());
+        }
 
         return redirect()->route('giohang')
             ->with('success', 'Bạn đã chọn thanh toán tiền mặt khi nhận hàng. Shipper sẽ thu tiền khi giao đơn FDL-'.$order->id.'.');
@@ -658,7 +673,7 @@ class CartController extends Controller
 
                 try {
                     if ($order->user && $order->user->email) {
-                        Mail::to($order->user->email)->send(new OrderPlacedMail($order));
+                        Mail::to($order->user->email)->queue(new OrderPlacedMail($order));
                     }
                 } catch (\Exception $mailError) {
                     \Illuminate\Support\Facades\Log::warning('OrderPlacedMail sending warning: ' . $mailError->getMessage());
@@ -681,6 +696,10 @@ class CartController extends Controller
     // AJAX Polling for Order updates
     public function pollOrders(Request $request)
     {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_write_close();
+        }
+
         $since = $request->query('since');
 
         if (!$since) {
@@ -803,18 +822,8 @@ class CartController extends Controller
         $totalAmount = floatval($request->input('total_amount', 0));
         $user = Auth::user();
 
-        $now = now()->format('Y-m-d');
         // Lấy tất cả coupon active
-        $allCoupons = \App\Models\Coupon::where(function($q) use ($now) {
-                $q->whereNull('start_date')->orWhere('start_date', '<=', $now);
-            })
-            ->where(function($q) use ($now) {
-                $q->whereNull('end_date')->orWhere('end_date', '>=', $now);
-            })
-            ->where(function($q) {
-                $q->whereNull('usage_limit')->orWhere('usage_limit', '>', 0);
-            })
-            ->get();
+        $allCoupons = \App\Models\Coupon::active()->get();
 
         $savedCouponIds = $user->savedCoupons()->pluck('coupons.id')->toArray();
 

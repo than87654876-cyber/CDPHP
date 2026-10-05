@@ -44,7 +44,7 @@ class ProcurementAndInventoryTest extends TestCase
         $response = $this->actingAs($admin)->get(route('quanly_kho'));
 
         $response->assertStatus(200);
-        $response->assertSee('Quản Lý Kho &amp; Hàng Tồn Thực Tế', false);
+        $response->assertSee('Quản Lý Kho & Hàng Tồn Thực Tế', false);
         $response->assertSee('Tổng mặt hàng trong kho');
     }
 
@@ -127,7 +127,15 @@ class ProcurementAndInventoryTest extends TestCase
     {
         $admin = $this->getAdminUser();
 
-        $item = InventoryItem::first();
+        $item = InventoryItem::first() ?? InventoryItem::create([
+            'item_code' => 'TEST-ADJUST-' . uniqid(),
+            'name' => 'Mặt Hàng Test Điều Chỉnh',
+            'unit' => 'kg',
+            'current_stock' => 10.0,
+            'min_stock' => 5.0,
+            'cost_price' => 50000,
+            'status' => 'active',
+        ]);
         $this->assertNotNull($item);
 
         $newStock = 77.5;

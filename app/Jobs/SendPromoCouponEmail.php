@@ -50,6 +50,7 @@ class SendPromoCouponEmail implements ShouldQueue
                     'subjectText' => $this->subject,
                     'bodyText' => $this->body,
                     'expiryDays' => $this->expiryDays,
+                    'websiteUrl' => route('muahang'),
                 ]
             );
         } catch (\Exception $e) {

@@ -27,7 +27,7 @@ class PHPMailerService
         $this->password = env('MAIL_PASSWORD');
         $this->encryption = env('MAIL_ENCRYPTION', 'ssl');
         $this->fromAddress = env('MAIL_FROM_ADDRESS');
-        $this->fromName = env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel'));
+        $this->fromName = env('MAIL_FROM_NAME', config('app.name', 'FOODDAILY'));
         $this->skipSslVerify = env('MAIL_SKIP_SSL_VERIFY', false);
         $this->debug = env('MAIL_DEBUG', false);
     }

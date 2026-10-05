@@ -21,6 +21,11 @@ class Order extends Model
         'payment_status',
         'order_status',
         'health_notes',
+        'delivery_address',
+        'delivery_phone',
+        'delivery_time',
+        'cancellation_reason',
+        'admin_notes',
         'points_accumulated',
         'payment_transaction_id',
         'payment_bank_reference',
@@ -29,6 +34,34 @@ class Order extends Model
         'payment_content',
         'payment_paid_at',
     ];
+
+    /**
+     * Get delivery phone with fallback to health_notes regex
+     */
+    public function getResolvedPhoneAttribute(): string
+    {
+        if (!empty($this->delivery_phone)) {
+            return $this->delivery_phone;
+        }
+        if (!empty($this->health_notes) && preg_match('/SĐT:\s*([0-9\+\.\s]+)/i', $this->health_notes, $m)) {
+            return trim($m[1]);
+        }
+        return $this->user->phone ?? '';
+    }
+
+    /**
+     * Get delivery address with fallback to health_notes regex
+     */
+    public function getResolvedAddressAttribute(): string
+    {
+        if (!empty($this->delivery_address)) {
+            return $this->delivery_address;
+        }
+        if (!empty($this->health_notes) && preg_match('/(?:Địa chỉ|Giao):\s*([^.\n]+)/i', $this->health_notes, $m)) {
+            return trim($m[1]);
+        }
+        return $this->user->address ?? '';
+    }
 
     /**
      * The "booted" method of the model.

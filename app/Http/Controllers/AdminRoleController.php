@@ -182,6 +182,7 @@ class AdminRoleController extends Controller
                 'items' => [
                     'orders.view' => 'Xem danh sách và chi tiết đơn hàng',
                     'orders.process' => 'Duyệt đơn & Cập nhật trạng thái đơn hàng',
+                    'orders.refund' => 'Xử lý hoàn tiền cho đơn hủy hoặc lỗi thanh toán',
                     'orders.delete' => 'Xóa đơn hàng khỏi hệ thống',
                 ]
             ],

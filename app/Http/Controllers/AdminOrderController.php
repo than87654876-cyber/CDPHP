@@ -23,7 +23,7 @@ class AdminOrderController extends Controller
             $query->where('order_status', $status);
         }
 
-        $orders = $query->get();
+        $orders = $query->paginate(20)->withQueryString();
 
         return view('admin.orders', compact('orders', 'status'));
     }
@@ -72,7 +72,7 @@ class AdminOrderController extends Controller
         // Lấy lịch giao combo định kỳ hôm nay kèm mã vận đơn
         $subscriptionSchedules = DailySchedule::with(['dish', 'subscription.user', 'subscription.package'])
             ->where('delivery_date', $todayStr)
-            ->where('delivery_status', 'pending')
+            ->whereIn('delivery_status', ['pending', 'delivered', 'preparing'])
             ->get();
 
         $subscriptionDishes = $subscriptionSchedules->groupBy('dish_id')->map(function ($items) {
@@ -124,14 +124,8 @@ class AdminOrderController extends Controller
         // Format dữ liệu chi tiết cho modal tra cứu và giải quyết khiếu nại của khách
         $initialCompletedOrders = $recentCompletedOrders->map(function ($order) {
             $customerName = $order->user->fullname ?? $order->user->name ?? 'Khách đặt món';
-            $phone = $order->user->phone ?? '';
-            $address = $order->user->address ?? '';
-            if (empty($phone) && !empty($order->health_notes) && preg_match('/SĐT:\s*([0-9\+\.\s]+)/i', $order->health_notes, $m)) {
-                $phone = trim($m[1]);
-            }
-            if (empty($address) && !empty($order->health_notes) && preg_match('/Giao:\s*([^.\n]+)/i', $order->health_notes, $m)) {
-                $address = trim($m[1]);
-            }
+            $phone = $order->resolved_phone;
+            $address = $order->resolved_address;
 
             return [
                 'id' => $order->id,
@@ -188,6 +182,7 @@ class AdminOrderController extends Controller
             $order->order_status = 'confirmed';
         }
         if ($request->admin_notes) {
+            $order->admin_notes = $request->admin_notes;
             $order->health_notes = ($order->health_notes ? $order->health_notes."\n" : '').'[Điều phối: '.$request->admin_notes.']';
         }
         $order->save();

@@ -180,22 +180,13 @@ class ShopController extends Controller
             }
         }
 
-        // 6. Lấy cấu hình trang chủ từ bảng settings
-        $settings = \App\Models\Setting::pluck('value', 'key')->all();
+        // 6. Lấy cấu hình trang chủ từ bảng settings (cached 1 hour)
+        $settings = \Illuminate\Support\Facades\Cache::remember('site_global_settings', 3600, function () {
+            return \App\Models\Setting::pluck('value', 'key')->all();
+        });
 
         // 7. Lấy danh sách mã khuyến mãi cho trang chủ (Pop-up chào mừng & Kho ưu đãi)
-        $now = now()->format('Y-m-d');
-        $activeCoupons = \App\Models\Coupon::where(function($q) use ($now) {
-                $q->whereNull('start_date')->orWhere('start_date', '<=', $now);
-            })
-            ->where(function($q) use ($now) {
-                $q->whereNull('end_date')->orWhere('end_date', '>=', $now);
-            })
-            ->where(function($q) {
-                $q->whereNull('usage_limit')->orWhere('usage_limit', '>', 0);
-            })
-            ->orderBy('discount_value', 'desc')
-            ->get();
+        $activeCoupons = \App\Models\Coupon::active()->orderByDesc('discount_value')->get();
 
         $savedCouponIds = [];
         if (auth()->check()) {
@@ -373,6 +364,10 @@ class ShopController extends Controller
     // AJAX Polling for settings and data changes (Cached 15s)
     public function pollSettings(Request $request)
     {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_write_close();
+        }
+
         $payload = \Illuminate\Support\Facades\Cache::remember('poll_settings_response', 15, function () {
             // 1. Get all settings
             $settings = \App\Models\Setting::pluck('value', 'key')->all();
@@ -427,6 +422,10 @@ class ShopController extends Controller
     // AJAX Polling for public guest order tracking
     public function pollTrackedOrder(Request $request)
     {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_write_close();
+        }
+
         $orderId = $request->query('order_id');
         $email = $request->query('email');
         $phone = $request->query('phone');

@@ -22,7 +22,7 @@ class AdminPromotionController extends Controller
     // Danh sách khuyến mãi
     public function index()
     {
-        $promotions = Coupon::orderBy('created_at', 'desc')->get();
+        $promotions = Coupon::orderBy('created_at', 'desc')->paginate(20)->withQueryString();
 
         return view('admin.promotion', compact('promotions'));
     }
@@ -81,11 +81,16 @@ class AdminPromotionController extends Controller
             'coupon_code', 'discount_type', 'discount_value', 'min_order_value', 'start_date', 'end_date', 'usage_limit'
         ));
 
-        // Nếu admin tích chọn "Gửi email hàng loạt cho khách hàng qua Gmail"
+        // Nếu admin tích chọn gửi email hàng loạt cho khách hàng
         if ($request->boolean('send_email_now')) {
             $query = User::where('role', 'customer')
                 ->where('status', true)
-                ->where('email', 'like', '%@gmail.com');
+                ->whereNotNull('email')
+                ->where('email', '!=', '');
+
+            if ($request->has('only_gmail') ? $request->boolean('only_gmail') : true) {
+                $query->where('email', 'like', '%@gmail.com');
+            }
 
             $customers = $query->get();
             $sentCount = 0;
@@ -93,22 +98,35 @@ class AdminPromotionController extends Controller
             $customBody = $request->input('email_message');
             $expiryDays = $coupon->end_date ? max(1, (int) now()->diffInDays(Carbon::parse($coupon->end_date), false)) : 30;
 
+            // Tự động lưu mã vào ví ưu đãi cá nhân hàng loạt (bulk upsert)
+            if ($request->boolean('auto_save_wallet', true) && $customers->isNotEmpty()) {
+                $walletEntries = $customers->map(function ($c) use ($coupon) {
+                    return [
+                        'user_id' => $c->id,
+                        'coupon_id' => $coupon->id,
+                        'is_used' => false,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                })->all();
+                UserCoupon::upsert($walletEntries, ['user_id', 'coupon_id'], ['is_used', 'updated_at']);
+            }
+
+            $websiteUrl = route('muahang');
             foreach ($customers as $customer) {
-                // Tự động lưu mã vào ví ưu đãi cá nhân của khách hàng
-                if ($request->boolean('auto_save_wallet', true)) {
-                    UserCoupon::updateOrCreate(
-                        ['user_id' => $customer->id, 'coupon_id' => $coupon->id],
-                        ['is_used' => false]
-                    );
-                }
 
                 $body = $customBody ?: (
                     "Xin chào " . ($customer->fullname ?: 'quý khách') . ",\n\n" .
                     "FOODDAILY trân trọng gửi tặng bạn mã giảm giá độc quyền #" . $coupon->coupon_code . " " .
                     "(" . $coupon->formatted_discount . " cho " . $coupon->formatted_min_order . ") " .
                     "nhân dịp siêu ưu đãi!\n\n" .
-                    "Mã ưu đãi đã được lưu trực tiếp vào Ví Voucher trong tài khoản của bạn. Đặt món ngay để thưởng thức những món ăn ngon tuyệt đỉnh cùng giá siêu hời!"
+                    "Mã ưu đãi đã được lưu trực tiếp vào Ví Voucher trong tài khoản của bạn. Đặt món ngay để thưởng thức những món ăn ngon tuyệt đỉnh cùng giá siêu hời!\n\n" .
+                    "👉 Truy cập website và đặt món ngay tại: " . $websiteUrl
                 );
+
+                if ($customBody && !str_contains($customBody, 'http')) {
+                    $body .= "\n\n👉 Truy cập website và đặt món ngay tại: " . $websiteUrl;
+                }
 
                 \App\Jobs\SendPromoCouponEmail::dispatch(
                     $customer->email,
@@ -206,13 +224,19 @@ class AdminPromotionController extends Controller
                 );
             }
 
+            $websiteUrl = route('muahang');
             $body = $customBody ?: (
                 "Xin chào " . ($customer->fullname ?: 'quý khách') . ",\n\n" .
                 "FOODDAILY trân trọng gửi tặng bạn mã giảm giá độc quyền #" . $coupon->coupon_code . " " .
                 "(" . $coupon->formatted_discount . " cho " . $coupon->formatted_min_order . ") " .
                 "nhân dịp ưu đãi đặc biệt hôm nay!\n\n" .
-                "Mã ưu đãi đã được lưu trực tiếp vào Ví Voucher trong tài khoản của bạn. Khi thanh toán giỏ hàng, hệ thống sẽ tự động áp dụng mã tốt nhất để giúp bạn tiết kiệm tối đa!"
+                "Mã ưu đãi đã được lưu trực tiếp vào Ví Voucher trong tài khoản của bạn. Khi thanh toán giỏ hàng, hệ thống sẽ tự động áp dụng mã tốt nhất để giúp bạn tiết kiệm tối đa!\n\n" .
+                "👉 Truy cập website và đặt món ngay tại: " . $websiteUrl
             );
+
+            if ($customBody && !str_contains($customBody, 'http')) {
+                $body .= "\n\n👉 Truy cập website và đặt món ngay tại: " . $websiteUrl;
+            }
 
             \App\Jobs\SendPromoCouponEmail::dispatch(
                 $customer->email,
@@ -330,29 +354,22 @@ class AdminPromotionController extends Controller
                 $query->where('created_at', '>=', Carbon::now()->subDays($days));
             }
 
-            // Lấy danh sách khách hàng ban đầu
-            $customers = $query->get();
-
-            // Lọc theo thời gian chưa mua hàng (inactive period)
+            // Lọc theo thời gian chưa mua hàng (inactive period): Tối ưu truy vấn ở cấp database, loại bỏ hoàn toàn vòng lặp N+1
             if ($request->filled('inactive_period') && $request->inactive_period !== 'all') {
-                $months = 1;
-                if ($request->inactive_period === '6_months') {
-                    $months = 6;
-                } elseif ($request->inactive_period === '1_year') {
-                    $months = 12;
-                }
+                $months = match ($request->inactive_period) {
+                    '6_months' => 6,
+                    '1_year' => 12,
+                    default => 1,
+                };
 
                 $cutoffDate = Carbon::now()->subMonths($months);
 
-                $customers = $customers->filter(function ($customer) use ($cutoffDate) {
-                    $lastOrder = Order::where('user_id', $customer->id)
-                        ->orderBy('created_at', 'desc')
-                        ->first();
-
-                    // Chỉ gửi cho khách hàng cũ đã từng mua hàng ít nhất một lần trước đây (không gửi cho tài khoản chưa từng mua hàng)
-                    return $lastOrder && Carbon::parse($lastOrder->created_at)->lt($cutoffDate);
-                });
+                // Khách hàng đã từng mua hàng nhưng không có đơn hàng nào kể từ mốc cutoffDate
+                $query->whereHas('orders')
+                      ->whereDoesntHave('orders', fn($q) => $q->where('created_at', '>=', $cutoffDate));
             }
+
+            $customers = $query->get();
         }
 
         if ($customers->isEmpty()) {
@@ -392,13 +409,18 @@ class AdminPromotionController extends Controller
                     'usage_limit' => 1, // Mã cá nhân dùng 1 lần
                 ]);
 
-                // Xây dựng nội dung tin nhắn gửi đi
+                // Xây dựng nội dung tin nhắn gửi đi kèm đường dẫn website
+                $websiteUrl = route('muahang');
                 $msgSubject = $request->email_subject;
                 $msgBody = str_replace(
-                    ['[MÃ_TỰ_SINH]', '[SỐ_NGÀY]'],
-                    [$couponCode, $request->expiry_days],
+                    ['[MÃ_TỰ_SINH]', '[SỐ_NGÀY]', '[LINK_WEBSITE]'],
+                    [$couponCode, $request->expiry_days, $websiteUrl],
                     $request->message_body
                 );
+
+                if (!str_contains($msgBody, 'http')) {
+                    $msgBody .= "\n\n👉 Truy cập website và đặt món ngay tại: " . $websiteUrl;
+                }
 
                 // Đưa việc gửi email vào hàng đợi (Queue) để tránh làm nghẽn trang web và tăng tốc độ phản hồi
                 \App\Jobs\SendPromoCouponEmail::dispatch(

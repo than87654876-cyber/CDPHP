@@ -77,6 +77,8 @@ class AdminDishController extends Controller
         }
 
         $dish = Dish::create($data);
+        \Illuminate\Support\Facades\Cache::forget('gemini_dishes_menu');
+        Dish::clearReviewsSummaryCache();
 
         return redirect()->route('quanly_monandon')->with('success', 'Đã thêm món ăn mới thành công!');
     }
@@ -120,6 +122,8 @@ class AdminDishController extends Controller
         }
 
         $dish->update($data);
+        \Illuminate\Support\Facades\Cache::forget('gemini_dishes_menu');
+        Dish::clearReviewsSummaryCache();
 
         return redirect()->route('quanly_monandon')->with('success', 'Đã cập nhật món ăn thành công!');
     }
@@ -135,6 +139,8 @@ class AdminDishController extends Controller
         }
 
         $dish->delete();
+        \Illuminate\Support\Facades\Cache::forget('gemini_dishes_menu');
+        Dish::clearReviewsSummaryCache();
 
         return redirect()->route('quanly_monandon')->with('success', 'Đã xóa món ăn thành công!');
     }
