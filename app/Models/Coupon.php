@@ -99,11 +99,20 @@ class Coupon extends Model
     public function calculateDiscount(float $totalAmount): float
     {
         if ($this->discount_type === 'percent') {
-            $discount = $totalAmount * ($this->discount_value / 100);
+            $discount = round($totalAmount * ($this->discount_value / 100));
         } else {
             $discount = (float) $this->discount_value;
         }
-        return min($discount, $totalAmount);
+
+        // Đảm bảo đơn hàng không bao giờ bị giảm xuống 0đ để khách hàng có thể chuyển khoản thanh toán
+        if ($totalAmount > 1000) {
+            $maxAllowedDiscount = max(0, $totalAmount - 1000);
+            $discount = min($discount, $maxAllowedDiscount);
+        } else {
+            $discount = 0;
+        }
+
+        return max(0, $discount);
     }
 
     public function isValidFor(float $totalAmount): array

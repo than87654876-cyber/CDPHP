@@ -444,4 +444,57 @@ class CouponPromotionSystemTest extends TestCase
             'is_used' => false,
         ]);
     }
+
+    public function test_percentage_coupon_applied_to_small_order_does_not_result_in_zero_final_amount(): void
+    {
+        $coupon = Coupon::create([
+            'coupon_code' => 'PERCENT_15',
+            'discount_type' => 'percent',
+            'discount_value' => 15,
+            'min_order_value' => 0,
+            'start_date' => now()->subDay()->format('Y-m-d'),
+            'end_date' => now()->addDays(5)->format('Y-m-d'),
+            'usage_limit' => 10,
+        ]);
+
+        $orderTotal = 20000.0; // Món 20.000đ
+        $discount = $coupon->calculateDiscount($orderTotal);
+
+        $this->assertEquals(3000.0, $discount);
+        $finalAmount = $orderTotal - $discount;
+        $this->assertEquals(17000.0, $finalAmount);
+        $this->assertGreaterThan(0, $finalAmount);
+
+        // API validate check
+        $response = $this->actingAs($this->customer)->postJson(route('api.coupon.validate'), [
+            'code' => 'PERCENT_15',
+            'total_amount' => $orderTotal,
+        ]);
+
+        $response->assertJson([
+            'success' => true,
+            'discount_amount' => 3000.0,
+            'final_amount' => 17000.0,
+        ]);
+    }
+
+    public function test_order_amount_never_drops_to_zero_so_bank_transfer_is_always_valid(): void
+    {
+        $couponHigh = Coupon::create([
+            'coupon_code' => 'SUPER_DISCOUNT',
+            'discount_type' => 'percent',
+            'discount_value' => 99,
+            'min_order_value' => 0,
+            'start_date' => now()->subDay()->format('Y-m-d'),
+            'end_date' => now()->addDays(5)->format('Y-m-d'),
+        ]);
+
+        $orderTotal = 20000.0;
+        $discount = $couponHigh->calculateDiscount($orderTotal);
+
+        // Discount được giới hạn an toàn để đơn hàng luôn còn số tiền tối thiểu để thanh toán
+        $this->assertLessThanOrEqual(19000.0, $discount);
+        $finalAmount = $orderTotal - $discount;
+        $this->assertGreaterThanOrEqual(1000.0, $finalAmount);
+    }
 }

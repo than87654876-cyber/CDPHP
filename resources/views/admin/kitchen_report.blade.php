@@ -390,6 +390,26 @@
                     @endforeach
                 </div>
 
+                <!-- Phân Trang Vé Bếp (KDS Pagination) -->
+                <div id="kitchen-pagination-bar" class="mt-6 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="text-xs text-slate-500 font-medium">
+                        Hiển thị đơn 
+                        <span id="kds-page-from" class="font-extrabold text-slate-900">1</span> - 
+                        <span id="kds-page-to" class="font-extrabold text-slate-900">3</span> 
+                        trong tổng số 
+                        <span id="kds-total-orders" class="font-extrabold text-slate-900">{{ $activeOrders->count() }}</span> mã đơn cần nấu
+                    </div>
+                    <div class="flex items-center gap-1.5" id="kds-pagination-controls">
+                        <button type="button" onclick="changeKitchenPage(-1)" id="btn-kds-prev" class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-100 transition-colors shadow-2xs cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+                            <i class="fas fa-chevron-left text-[10px]"></i> Trước
+                        </button>
+                        <div id="kds-page-numbers" class="flex items-center gap-1"></div>
+                        <button type="button" onclick="changeKitchenPage(1)" id="btn-kds-next" class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-100 transition-colors shadow-2xs cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+                            Sau <i class="fas fa-chevron-right text-[10px]"></i>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Empty state khi tìm kiếm không ra kết quả -->
                 <div id="kitchen-search-empty" class="hidden text-center py-16 space-y-3 bg-slate-50 rounded-3xl border border-dashed border-slate-200">
                     <div class="w-16 h-16 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center text-2xl mx-auto">
@@ -477,18 +497,47 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
             <!-- Panel 1: Single Dishes (Món Ăn Cho Đơn Hàng Lẻ) -->
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden flex flex-col justify-between">
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden flex flex-col justify-between" id="panel-single-dishes">
                 <div>
-                    <div class="p-5 bg-rose-50 border-b border-rose-100 flex items-center justify-between">
-                        <h3 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                            <i class="fas fa-utensils text-[#ee4d2d]"></i> Món Ăn Cho Đơn Hàng Lẻ
-                        </h3>
-                        <span class="px-3 py-1 rounded-full bg-[#ee4d2d] text-white text-xs font-black shadow-xs">
-                            {{ $singleDishes->sum('total_qty') }} Suất
-                        </span>
+                    <div class="p-4 sm:p-5 bg-rose-50 border-b border-rose-100 flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                                <i class="fas fa-utensils text-[#ee4d2d]"></i> Món Ăn Cho Đơn Hàng Lẻ
+                            </h3>
+                            <span class="px-2 py-0.5 rounded-full bg-rose-100 text-[#ee4d2d] text-[10px] font-black border border-rose-200" id="badge-single-dishes-count">
+                                {{ $singleDishes->count() }} món
+                            </span>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <!-- Ô Tìm kiếm nhanh món ăn -->
+                            <div class="relative w-32 sm:w-40">
+                                <i class="fas fa-search absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]"></i>
+                                <input type="text" 
+                                       id="input-search-single-dishes" 
+                                       oninput="searchSingleDishes(this.value)" 
+                                       placeholder="Tìm món..." 
+                                       class="w-full pl-7 pr-2.5 py-1 text-xs rounded-xl border border-rose-200 bg-white/90 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#ee4d2d] shadow-2xs font-bold">
+                            </div>
+
+                            <!-- Chế độ chọn số lượng món/trang -->
+                            <div class="bg-white/90 p-0.5 rounded-xl border border-rose-200 flex items-center text-[11px] font-extrabold shadow-2xs">
+                                <button type="button" onclick="setSingleDishLimit(5)" id="btn-sd-limit-5" class="px-2.5 py-1 rounded-lg bg-slate-900 text-amber-300 transition-all cursor-pointer shadow-2xs font-black">
+                                    5 món
+                                </button>
+                                <button type="button" onclick="setSingleDishLimit(10)" id="btn-sd-limit-10" class="px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900 transition-all cursor-pointer">
+                                    10 món
+                                </button>
+                                <button type="button" onclick="setSingleDishLimit(999)" id="btn-sd-limit-all" class="px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900 transition-all cursor-pointer">
+                                    Tất cả
+                                </button>
+                            </div>
+                            <span class="px-3 py-1 rounded-full bg-[#ee4d2d] text-white text-xs font-black shadow-xs">
+                                {{ $singleDishes->sum('total_qty') }} Suất
+                            </span>
+                        </div>
                     </div>
 
-                    <div class="p-6">
+                    <div class="p-4 sm:p-5">
                         @if($singleDishes->isEmpty())
                             <div class="text-center py-10 space-y-2">
                                 <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold mx-auto">
@@ -499,49 +548,75 @@
                             </div>
                         @else
                             <div class="overflow-x-auto">
-                                <table class="w-full text-left text-xs">
+                                <table class="w-full text-left text-xs" id="table-single-dishes">
                                     <thead>
                                         <tr class="bg-slate-50 border-b border-slate-100 text-[11px] text-slate-400 uppercase font-extrabold tracking-wider">
-                                            <th class="py-3.5 px-4">Tên Món Ăn</th>
-                                            <th class="py-3.5 px-4">Mã Vận Đơn</th>
-                                            <th class="py-3.5 px-4 text-center">Số Lượng Cần Làm</th>
+                                            <th class="py-3 px-3.5">Tên Món Ăn</th>
+                                            <th class="py-3 px-3.5">Mã Vận Đơn</th>
+                                            <th class="py-3 px-3.5 text-center">Cần Làm</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y divide-slate-100">
+                                    <tbody class="divide-y divide-slate-100" id="tbody-single-dishes">
                                         @foreach($singleDishes as $item)
-                                            <tr class="hover:bg-slate-50/80 transition-colors">
-                                                <td class="py-3.5 px-4 font-extrabold text-slate-900 align-top">
+                                            @php
+                                                $ordersCount = $item->orders->count();
+                                                $previewOrders = $item->orders->take(2);
+                                                $moreCount = $ordersCount - 2;
+                                                $ordersDataJson = json_encode($item->orders->map(fn($o) => [
+                                                    'order_id' => $o->order_id,
+                                                    'tracking_code' => $o->tracking_code,
+                                                    'quantity' => $o->quantity,
+                                                    'order_status' => $o->order_status,
+                                                    'payment_status' => $o->payment_status,
+                                                    'customer_name' => $o->customer_name,
+                                                    'health_notes' => $o->health_notes,
+                                                ]));
+                                            @endphp
+                                            <tr class="hover:bg-slate-50/80 transition-colors single-dish-row" data-dish-name="{{ mb_strtolower($item->dish->dish_name ?? '') }}">
+                                                <td class="py-2.5 px-3.5 font-extrabold text-slate-900 align-middle">
                                                     <div class="flex items-center gap-2">
-                                                        <span class="w-2 h-2 rounded-full bg-[#ee4d2d]"></span>
-                                                        <span>{{ $item->dish->dish_name ?? 'Món ăn không tồn tại' }}</span>
+                                                        <span class="w-2 h-2 rounded-full bg-[#ee4d2d] shrink-0"></span>
+                                                        <span class="font-extrabold text-xs text-slate-900">{{ $item->dish->dish_name ?? 'Món ăn không tồn tại' }}</span>
                                                     </div>
                                                     @if(isset($item->dish->category))
-                                                        <span class="text-[10px] text-slate-400 font-semibold ml-4">{{ $item->dish->category->category_name }}</span>
+                                                        <span class="text-[10px] text-slate-400 font-semibold ml-4 block">{{ $item->dish->category->category_name }}</span>
                                                     @endif
                                                 </td>
-                                                <td class="py-3.5 px-4 align-top">
-                                                    <div class="flex flex-wrap gap-1.5 max-w-xs sm:max-w-sm">
-                                                        @foreach($item->orders as $ord)
+                                                <td class="py-2.5 px-3.5 align-middle">
+                                                    <div class="flex flex-wrap items-center gap-1.5">
+                                                        <span class="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 text-[10px] font-black border border-slate-200 shrink-0">
+                                                            {{ $ordersCount }} đơn
+                                                        </span>
+
+                                                        @foreach($previewOrders as $ord)
                                                             <a href="{{ route('donhang_xem', $ord->order_id) }}" 
                                                                title="Khách: {{ $ord->customer_name }} • {{ $ord->health_notes ?: 'Không có ghi chú' }}"
-                                                               class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-extrabold border transition-all hover:scale-105 shadow-2xs
+                                                               class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-black border transition-all hover:scale-105 shadow-2xs shrink-0
                                                                       @if($ord->order_status === 'pending') bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100
                                                                       @elseif($ord->order_status === 'confirmed') bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100
                                                                       @else bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100 @endif">
-                                                                <i class="fas fa-barcode text-[10px] opacity-70"></i>
                                                                 <span>#{{ $ord->tracking_code }}</span>
-                                                                <span class="px-1.5 py-0.2 rounded-md bg-white/90 text-[10px] font-black text-slate-800 shadow-2xs">
-                                                                    {{ $ord->quantity }} suất
+                                                                <span class="px-1 py-0.1 rounded bg-white text-[9px] font-black text-slate-800 shadow-2xs">
+                                                                    {{ $ord->quantity }}
                                                                 </span>
-                                                                @if(!empty($ord->health_notes))
-                                                                    <i class="fas fa-note-sticky text-amber-500 text-[10px]" title="{{ $ord->health_notes }}"></i>
-                                                                @endif
                                                             </a>
                                                         @endforeach
+
+                                                        @if($moreCount > 0)
+                                                            <button type="button" 
+                                                                    data-dish-name="{{ $item->dish->dish_name ?? 'Món ăn' }}"
+                                                                    data-total-qty="{{ $item->total_qty }}"
+                                                                    data-orders="{{ e($ordersDataJson) }}"
+                                                                    onclick="openDishOrdersModalFromBtn(this)"
+                                                                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-black bg-rose-50 hover:bg-rose-100 text-[#ee4d2d] border border-rose-200 transition-colors cursor-pointer shadow-2xs shrink-0">
+                                                                <span>+{{ $moreCount }} đơn khác</span>
+                                                                <i class="fas fa-chevron-right text-[8px]"></i>
+                                                            </button>
+                                                        @endif
                                                     </div>
                                                 </td>
-                                                <td class="py-3.5 px-4 text-center align-top">
-                                                    <span class="px-3 py-1 rounded-xl bg-rose-50 text-[#ee4d2d] text-xs font-black border border-rose-200 whitespace-nowrap">
+                                                <td class="py-2.5 px-3.5 text-center align-middle">
+                                                    <span class="px-2.5 py-1 rounded-xl bg-rose-50 text-[#ee4d2d] text-xs font-black border border-rose-200 whitespace-nowrap">
                                                         {{ $item->total_qty }} suất
                                                     </span>
                                                 </td>
@@ -550,24 +625,59 @@
                                     </tbody>
                                 </table>
                             </div>
+
+                            <!-- Thanh phân trang cho Món Ăn Đơn Hàng Lẻ -->
+                            <div id="single-dishes-pagination-bar" class="mt-4 pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                                <div class="text-slate-500 font-medium text-[11px]">
+                                    Hiển thị món <span id="sd-page-from" class="font-extrabold text-slate-900">1</span> - <span id="sd-page-to" class="font-extrabold text-slate-900">5</span> / <span id="sd-total-dishes" class="font-extrabold text-slate-900">{{ $singleDishes->count() }}</span> món
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <button type="button" onclick="changeSingleDishPage(-1)" id="btn-sd-prev" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-100 transition-colors shadow-2xs cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+                                        <i class="fas fa-chevron-left text-[9px]"></i> Trước
+                                    </button>
+                                    <div id="sd-page-numbers" class="flex items-center gap-1"></div>
+                                    <button type="button" onclick="changeSingleDishPage(1)" id="btn-sd-next" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-100 transition-colors shadow-2xs cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+                                        Sau <i class="fas fa-chevron-right text-[9px]"></i>
+                                    </button>
+                                </div>
+                            </div>
                         @endif
                     </div>
                 </div>
             </div>
 
             <!-- Panel 2: Subscriptions (Món Ăn Cho Gói Combo Định Kỳ) -->
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden flex flex-col justify-between">
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden flex flex-col justify-between" id="panel-subscription-dishes">
                 <div>
-                    <div class="p-5 bg-amber-50 border-b border-amber-100 flex items-center justify-between">
-                        <h3 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                            <i class="fas fa-box-archive text-amber-600"></i> Món Ăn Cho Gói Combo Định Kỳ
-                        </h3>
-                        <span class="px-3 py-1 rounded-full bg-amber-500 text-white text-xs font-black shadow-xs">
-                            {{ $subscriptionDishes->sum('total_qty') }} Suất
-                        </span>
+                    <div class="p-4 sm:p-5 bg-amber-50 border-b border-amber-100 flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                                <i class="fas fa-box-archive text-amber-600"></i> Món Ăn Cho Gói Combo Định Kỳ
+                            </h3>
+                            <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-black border border-amber-200" id="badge-subscription-dishes-count">
+                                {{ $subscriptionDishes->count() }} món
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <!-- Chế độ chọn số lượng món/trang -->
+                            <div class="bg-white/90 p-0.5 rounded-xl border border-amber-200 flex items-center text-[11px] font-extrabold shadow-2xs">
+                                <button type="button" onclick="setSubscriptionDishLimit(5)" id="btn-subd-limit-5" class="px-2.5 py-1 rounded-lg bg-slate-900 text-amber-300 transition-all cursor-pointer shadow-2xs font-black">
+                                    5 món
+                                </button>
+                                <button type="button" onclick="setSubscriptionDishLimit(10)" id="btn-subd-limit-10" class="px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900 transition-all cursor-pointer">
+                                    10 món
+                                </button>
+                                <button type="button" onclick="setSubscriptionDishLimit(999)" id="btn-subd-limit-all" class="px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900 transition-all cursor-pointer">
+                                    Tất cả
+                                </button>
+                            </div>
+                            <span class="px-3 py-1 rounded-full bg-amber-500 text-white text-xs font-black shadow-xs">
+                                {{ $subscriptionDishes->sum('total_qty') }} Suất
+                            </span>
+                        </div>
                     </div>
 
-                    <div class="p-6">
+                    <div class="p-4 sm:p-5">
                         @if($subscriptionDishes->isEmpty())
                             <div class="text-center py-10 space-y-2">
                                 <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold mx-auto">
@@ -578,40 +688,50 @@
                             </div>
                         @else
                             <div class="overflow-x-auto">
-                                <table class="w-full text-left text-xs">
+                                <table class="w-full text-left text-xs" id="table-subscription-dishes">
                                     <thead>
                                         <tr class="bg-slate-50 border-b border-slate-100 text-[11px] text-slate-400 uppercase font-extrabold tracking-wider">
-                                            <th class="py-3.5 px-4">Tên Món Ăn</th>
-                                            <th class="py-3.5 px-4">Mã Lịch Giao / Đăng Ký</th>
-                                            <th class="py-3.5 px-4 text-center">Số Lượng Cần Làm</th>
+                                            <th class="py-3 px-3.5">Tên Món Ăn</th>
+                                            <th class="py-3 px-3.5">Mã Lịch Giao / Đăng Ký</th>
+                                            <th class="py-3 px-3.5 text-center">Cần Làm</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y divide-slate-100">
+                                    <tbody class="divide-y divide-slate-100" id="tbody-subscription-dishes">
                                         @foreach($subscriptionDishes as $item)
-                                            <tr class="hover:bg-slate-50/80 transition-colors">
-                                                <td class="py-3.5 px-4 font-extrabold text-slate-900 align-top">
+                                            @php
+                                                $schedules = $item->schedules ?? collect();
+                                                $schedCount = $schedules->count();
+                                                $previewSched = $schedules->take(2);
+                                                $moreSched = $schedCount - 2;
+                                            @endphp
+                                            <tr class="hover:bg-slate-50/80 transition-colors subscription-dish-row">
+                                                <td class="py-2.5 px-3.5 font-extrabold text-slate-900 align-middle">
                                                     <div class="flex items-center gap-2">
-                                                        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                                                        <span>{{ $item->dish->dish_name ?? 'Món ăn không tồn tại' }}</span>
+                                                        <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
+                                                        <span class="font-extrabold text-xs text-slate-900">{{ $item->dish->dish_name ?? 'Món ăn không tồn tại' }}</span>
                                                     </div>
                                                 </td>
-                                                <td class="py-3.5 px-4 align-top">
-                                                    <div class="flex flex-wrap gap-1.5 max-w-xs sm:max-w-sm">
-                                                        @if(isset($item->schedules))
-                                                            @foreach($item->schedules as $sch)
-                                                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-extrabold bg-amber-50 text-amber-800 border border-amber-200"
-                                                                      title="Hội viên: {{ $sch->customer_name }} • {{ $sch->package_name }} • {{ $sch->delivery_notes ?: 'Không có ghi chú' }}">
-                                                                    <i class="fas fa-box-open text-[10px] opacity-70"></i>
-                                                                    <span>#{{ $sch->tracking_code }}</span>
-                                                                </span>
-                                                            @endforeach
-                                                        @else
-                                                            <span class="text-slate-400 italic">Lịch giao hôm nay</span>
+                                                <td class="py-2.5 px-3.5 align-middle">
+                                                    <div class="flex flex-wrap items-center gap-1.5">
+                                                        <span class="px-2 py-0.5 rounded-lg bg-amber-100 text-amber-900 text-[10px] font-black border border-amber-200 shrink-0">
+                                                            {{ $schedCount }} lịch giao
+                                                        </span>
+                                                        @foreach($previewSched as $sch)
+                                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-extrabold bg-amber-50 text-amber-800 border border-amber-200 shrink-0"
+                                                                  title="Hội viên: {{ $sch->customer_name }} • {{ $sch->package_name }} • {{ $sch->delivery_notes ?: 'Không có ghi chú' }}">
+                                                                <i class="fas fa-box-open text-[9px] opacity-70"></i>
+                                                                <span>#{{ $sch->tracking_code }}</span>
+                                                            </span>
+                                                        @endforeach
+                                                        @if($moreSched > 0)
+                                                            <span class="text-[10px] font-extrabold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200 shrink-0">
+                                                                +{{ $moreSched }} lịch khác
+                                                            </span>
                                                         @endif
                                                     </div>
                                                 </td>
-                                                <td class="py-3.5 px-4 text-center align-top">
-                                                    <span class="px-3 py-1 rounded-xl bg-amber-50 text-amber-700 text-xs font-black border border-amber-200 whitespace-nowrap">
+                                                <td class="py-2.5 px-3.5 text-center align-middle">
+                                                    <span class="px-2.5 py-1 rounded-xl bg-amber-50 text-amber-700 text-xs font-black border border-amber-200 whitespace-nowrap">
                                                         {{ $item->total_qty }} suất
                                                     </span>
                                                 </td>
@@ -620,11 +740,76 @@
                                     </tbody>
                                 </table>
                             </div>
+
+                            <!-- Thanh phân trang cho Món Combo Định Kỳ -->
+                            <div id="subscription-dishes-pagination-bar" class="mt-4 pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                                <div class="text-slate-500 font-medium text-[11px]">
+                                    Hiển thị món <span id="subd-page-from" class="font-extrabold text-slate-900">1</span> - <span id="subd-page-to" class="font-extrabold text-slate-900">5</span> / <span id="subd-total-dishes" class="font-extrabold text-slate-900">{{ $subscriptionDishes->count() }}</span> món
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <button type="button" onclick="changeSubscriptionDishPage(-1)" id="btn-subd-prev" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-100 transition-colors shadow-2xs cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+                                        <i class="fas fa-chevron-left text-[9px]"></i> Trước
+                                    </button>
+                                    <div id="subd-page-numbers" class="flex items-center gap-1"></div>
+                                    <button type="button" onclick="changeSubscriptionDishPage(1)" id="btn-subd-next" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-100 transition-colors shadow-2xs cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+                                        Sau <i class="fas fa-chevron-right text-[9px]"></i>
+                                    </button>
+                                </div>
+                            </div>
                         @endif
                     </div>
                 </div>
             </div>
 
+        </div>
+    </div>
+
+    <!-- MODAL: DANH SÁCH CHI TIẾT MÃ VẬN ĐƠN CỦA TỪNG MÓN ĂN (MISE EN PLACE) -->
+    <div id="dishOrdersModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs hidden transition-opacity">
+        <div class="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl border border-slate-200 flex flex-col max-h-[85vh]">
+            <!-- Header Modal -->
+            <div class="p-5 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white flex items-center justify-between shrink-0 border-b border-slate-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-rose-500/20 text-[#ee4d2d] flex items-center justify-center text-lg border border-rose-500/30">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-black text-sm tracking-wide flex items-center gap-2">
+                            <span id="modal-dish-title">Tên Món Ăn</span>
+                            <span id="modal-dish-qty-badge" class="px-2.5 py-0.5 rounded-full bg-[#ee4d2d] text-white text-[11px] font-black">0 suất</span>
+                        </h3>
+                        <p class="text-[11px] text-slate-300 font-medium" id="modal-dish-subtitle">Danh sách tất cả các mã đơn hàng có món này</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeDishOrdersModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-lg cursor-pointer transition-colors">
+                    &times;
+                </button>
+            </div>
+
+            <!-- Thanh tìm kiếm nhanh bên trong Modal -->
+            <div class="p-3 bg-slate-100/90 border-b border-slate-200 shrink-0">
+                <div class="relative">
+                    <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="text" 
+                           id="modal-dish-search" 
+                           oninput="filterDishOrdersInModal(this.value)" 
+                           placeholder="🔍 Tìm nhanh theo mã đơn (vd: 1313), tên khách, ghi chú..." 
+                           class="w-full pl-9 pr-8 py-2 rounded-xl bg-white border border-slate-200 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-2xs">
+                </div>
+            </div>
+
+            <!-- Danh sách các mã đơn có món này -->
+            <div class="p-4 overflow-y-auto space-y-2 flex-1 bg-slate-50/50" id="modal-dish-orders-container">
+                <!-- Render động bằng JS -->
+            </div>
+
+            <!-- Footer Modal -->
+            <div class="p-4 bg-white border-t border-slate-200 flex items-center justify-between shrink-0">
+                <span class="text-xs text-slate-500 font-medium" id="modal-dish-footer-count">Đang hiển thị 0 đơn</span>
+                <button type="button" onclick="closeDishOrdersModal()" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer shadow-xs">
+                    Đóng
+                </button>
+            </div>
         </div>
     </div>
 
@@ -635,14 +820,23 @@
 <script>
     // Trạng thái quản lý KDS (Kitchen Display System)
     let currentViewLimit = 3; // Mặc định chỉ hiển thị 3 đơn tập trung
+    let currentKitchenPage = 1; // Trang hiện tại của hàng đợi bếp
     let searchKeyword = '';
     let completedOrdersList = @json($initialCompletedOrders ?? []);
     let modalFilterText = '';
 
+    // Trạng thái phân trang danh sách món ăn (Mise en Place)
+    let singleDishPage = 1;
+    let singleDishLimit = 5;
+    let subscriptionDishPage = 1;
+    let subscriptionDishLimit = 5;
+
     document.addEventListener("DOMContentLoaded", function () {
-        // Khởi tạo hàng đợi bếp & danh sách đơn hoàn thành
+        // Khởi tạo hàng đợi bếp, danh sách đơn hoàn thành & phân trang món ăn
         renderKitchenQueue();
         updateCompletedOrdersModal();
+        renderSingleDishesPagination();
+        renderSubscriptionDishesPagination();
 
         // Polling cập nhật dữ liệu realtime
         let lastCheckedTime = null;
@@ -673,11 +867,23 @@
         }
     });
 
+    // Chuyển trang hàng đợi bếp
+    function changeKitchenPage(delta) {
+        currentKitchenPage += delta;
+        renderKitchenQueue();
+    }
+
+    function setKitchenPage(page) {
+        currentKitchenPage = page;
+        renderKitchenQueue();
+    }
+
     // Hàm render lại hàng đợi hiển thị đơn hàng (KDS Queue)
     function renderKitchenQueue() {
         const grid = document.getElementById('kitchen-orders-grid');
         const emptySearch = document.getElementById('kitchen-search-empty');
         const activeBadge = document.getElementById('active-orders-count-badge');
+        const paginationBar = document.getElementById('kitchen-pagination-bar');
         if (!grid) return;
 
         // Lấy tất cả các thẻ đơn chưa hoàn thành
@@ -689,6 +895,8 @@
 
         // Trường hợp 1: Đang có từ khóa tìm kiếm
         if (searchKeyword !== '') {
+            if (paginationBar) paginationBar.style.display = 'none';
+
             let matchedCount = 0;
             activeCards.forEach(card => {
                 const searchData = card.getAttribute('data-search-text') || '';
@@ -723,11 +931,65 @@
         const feedback = document.getElementById('kitchen-search-feedback');
         if (feedback) feedback.classList.add('hidden');
 
+        const totalActive = activeCards.length;
+        let startIndex = 0;
+        let endIndex = totalActive;
+
+        if (currentViewLimit < 999) {
+            const totalPages = Math.max(1, Math.ceil(totalActive / currentViewLimit));
+            if (currentKitchenPage > totalPages) currentKitchenPage = totalPages;
+            if (currentKitchenPage < 1) currentKitchenPage = 1;
+
+            startIndex = (currentKitchenPage - 1) * currentViewLimit;
+            endIndex = Math.min(startIndex + currentViewLimit, totalActive);
+
+            if (paginationBar) {
+                paginationBar.style.display = totalActive > currentViewLimit ? 'flex' : 'none';
+                const pageFrom = document.getElementById('kds-page-from');
+                const pageTo = document.getElementById('kds-page-to');
+                const totalElem = document.getElementById('kds-total-orders');
+                const btnPrev = document.getElementById('btn-kds-prev');
+                const btnNext = document.getElementById('btn-kds-next');
+                const pageNums = document.getElementById('kds-page-numbers');
+
+                if (pageFrom) pageFrom.innerText = totalActive === 0 ? 0 : startIndex + 1;
+                if (pageTo) pageTo.innerText = endIndex;
+                if (totalElem) totalElem.innerText = totalActive;
+
+                if (btnPrev) btnPrev.disabled = (currentKitchenPage <= 1);
+                if (btnNext) btnNext.disabled = (currentKitchenPage >= totalPages);
+
+                if (pageNums) {
+                    pageNums.innerHTML = '';
+                    let startPage = Math.max(1, currentKitchenPage - 2);
+                    let endPage = Math.min(totalPages, startPage + 4);
+                    if (endPage - startPage < 4) {
+                        startPage = Math.max(1, endPage - 4);
+                    }
+
+                    for (let p = startPage; p <= endPage; p++) {
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.onclick = () => setKitchenPage(p);
+                        btn.innerText = p;
+                        if (p === currentKitchenPage) {
+                            btn.className = 'w-7 h-7 rounded-xl bg-[#ee4d2d] text-white font-black text-xs shadow-xs';
+                        } else {
+                            btn.className = 'w-7 h-7 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 font-bold text-xs transition-colors shadow-2xs';
+                        }
+                        pageNums.appendChild(btn);
+                    }
+                }
+            }
+        } else {
+            if (paginationBar) paginationBar.style.display = 'none';
+        }
+
         activeCards.forEach((card, index) => {
             const badgeContainer = card.querySelector('.queue-priority-badge');
             const isPreparing = card.getAttribute('data-order-status') === 'preparing';
 
-            if (index < currentViewLimit) {
+            if (index >= startIndex && index < endIndex) {
                 // Hiển thị thẻ đơn
                 if (card.style.display === 'none') {
                     card.style.display = 'flex';
@@ -792,6 +1054,7 @@
     // Chọn số lượng đơn hiển thị tập trung (3 / 6 / tất cả)
     function setKitchenViewLimit(limit) {
         currentViewLimit = limit;
+        currentKitchenPage = 1;
         const btn3 = document.getElementById('btn-view-limit-3');
         const btn6 = document.getElementById('btn-view-limit-6');
         const btnAll = document.getElementById('btn-view-limit-all');
@@ -1222,5 +1485,374 @@
             setTimeout(() => toast.remove(), 350);
         }, 2800);
     }
+
+    // =========================================================================
+    // PHÂN TRANG: MÓN ĂN CHO ĐƠN HÀNG LẺ (MISE EN PLACE)
+    // =========================================================================
+    function setSingleDishLimit(limit) {
+        singleDishLimit = limit;
+        singleDishPage = 1;
+        const btn5 = document.getElementById('btn-sd-limit-5');
+        const btn10 = document.getElementById('btn-sd-limit-10');
+        const btnAll = document.getElementById('btn-sd-limit-all');
+
+        [btn5, btn10, btnAll].forEach(b => {
+            if (b) b.className = 'px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900 transition-all cursor-pointer';
+        });
+
+        if (limit === 5 && btn5) {
+            btn5.className = 'px-2.5 py-1 rounded-lg bg-slate-900 text-amber-300 transition-all cursor-pointer shadow-2xs font-black';
+        } else if (limit === 10 && btn10) {
+            btn10.className = 'px-2.5 py-1 rounded-lg bg-slate-900 text-amber-300 transition-all cursor-pointer shadow-2xs font-black';
+        } else if (limit >= 999 && btnAll) {
+            btnAll.className = 'px-2.5 py-1 rounded-lg bg-slate-900 text-amber-300 transition-all cursor-pointer shadow-2xs font-black';
+        }
+
+        renderSingleDishesPagination();
+    }
+
+    function changeSingleDishPage(delta) {
+        singleDishPage += delta;
+        renderSingleDishesPagination();
+    }
+
+    function setSingleDishPage(p) {
+        singleDishPage = p;
+        renderSingleDishesPagination();
+    }
+
+    function renderSingleDishesPagination() {
+        const rows = document.querySelectorAll('.single-dish-row');
+        const paginationBar = document.getElementById('single-dishes-pagination-bar');
+        const total = rows.length;
+        if (total === 0) return;
+
+        if (singleDishLimit >= 999) {
+            rows.forEach(r => r.style.display = '');
+            if (paginationBar) paginationBar.style.display = 'none';
+            return;
+        }
+
+        const totalPages = Math.max(1, Math.ceil(total / singleDishLimit));
+        if (singleDishPage > totalPages) singleDishPage = totalPages;
+        if (singleDishPage < 1) singleDishPage = 1;
+
+        const start = (singleDishPage - 1) * singleDishLimit;
+        const end = Math.min(start + singleDishLimit, total);
+
+        rows.forEach((r, idx) => {
+            if (idx >= start && idx < end) {
+                r.style.display = '';
+            } else {
+                r.style.display = 'none';
+            }
+        });
+
+        if (paginationBar) {
+            paginationBar.style.display = total > singleDishLimit ? 'flex' : 'none';
+            const fromElem = document.getElementById('sd-page-from');
+            const toElem = document.getElementById('sd-page-to');
+            const totalElem = document.getElementById('sd-total-dishes');
+            const btnPrev = document.getElementById('btn-sd-prev');
+            const btnNext = document.getElementById('btn-sd-next');
+            const pageNums = document.getElementById('sd-page-numbers');
+
+            if (fromElem) fromElem.innerText = start + 1;
+            if (toElem) toElem.innerText = end;
+            if (totalElem) totalElem.innerText = total;
+
+            if (btnPrev) btnPrev.disabled = (singleDishPage <= 1);
+            if (btnNext) btnNext.disabled = (singleDishPage >= totalPages);
+
+            if (pageNums) {
+                pageNums.innerHTML = '';
+                let startP = Math.max(1, singleDishPage - 2);
+                let endP = Math.min(totalPages, startP + 4);
+                if (endP - startP < 4) {
+                    startP = Math.max(1, endP - 4);
+                }
+
+                for (let p = startP; p <= endP; p++) {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.onclick = () => setSingleDishPage(p);
+                    btn.innerText = p;
+                    if (p === singleDishPage) {
+                        btn.className = 'w-6 h-6 rounded-lg bg-[#ee4d2d] text-white font-black text-xs shadow-xs';
+                    } else {
+                        btn.className = 'w-6 h-6 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 font-bold text-xs transition-colors shadow-2xs';
+                    }
+                    pageNums.appendChild(btn);
+                }
+            }
+        }
+    }
+
+    // =========================================================================
+    // PHÂN TRANG: MÓN ĂN CHO GÓI COMBO ĐỊNH KỲ
+    // =========================================================================
+    function setSubscriptionDishLimit(limit) {
+        subscriptionDishLimit = limit;
+        subscriptionDishPage = 1;
+        const btn5 = document.getElementById('btn-subd-limit-5');
+        const btn10 = document.getElementById('btn-subd-limit-10');
+        const btnAll = document.getElementById('btn-subd-limit-all');
+
+        [btn5, btn10, btnAll].forEach(b => {
+            if (b) b.className = 'px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900 transition-all cursor-pointer';
+        });
+
+        if (limit === 5 && btn5) {
+            btn5.className = 'px-2.5 py-1 rounded-lg bg-slate-900 text-amber-300 transition-all cursor-pointer shadow-2xs font-black';
+        } else if (limit === 10 && btn10) {
+            btn10.className = 'px-2.5 py-1 rounded-lg bg-slate-900 text-amber-300 transition-all cursor-pointer shadow-2xs font-black';
+        } else if (limit >= 999 && btnAll) {
+            btnAll.className = 'px-2.5 py-1 rounded-lg bg-slate-900 text-amber-300 transition-all cursor-pointer shadow-2xs font-black';
+        }
+
+        renderSubscriptionDishesPagination();
+    }
+
+    function changeSubscriptionDishPage(delta) {
+        subscriptionDishPage += delta;
+        renderSubscriptionDishesPagination();
+    }
+
+    function setSubscriptionDishPage(p) {
+        subscriptionDishPage = p;
+        renderSubscriptionDishesPagination();
+    }
+
+    function renderSubscriptionDishesPagination() {
+        const rows = document.querySelectorAll('.subscription-dish-row');
+        const paginationBar = document.getElementById('subscription-dishes-pagination-bar');
+        const total = rows.length;
+        if (total === 0) return;
+
+        if (subscriptionDishLimit >= 999) {
+            rows.forEach(r => r.style.display = '');
+            if (paginationBar) paginationBar.style.display = 'none';
+            return;
+        }
+
+        const totalPages = Math.max(1, Math.ceil(total / subscriptionDishLimit));
+        if (subscriptionDishPage > totalPages) subscriptionDishPage = totalPages;
+        if (subscriptionDishPage < 1) subscriptionDishPage = 1;
+
+        const start = (subscriptionDishPage - 1) * subscriptionDishLimit;
+        const end = Math.min(start + subscriptionDishLimit, total);
+
+        rows.forEach((r, idx) => {
+            if (idx >= start && idx < end) {
+                r.style.display = '';
+            } else {
+                r.style.display = 'none';
+            }
+        });
+
+        if (paginationBar) {
+            paginationBar.style.display = total > subscriptionDishLimit ? 'flex' : 'none';
+            const fromElem = document.getElementById('subd-page-from');
+            const toElem = document.getElementById('subd-page-to');
+            const totalElem = document.getElementById('subd-total-dishes');
+            const btnPrev = document.getElementById('btn-subd-prev');
+            const btnNext = document.getElementById('btn-subd-next');
+            const pageNums = document.getElementById('subd-page-numbers');
+
+            if (fromElem) fromElem.innerText = start + 1;
+            if (toElem) toElem.innerText = end;
+            if (totalElem) totalElem.innerText = total;
+
+            if (btnPrev) btnPrev.disabled = (subscriptionDishPage <= 1);
+            if (btnNext) btnNext.disabled = (subscriptionDishPage >= totalPages);
+
+            if (pageNums) {
+                pageNums.innerHTML = '';
+                let startP = Math.max(1, subscriptionDishPage - 2);
+                let endP = Math.min(totalPages, startP + 4);
+                if (endP - startP < 4) {
+                    startP = Math.max(1, endP - 4);
+                }
+
+                for (let p = startP; p <= endP; p++) {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.onclick = () => setSubscriptionDishPage(p);
+                    btn.innerText = p;
+                    if (p === subscriptionDishPage) {
+                        btn.className = 'w-6 h-6 rounded-lg bg-[#ee4d2d] text-white font-black text-xs shadow-xs';
+                    } else {
+                        btn.className = 'w-6 h-6 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 font-bold text-xs transition-colors shadow-2xs';
+                    }
+                    pageNums.appendChild(btn);
+                }
+            }
+        }
+    }
+
+    // =========================================================================
+    // TÌM KIẾM & MODAL CHI TIẾT MÃ VẬN ĐƠN CỦA MÓN ĂN (MISE EN PLACE)
+    // =========================================================================
+    let singleDishSearchQuery = '';
+
+    function searchSingleDishes(query) {
+        singleDishSearchQuery = (query || '').trim().toLowerCase();
+        const rows = document.querySelectorAll('.single-dish-row');
+        const paginationBar = document.getElementById('single-dishes-pagination-bar');
+        
+        if (singleDishSearchQuery === '') {
+            singleDishPage = 1;
+            renderSingleDishesPagination();
+            return;
+        }
+
+        let visibleCount = 0;
+        rows.forEach(r => {
+            const name = r.getAttribute('data-dish-name') || '';
+            if (name.includes(singleDishSearchQuery)) {
+                r.style.display = '';
+                visibleCount++;
+            } else {
+                r.style.display = 'none';
+            }
+        });
+
+        if (paginationBar) {
+            paginationBar.style.display = 'none';
+        }
+    }
+
+    let currentModalDishOrders = [];
+    let modalDishFilterText = '';
+
+    function openDishOrdersModalFromBtn(btn) {
+        const dishName = btn.getAttribute('data-dish-name') || 'Món ăn';
+        const totalQty = btn.getAttribute('data-total-qty') || '0';
+        let orders = [];
+        try {
+            orders = JSON.parse(btn.getAttribute('data-orders') || '[]');
+        } catch (e) {
+            orders = [];
+        }
+
+        currentModalDishOrders = orders;
+        modalDishFilterText = '';
+
+        const titleElem = document.getElementById('modal-dish-title');
+        const qtyBadge = document.getElementById('modal-dish-qty-badge');
+        const subtitleElem = document.getElementById('modal-dish-subtitle');
+        const searchInput = document.getElementById('modal-dish-search');
+
+        if (titleElem) titleElem.innerText = dishName;
+        if (qtyBadge) qtyBadge.innerText = `${totalQty} suất`;
+        if (subtitleElem) subtitleElem.innerText = `Tổng ${orders.length} đơn hàng chứa món ăn này`;
+        if (searchInput) searchInput.value = '';
+
+        renderModalDishOrders();
+
+        const modal = document.getElementById('dishOrdersModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+        }
+    }
+
+    function closeDishOrdersModal() {
+        const modal = document.getElementById('dishOrdersModal');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+    }
+
+    function filterDishOrdersInModal(query) {
+        modalDishFilterText = (query || '').trim().toLowerCase();
+        renderModalDishOrders();
+    }
+
+    function renderModalDishOrders() {
+        const container = document.getElementById('modal-dish-orders-container');
+        const footerCount = document.getElementById('modal-dish-footer-count');
+        if (!container) return;
+
+        const filtered = currentModalDishOrders.filter(ord => {
+            if (!modalDishFilterText) return true;
+            const haystack = `#${ord.tracking_code} ${ord.tracking_code} ${ord.order_id} ${ord.customer_name} ${ord.health_notes || ''}`.toLowerCase();
+            return haystack.includes(modalDishFilterText);
+        });
+
+        if (footerCount) {
+            footerCount.innerText = `Đang hiển thị ${filtered.length} / ${currentModalDishOrders.length} đơn hàng`;
+        }
+
+        if (filtered.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-8 text-xs text-slate-400">
+                    <i class="fas fa-search text-2xl mb-2 text-slate-300 block"></i>
+                    <p class="font-bold text-slate-600">Không tìm thấy đơn hàng nào khớp với từ khóa</p>
+                </div>`;
+            return;
+        }
+
+        let html = '';
+        filtered.forEach(ord => {
+            let statusBadge = '';
+            if (ord.order_status === 'pending') {
+                statusBadge = '<span class="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 text-[10px] font-bold border border-blue-200">Chờ duyệt</span>';
+            } else if (ord.order_status === 'confirmed') {
+                statusBadge = '<span class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">Đã xác nhận</span>';
+            } else if (ord.order_status === 'preparing') {
+                statusBadge = '<span class="px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 text-[10px] font-bold border border-purple-200">Đang nấu</span>';
+            } else {
+                statusBadge = `<span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-200">${ord.order_status}</span>`;
+            }
+
+            const notesHtml = ord.health_notes ? `
+                <div class="mt-1.5 text-[11px] text-amber-900 bg-amber-50 p-2 rounded-lg border border-amber-200 font-medium flex items-start gap-1.5">
+                    <i class="fas fa-triangle-exclamation text-amber-500 mt-0.5 text-[10px] shrink-0"></i>
+                    <span>${ord.health_notes}</span>
+                </div>
+            ` : '';
+
+            html += `
+                <div class="bg-white rounded-2xl p-3 border border-slate-200 hover:border-slate-300 shadow-2xs transition-all flex flex-col gap-1.5">
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-1 rounded-xl bg-slate-900 text-white font-black text-xs tracking-wider flex items-center gap-1">
+                                <i class="fas fa-barcode text-[10px] text-amber-400"></i>
+                                #${ord.tracking_code}
+                            </span>
+                            ${statusBadge}
+                            <span class="font-bold text-xs text-slate-800">
+                                <i class="far fa-user text-slate-400 text-[11px] mr-1"></i>${ord.customer_name}
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span class="px-2.5 py-0.5 rounded-xl bg-rose-50 text-[#ee4d2d] font-black text-xs border border-rose-200">
+                                ${ord.quantity} suất
+                            </span>
+                            <a href="{{ url('/donhang_xem') }}/${ord.order_id}" target="_blank"
+                               class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold transition-colors inline-flex items-center gap-1 shadow-2xs">
+                                <i class="far fa-eye text-slate-500"></i> Xem đơn
+                            </a>
+                        </div>
+                    </div>
+                    ${notesHtml}
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeDishOrdersModal();
+        }
+    });
+
+    document.getElementById('dishOrdersModal')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeDishOrdersModal();
+        }
+    });
 </script>
 @endsection

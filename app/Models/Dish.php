@@ -54,9 +54,25 @@ class Dish extends Model
     }
 
     /**
-     * Quan hệ lấy danh sách các đánh giá của món ăn này
+     * Quan hệ lấy danh sách các đánh giá chung của món ăn này (chỉ hiển thị công khai các đánh giá chung, không lấy đánh giá từng đơn)
      */
     public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class)->whereNull('order_id')->with('user')->latest();
+    }
+
+    /**
+     * Quan hệ lấy các đánh giá chung công khai
+     */
+    public function generalReviews(): HasMany
+    {
+        return $this->reviews();
+    }
+
+    /**
+     * Quan hệ lấy toàn bộ đánh giá (dành riêng cho nội bộ admin nếu cần)
+     */
+    public function allReviews(): HasMany
     {
         return $this->hasMany(Review::class)->with('user')->latest();
     }
@@ -80,9 +96,11 @@ class Dish extends Model
 
         self::$reviewsSummaryCache = [];
         try {
-            // 1. Ưu tiên các đánh giá trực tiếp gắn theo dish_id
+            // Chỉ lấy các đánh giá chung cho món ăn (order_id IS NULL)
+            // Đánh giá từng đơn (order_id IS NOT NULL) là nội bộ dành cho Admin
             $directReviews = \Illuminate\Support\Facades\DB::table('reviews')
                 ->whereNotNull('dish_id')
+                ->whereNull('order_id')
                 ->select(
                     'dish_id',
                     \Illuminate\Support\Facades\DB::raw('AVG(rating) as avg_rating'),
@@ -96,28 +114,6 @@ class Dish extends Model
                     'avg' => round((float) $row->avg_rating, 1),
                     'count' => (int) $row->total_reviews,
                 ];
-            }
-
-            // 2. Kế thừa đánh giá qua đơn hàng nếu món chưa có đánh giá trực tiếp
-            $summaries = \Illuminate\Support\Facades\DB::table('reviews')
-                ->whereNull('reviews.dish_id')
-                ->join('orders', 'reviews.order_id', '=', 'orders.id')
-                ->join('order_items', 'orders.id', '=', 'order_items.order_id')
-                ->select(
-                    'order_items.dish_id',
-                    \Illuminate\Support\Facades\DB::raw('AVG(reviews.rating) as avg_rating'),
-                    \Illuminate\Support\Facades\DB::raw('COUNT(DISTINCT reviews.id) as total_reviews')
-                )
-                ->groupBy('order_items.dish_id')
-                ->get();
-
-            foreach ($summaries as $row) {
-                if (!isset(self::$reviewsSummaryCache[(int) $row->dish_id])) {
-                    self::$reviewsSummaryCache[(int) $row->dish_id] = [
-                        'avg' => round((float) $row->avg_rating, 1),
-                        'count' => (int) $row->total_reviews,
-                    ];
-                }
             }
         } catch (\Throwable $e) {
             // Silently continue with fallbacks if tables don't exist yet
@@ -138,9 +134,7 @@ class Dish extends Model
             return self::$reviewsSummaryCache[$this->id]['avg'];
         }
 
-        // Deterministic realistic rating score based on dish id (from 4.5 to 5.0)
-        $scores = [5.0, 4.9, 4.8, 5.0, 4.7, 4.9, 5.0, 4.8, 4.6, 4.9, 5.0, 4.8];
-        return $scores[$this->id % count($scores)];
+        return 5.0;
     }
 
     /**
@@ -153,11 +147,11 @@ class Dish extends Model
         }
 
         self::loadReviewsSummary();
-        if (isset(self::$reviewsSummaryCache[$this->id]) && self::$reviewsSummaryCache[$this->id]['count'] > 0) {
-            return self::$reviewsSummaryCache[$this->id]['count'] + 20;
+        if (isset(self::$reviewsSummaryCache[$this->id])) {
+            return self::$reviewsSummaryCache[$this->id]['count'];
         }
 
-        return 35 + (($this->id * 17) % 180);
+        return 0;
     }
 
     /**

@@ -539,7 +539,9 @@
                                         <i class="fas fa-star text-[9px] text-amber-500"></i>
                                         <span>{{ number_format($dish->rating_score, 1) }}</span>
                                     </div>
-                                    <span class="text-[10px] font-semibold text-slate-400">({{ $dish->reviews_count }} đánh giá)</span>
+                                    <span class="text-[10px] font-semibold text-slate-400">
+                                        {{ $dish->reviews_count > 0 ? "({$dish->reviews_count} đánh giá)" : '(Chưa có đánh giá)' }}
+                                    </span>
                                 </div>
 
                                 <!-- Red Promo Tag Badge -->
@@ -601,7 +603,9 @@
                                             <i class="fas fa-star text-[9px] text-amber-500"></i>
                                             <span>{{ number_format($dish->rating_score, 1) }}</span>
                                         </div>
-                                        <span class="text-[10px] font-semibold text-slate-400">({{ $dish->reviews_count }} đánh giá)</span>
+                                        <span class="text-[10px] font-semibold text-slate-400">
+                                            {{ $dish->reviews_count > 0 ? "({$dish->reviews_count} đánh giá)" : '(Chưa có đánh giá)' }}
+                                        </span>
                                     </div>
 
                                     <div>

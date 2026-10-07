@@ -117,11 +117,11 @@
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
                 <button type="button" 
-                        onclick="applyPreset('TET2026_LIXI', 'fixed', 68000, 168000, 7, '🧧 TẾT NGUYÊN ĐÁN - LỘC XUÂN NHƯ Ý', 'Lì xì đầu năm 68.000đ phát tài phát lộc')" 
+                        onclick="applyPreset('TET2026_LIXI', 'percent', 25, 100000, 7, '🧧 TẾT NGUYÊN ĐÁN - LỘC XUÂN NHƯ Ý', 'Lì xì đầu năm giảm 25% phát tài phát lộc')" 
                         class="p-2.5 rounded-2xl bg-white border border-rose-200 hover:border-rose-500 hover:shadow-md transition-all text-left group cursor-pointer">
                     <p class="text-[11px] font-black text-slate-900 group-hover:text-rose-600 truncate">🧧 Tết Nguyên Đán</p>
-                    <p class="text-[10px] text-rose-600 font-extrabold">Lì xì 68.000đ</p>
-                    <p class="text-[9px] text-slate-400">Đơn từ 168K</p>
+                    <p class="text-[10px] text-rose-600 font-extrabold">Giảm 25%</p>
+                    <p class="text-[9px] text-slate-400">Đơn từ 100K</p>
                 </button>
 
                 <button type="button" 
@@ -133,26 +133,26 @@
                 </button>
 
                 <button type="button" 
-                        onclick="applyPreset('XMAS_NEWYEAR', 'fixed', 40000, 120000, 5, '🎄 GIÁNG SINH & CHÀO NĂM MỚI', 'Mừng Giáng Sinh an lành và Năm Mới rực rỡ')" 
+                        onclick="applyPreset('XMAS_NEWYEAR', 'percent', 20, 100000, 5, '🎄 GIÁNG SINH & CHÀO NĂM MỚI', 'Mừng Giáng Sinh an lành và Năm Mới rực rỡ')" 
                         class="p-2.5 rounded-2xl bg-white border border-emerald-200 hover:border-emerald-600 hover:shadow-md transition-all text-left group cursor-pointer">
                     <p class="text-[11px] font-black text-slate-900 group-hover:text-emerald-700 truncate">🎄 Giáng Sinh & Năm Mới</p>
-                    <p class="text-[10px] text-emerald-600 font-extrabold">Giảm 40.000đ</p>
-                    <p class="text-[9px] text-slate-400">Đơn từ 120K</p>
+                    <p class="text-[10px] text-emerald-600 font-extrabold">Giảm 20%</p>
+                    <p class="text-[9px] text-slate-400">Đơn từ 100K</p>
                 </button>
 
                 <button type="button" 
-                        onclick="applyPreset('DAILE_TRIAN', 'fixed', 45000, 130000, 4, '🇻🇳 MỪNG ĐẠI LỄ NƯỚC NHÀ', 'Khai tiệc mừng Đại Lễ non sông')" 
+                        onclick="applyPreset('DAILE_TRIAN', 'percent', 25, 100000, 4, '🇻🇳 MỪNG ĐẠI LỄ NƯỚC NHÀ', 'Khai tiệc mừng Đại Lễ non sông')" 
                         class="p-2.5 rounded-2xl bg-white border border-red-200 hover:border-red-600 hover:shadow-md transition-all text-left group cursor-pointer">
                     <p class="text-[11px] font-black text-slate-900 group-hover:text-red-600 truncate">🇻🇳 Đại Lễ 30/4 & 2/9</p>
-                    <p class="text-[10px] text-red-600 font-extrabold">Giảm 45.000đ</p>
-                    <p class="text-[9px] text-slate-400">Đơn từ 130K</p>
+                    <p class="text-[10px] text-red-600 font-extrabold">Giảm 25%</p>
+                    <p class="text-[9px] text-slate-400">Đơn từ 100K</p>
                 </button>
 
                 <button type="button" 
-                        onclick="applyPreset('FREESHIP_MAX', 'fixed', 25000, 50000, 7, '🛵 SIÊU HỘI FREESHIP 0Đ', 'Miễn phí giao hàng tận cửa cho mọi bữa ăn')" 
+                        onclick="applyPreset('FREESHIP_MAX', 'percent', 15, 50000, 7, '🛵 SIÊU HỘI FREESHIP', 'Freeship giảm 15% cho mọi bữa ăn')" 
                         class="p-2.5 rounded-2xl bg-white border border-amber-200 hover:border-amber-600 hover:shadow-md transition-all text-left group cursor-pointer">
                     <p class="text-[11px] font-black text-slate-900 group-hover:text-amber-600 truncate">🛵 Siêu Hội Freeship</p>
-                    <p class="text-[10px] text-amber-600 font-extrabold">Freeship 25.000đ</p>
+                    <p class="text-[10px] text-amber-600 font-extrabold">Giảm 15%</p>
                     <p class="text-[9px] text-slate-400">Đơn từ 50K</p>
                 </button>
             </div>

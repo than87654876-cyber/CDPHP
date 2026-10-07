@@ -60,6 +60,39 @@
                         </a>
                     </div>
                 </div>
+            @elseif($displayAmount <= 0)
+                <!-- Card state: 0đ Order (No payment required) -->
+                <div class="space-y-6 py-4">
+                    <div class="w-20 h-20 rounded-full bg-emerald-100 text-emerald-500 mx-auto flex items-center justify-center text-4xl shadow-sm">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <div>
+                        <div class="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-full text-xs font-black mb-2 uppercase tracking-wider">
+                            <i class="fas fa-circle-check"></i> Đơn Hàng Ưu Đãi (0đ)
+                        </div>
+                        <h2 class="text-2xl font-black text-slate-900">Không Cần Chuyển Khoản!</h2>
+                        <p class="text-xs text-slate-500 mt-1">Mã đơn hàng: <span class="font-extrabold text-[#ee4d2d]">#FDL-{{ $order_id }}</span></p>
+                    </div>
+
+                    <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200 text-left text-xs space-y-3">
+                        <div class="flex justify-between items-center pb-2 border-b border-slate-200/60">
+                            <span class="text-slate-500 font-bold">Số tiền cần thanh toán:</span>
+                            <span class="font-black text-emerald-600 text-sm">0đ</span>
+                        </div>
+                        <div class="flex justify-between items-center pb-2 border-b border-slate-200/60">
+                            <span class="text-slate-500 font-bold">Phương thức:</span>
+                            <span class="font-bold text-slate-800">Ưu đãi / Miễn phí</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500">Đơn hàng đã được áp dụng toàn bộ ưu đãi nên không cần thực hiện quét mã VietQR. Bạn chỉ cần bấm nút xác nhận bên dưới để gửi đơn sang bếp nấu.</p>
+                    </div>
+
+                    <form action="{{ route('thanhtoan_chuyenkhoan_xacnhan', $order_id) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs transition-all shadow-md cursor-pointer flex items-center justify-center gap-2">
+                            <i class="fas fa-check-circle"></i> Xác nhận gửi đơn sang bếp nấu ngay
+                        </button>
+                    </form>
+                </div>
             @else
                 <!-- Header Title -->
                 <div class="border-b border-slate-100 pb-4">

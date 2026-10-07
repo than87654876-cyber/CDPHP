@@ -85,7 +85,7 @@
                             <span class="text-slate-400 font-medium text-xs">({{ $dish->reviews_count }} đánh giá)</span>
                         </a>
                         <span>•</span>
-                        <span class="text-slate-600 font-medium"><i class="fas fa-fire text-rose-500 mr-1"></i>Đã bán {{ number_format($dish->reviews_count * 8) }}+</span>
+                        <span class="text-slate-600 font-medium"><i class="fas fa-fire text-rose-500 mr-1"></i>Đã bán {{ number_format(max(15, $dish->reviews_count * 8)) }}+</span>
                         <span>•</span>
                         <span class="text-slate-600 font-medium"><i class="fas fa-bolt text-amber-500 mr-1"></i>Giao siêu tốc 20 phút</span>
                     </div>
@@ -213,28 +213,40 @@
                             @endfor
                         </div>
                         <p class="text-xs font-bold text-slate-600">
-                            Dựa trên <strong class="text-slate-900">{{ $dish->reviews_count }}</strong> lượt đánh giá từ người mua
+                            @if($reviews->count() > 0)
+                                Dựa trên <strong class="text-slate-900">{{ $reviews->count() }}</strong> lượt đánh giá từ người mua
+                            @else
+                                Chưa có đánh giá từ người mua
+                            @endif
                         </p>
                     </div>
 
-                    <!-- Middle: Star Distribution Bars -->
+                    <!-- Middle: Star Distribution Bars (Tính toán động 100% từ đánh giá thực tế) -->
                     <div class="md:col-span-5 space-y-1.5">
                         @php
-                            $ratingDist = [
-                                5 => 86,
-                                4 => 10,
-                                3 => 3,
-                                2 => 1,
-                                1 => 0,
-                            ];
+                            $totalReviewsForDist = $reviews->count();
+                            $starCounts = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
+                            foreach ($reviews as $rev) {
+                                $rVal = (int) $rev->rating;
+                                if (isset($starCounts[$rVal])) {
+                                    $starCounts[$rVal]++;
+                                }
+                            }
+                            $ratingDist = [];
+                            foreach ($starCounts as $star => $cnt) {
+                                $ratingDist[$star] = [
+                                    'pct' => $totalReviewsForDist > 0 ? round(($cnt / $totalReviewsForDist) * 100) : 0,
+                                    'count' => $cnt,
+                                ];
+                            }
                         @endphp
-                        @foreach($ratingDist as $star => $pct)
+                        @foreach($ratingDist as $star => $stat)
                             <div class="flex items-center gap-2 text-xs">
                                 <span class="font-extrabold text-slate-600 w-8">{{ $star }} ★</span>
                                 <div class="flex-1 bg-white rounded-full h-2 overflow-hidden border border-amber-200/80">
-                                    <div class="bg-amber-400 h-full rounded-full transition-all duration-500" style="width: {{ $pct }}%;"></div>
+                                    <div class="bg-amber-400 h-full rounded-full transition-all duration-500" style="width: {{ $stat['pct'] }}%;"></div>
                                 </div>
-                                <span class="text-[11px] font-bold text-slate-400 w-10 text-right">{{ $pct }}%</span>
+                                <span class="text-[11px] font-bold text-slate-400 w-12 text-right">{{ $stat['pct'] }}%</span>
                             </div>
                         @endforeach
                     </div>

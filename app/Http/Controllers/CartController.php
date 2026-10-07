@@ -217,7 +217,7 @@ class CartController extends Controller
             $order->user_id = $userId;
             $order->order_type = 'single';
             $order->total_amount = $totalAmount;
-            $order->final_amount = max(0, $totalAmount - $discountAmount);
+            $order->final_amount = ($totalAmount > 1000) ? max(1000, $totalAmount - $discountAmount) : $totalAmount;
             if ($couponId) {
                 $order->coupon_id = $couponId;
             }
@@ -390,24 +390,13 @@ class CartController extends Controller
 
         $userId = Auth::id() ?? $order->user_id;
 
-        // 1. Lưu đánh giá chung cho đơn hàng
+        // 1. Lưu đánh giá cho đơn hàng (Đánh giá từng đơn - Nội bộ quản trị Admin)
         Review::create([
             'user_id' => $userId,
             'order_id' => $order->id,
             'rating' => $request->rating_stars,
             'comment' => $request->review_comment,
         ]);
-
-        // 2. Tự động lưu đánh giá cho từng món ăn trong đơn hàng
-        foreach ($order->orderItems as $item) {
-            Review::create([
-                'user_id' => $userId,
-                'order_id' => $order->id,
-                'dish_id' => $item->dish_id,
-                'rating' => $request->rating_stars,
-                'comment' => $request->review_comment,
-            ]);
-        }
 
         \App\Models\Dish::clearReviewsSummaryCache();
         $order->touch();
@@ -803,7 +792,7 @@ class CartController extends Controller
             'coupon_code' => $coupon->coupon_code,
             'discount_amount' => $discountAmount,
             'formatted_discount' => $coupon->formatted_discount,
-            'final_amount' => max(0, $totalAmount - $discountAmount),
+            'final_amount' => ($totalAmount > 1000) ? max(1000, $totalAmount - $discountAmount) : $totalAmount,
             'message' => 'Áp dụng mã ' . $coupon->coupon_code . ' thành công! (' . $coupon->formatted_discount . ')'
         ]);
     }
@@ -881,7 +870,7 @@ class CartController extends Controller
                 'discount_amount' => $maxDiscount,
                 'formatted_discount' => $bestCoupon->formatted_discount,
                 'formatted_min_order' => $bestCoupon->formatted_min_order,
-                'final_amount' => max(0, $totalAmount - $maxDiscount),
+                'final_amount' => ($totalAmount > 1000) ? max(1000, $totalAmount - $maxDiscount) : $totalAmount,
                 'message' => 'Đã tự động chọn mã ' . $bestCoupon->coupon_code . ' (' . $bestCoupon->formatted_discount . ')'
             ] : null,
             'eligible_coupons' => $eligibleCoupons,

@@ -29,7 +29,7 @@
 
 ### 4. Dịch vụ sau bán hàng & Đặt gói định kỳ
 * **Hủy đơn linh hoạt:** Khách hàng được quyền tự hủy đơn nếu quán chưa tiến hành nấu món.
-* **Đánh giá & Phản hồi:** Chấm điểm số sao (1-5 sao) và để lại nhận xét sau khi nhận và thưởng thức món ăn.
+* **Đánh giá & Phản hồi:** Đánh giá chung công khai (chấm điểm 1-5 sao và viết nhận xét trực tiếp cho món ăn trên trang chủ / chi tiết món) hiển thị minh bạch cho tất cả khách hàng với biểu đồ phân bổ sao thời gian thực; Đánh giá từng đơn hàng (#FDL) sau khi nhận được thiết kế như phản hồi chất lượng nội bộ (chỉ Admin xem và quản lý, không đưa lên giao diện công khai).
 * **Gói ăn định kỳ (Subscription):** Đăng ký các gói ăn theo tuần hoặc theo tháng (quán tự nấu và giao mỗi ngày):
   * Khách được quyền tự đổi món ăn từng ngày theo sở thích.
   * Tạm ngưng giao hàng khi bận hoặc hủy gói bất kỳ lúc nào.
@@ -57,7 +57,7 @@
 * **Quản lý Đơn hàng:** Xem chi tiết từng hóa đơn, thay đổi trạng thái đơn hàng, chỉnh sửa thông tin người nhận hoặc hủy đơn khi có sự cố.
 * **Quản lý Gói dịch vụ (Combo Packages):** Thiết lập các gói combo tuần/tháng, chọn trước thực đơn cho từng ngày trong tuần.
 * **Quản lý Gói khách đăng ký:** Theo dõi danh sách các gói khách hàng đang sử dụng, hỗ trợ đổi món và tự động kích hoạt tạo đơn giao hàng mỗi ngày.
-* **Quản lý Đánh giá (Reviews):** Theo dõi toàn bộ nhận xét, đánh giá sao từ khách; cho phép kiểm duyệt hoặc xóa các đánh giá spam, phản cảm.
+* **Quản lý Đánh giá (Reviews):** Theo dõi toàn bộ nhận xét từ khách hàng; hỗ trợ bộ lọc phân biệt rành mạch giữa "Đánh giá từng đơn (#FDL - Nội bộ)" và "Đánh giá chung (Công khai giao diện)", cho phép kiểm duyệt hoặc xóa các đánh giá spam, phản cảm.
 
 ### 2. Quản lý Kho & Nhập hàng (Procurement)
 * **Quản lý Tồn kho:** Theo dõi số lượng tồn thực tế của từng loại nguyên vật liệu, điều chỉnh số lượng và tự động cảnh báo khi nguyên liệu sắp hết.
@@ -82,3 +82,4 @@
 
 ---
 *Tài liệu được khởi tạo tự động phục vụ báo cáo đồ án / thuyết minh hệ thống FOODDAILY.*
+

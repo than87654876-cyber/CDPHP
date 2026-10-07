@@ -33,9 +33,9 @@ class CouponSeeder extends Seeder
             ],
             [
                 'coupon_code' => 'FLAT20',
-                'discount_type' => 'fixed',
+                'discount_type' => 'percent',
                 'discount_value' => 20.00,
-                'min_order_value' => 150.00,
+                'min_order_value' => 100000.00,
                 'start_date' => now()->format('Y-m-d'),
                 'end_date' => now()->addMonths(1)->format('Y-m-d'),
                 'usage_limit' => 50,

@@ -200,11 +200,11 @@
 
                 <div class="space-y-1.5">
                     <label for="discount_type" class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider">
-                        Loại giảm giá
+                        Loại giảm giá <span class="text-[#ee4d2d]">*</span>
                     </label>
                     <select id="discount_type" name="discount_type" class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs font-bold text-slate-900 focus:border-[#ee4d2d] outline-none shadow-xs bg-white">
-                        <option value="fixed" selected>Giảm tiền cố định (đ)</option>
-                        <option value="percentage">Giảm theo phần trăm (%)</option>
+                        <option value="percentage" selected>Giảm theo phần trăm (%) - Tránh đơn 0đ</option>
+                        <option value="fixed">Giảm tiền cố định (đ)</option>
                     </select>
                 </div>
 
@@ -212,7 +212,7 @@
                     <label for="discount_value" class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider">
                         Mức giảm giá <span class="text-[#ee4d2d]">*</span>
                     </label>
-                    <input type="number" id="discount_value" name="discount_value" value="20000" min="1" required class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs font-black text-rose-600 focus:border-[#ee4d2d] outline-none shadow-xs">
+                    <input type="number" id="discount_value" name="discount_value" value="15" min="1" max="90" required placeholder="Ví dụ: 15 (tức giảm 15%)" class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs font-black text-rose-600 focus:border-[#ee4d2d] outline-none shadow-xs">
                 </div>
 
                 <div class="space-y-1.5">

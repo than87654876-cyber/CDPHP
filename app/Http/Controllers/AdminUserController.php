@@ -28,7 +28,7 @@ class AdminUserController extends Controller
         $query = $this->applyCustomerFilter($query, $filter);
         $query = $this->applyAdvancedCustomerFilters($query, $request);
 
-        $customers = $query->paginate(20)->withQueryString();
+        $customers = $query->paginate(10)->withQueryString();
 
         return view('admin.customers', compact('customers', 'filter'));
     }

@@ -52,7 +52,7 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
-                    @foreach($orders as $order)
+                    @forelse($orders as $order)
                         @php
                             $paymentMethodText = 'COD';
                             if ($order->payment_method === 'bank_transfer') {
@@ -109,10 +109,28 @@
                                 </a>
                             </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="6" class="py-12 text-center text-slate-400 font-medium">
+                                <div class="max-w-xs mx-auto space-y-2">
+                                    <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center text-xl mx-auto">
+                                        <i class="fas fa-receipt"></i>
+                                    </div>
+                                    <h4 class="font-extrabold text-slate-800 text-sm">Không tìm thấy đơn hàng nào</h4>
+                                    <p class="text-xs text-slate-400">Các đơn hàng phát sinh sẽ xuất hiện tại đây.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
+
+        @if($orders->hasPages())
+            <div class="p-4 border-t border-slate-100 bg-slate-50/50">
+                {{ $orders->links() }}
+            </div>
+        @endif
     </div>
 </div>
 @endsection

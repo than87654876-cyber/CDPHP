@@ -126,17 +126,16 @@ class OrderDeliveryReviewPageTest extends TestCase
         $response->assertRedirect(route('donhang.danhgia', $order->id));
         $response->assertSessionHas('success');
 
-        // Verify review created for order and dish
+        // Verify review created for order (Internal for admin)
         $this->assertDatabaseHas('reviews', [
             'order_id' => $order->id,
             'dish_id' => null,
             'rating' => 5,
         ]);
 
-        $this->assertDatabaseHas('reviews', [
+        $this->assertDatabaseMissing('reviews', [
             'order_id' => $order->id,
             'dish_id' => $this->dish1->id,
-            'rating' => 5,
         ]);
 
         // Review page now shows existing review

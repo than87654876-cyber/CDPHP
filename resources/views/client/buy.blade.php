@@ -481,7 +481,7 @@
         container.innerHTML = html;
         document.getElementById('summary-subtotal').innerText = formatMoney(subtotal);
 
-        const finalTotal = Math.max(0, subtotal - appliedDiscount);
+        const finalTotal = (subtotal > 1000) ? Math.max(1000, subtotal - appliedDiscount) : subtotal;
         document.getElementById('summary-total').innerText = formatMoney(finalTotal);
 
         if (shouldAutoApply !== false) {

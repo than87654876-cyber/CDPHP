@@ -15,6 +15,8 @@ class AdminOrderController extends Controller
     public function index(Request $request)
     {
         $status = $request->input('status');
+        $search = $request->input('search');
+
         $query = Order::with(['user', 'orderItems.dish'])
             ->where('order_type', '!=', 'subscription')
             ->orderBy('created_at', 'desc');
@@ -23,9 +25,21 @@ class AdminOrderController extends Controller
             $query->where('order_status', $status);
         }
 
-        $orders = $query->paginate(20)->withQueryString();
+        if ($search) {
+            $cleanCode = str_ireplace(['#fdl-', 'fdl-', '#'], '', $search);
+            $query->where(function ($q) use ($search, $cleanCode) {
+                $q->where('id', $cleanCode)
+                  ->orWhereHas('user', function ($uq) use ($search) {
+                      $uq->where('fullname', 'like', "%{$search}%")
+                         ->orWhere('phone', 'like', "%{$search}%")
+                         ->orWhere('email', 'like', "%{$search}%");
+                  });
+            });
+        }
 
-        return view('admin.orders', compact('orders', 'status'));
+        $orders = $query->paginate(10)->withQueryString();
+
+        return view('admin.orders', compact('orders', 'status', 'search'));
     }
 
     // Bảng chuẩn bị món ăn hôm nay của nhà bếp
@@ -272,14 +286,61 @@ class AdminOrderController extends Controller
     // QUẢN LÝ ĐÁNH GIÁ ĐƠN HÀNG (REVIEWS)
     // =========================================================================
 
-    // Danh sách đánh giá của khách hàng
-    public function reviewsList()
+    // Danh sách đánh giá của khách hàng (hỗ trợ phân trang, lọc loại đánh giá và tìm kiếm)
+    public function reviewsList(Request $request)
     {
-        $reviews = \App\Models\Review::with(['user', 'order'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $search = $request->input('search');
+        $type = $request->input('type', 'all');
 
-        return view('admin.reviews', compact('reviews'));
+        $query = \App\Models\Review::with(['user', 'order', 'dish'])
+            ->orderBy('created_at', 'desc');
+
+        if ($type === 'order') {
+            $query->whereNotNull('order_id');
+        } elseif ($type === 'general') {
+            $query->whereNull('order_id');
+        }
+
+        if ($search) {
+            $cleanCode = str_ireplace(['#fdl-', 'fdl-', '#'], '', $search);
+            $query->where(function ($q) use ($search, $cleanCode) {
+                $q->where('comment', 'like', "%{$search}%")
+                  ->orWhere('order_id', $cleanCode)
+                  ->orWhereHas('user', function ($uq) use ($search) {
+                      $uq->where('fullname', 'like', "%{$search}%")
+                         ->orWhere('phone', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('dish', function ($dq) use ($search) {
+                      $dq->where('dish_name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Toàn bộ thống kê tổng quan (tính trên toàn bộ cơ sở dữ liệu để chính xác khi phân trang)
+        $allReviews = \App\Models\Review::all();
+        $totalReviewsCount = $allReviews->count();
+        $orderReviewsCount = $allReviews->whereNotNull('order_id')->count();
+        $generalReviewsCount = $allReviews->whereNull('order_id')->count();
+
+        $avgRating = $totalReviewsCount > 0 ? round($allReviews->avg('rating'), 1) : 5.0;
+        $fiveStarCount = $allReviews->where('rating', 5)->count();
+        $fiveStarPercent = $totalReviewsCount > 0 ? round(($fiveStarCount / $totalReviewsCount) * 100) : 100;
+        $withCommentCount = $allReviews->filter(fn($r) => !empty($r->comment))->count();
+
+        $reviews = $query->paginate(10)->withQueryString();
+
+        return view('admin.reviews', compact(
+            'reviews',
+            'totalReviewsCount',
+            'orderReviewsCount',
+            'generalReviewsCount',
+            'avgRating',
+            'fiveStarCount',
+            'fiveStarPercent',
+            'withCommentCount',
+            'search',
+            'type'
+        ));
     }
 
     // Xóa đánh giá

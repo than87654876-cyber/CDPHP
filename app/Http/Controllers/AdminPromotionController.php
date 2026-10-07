@@ -378,7 +378,11 @@ class AdminPromotionController extends Controller
 
         // 2. Tạo mã và lưu vào bảng Coupons cho từng người dùng
         $prefix = strtoupper($request->code_prefix ?? 'CODE');
-        $discountType = $request->discount_type === 'percentage' ? 'percent' : 'fixed';
+        $discountType = $request->discount_type === 'fixed' ? 'fixed' : 'percent';
+        $discountVal = (float) ($request->discount_value ?? 15);
+        if ($discountType === 'percent' && $discountVal > 90) {
+            $discountVal = 15;
+        }
         $sentCount = 0;
         $details = [];
 
@@ -402,7 +406,7 @@ class AdminPromotionController extends Controller
                 $coupon = Coupon::create([
                     'coupon_code' => $couponCode,
                     'discount_type' => $discountType,
-                    'discount_value' => $request->discount_value,
+                    'discount_value' => $discountVal,
                     'min_order_value' => $request->min_order,
                     'start_date' => Carbon::now()->format('Y-m-d'),
                     'end_date' => Carbon::now()->addDays((int) $request->expiry_days)->format('Y-m-d'),

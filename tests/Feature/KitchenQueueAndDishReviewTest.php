@@ -131,7 +131,7 @@ class KitchenQueueAndDishReviewTest extends TestCase
     }
 
     /**
-     * Test reviewing an order automatically creates reviews for all dishes in that order.
+     * Test reviewing an order creates internal order review visible to admin and not leaked to client frontend.
      */
     public function test_user_can_review_order_and_evaluates_dishes(): void
     {
@@ -169,7 +169,7 @@ class KitchenQueueAndDishReviewTest extends TestCase
         $response->assertRedirect(route('giohang'));
         $response->assertSessionHas('success');
 
-        // Verify review for order created
+        // Verify review for order created (Internal for admin)
         $this->assertDatabaseHas('reviews', [
             'user_id' => $this->customer->id,
             'order_id' => $order->id,
@@ -177,26 +177,21 @@ class KitchenQueueAndDishReviewTest extends TestCase
             'rating' => 5,
         ]);
 
-        // Verify reviews for each dish in order created
-        $this->assertDatabaseHas('reviews', [
-            'user_id' => $this->customer->id,
+        // Verify dish records are not duplicated
+        $this->assertDatabaseMissing('reviews', [
             'order_id' => $order->id,
             'dish_id' => $this->dishA->id,
-            'rating' => 5,
         ]);
 
-        $this->assertDatabaseHas('reviews', [
-            'user_id' => $this->customer->id,
-            'order_id' => $order->id,
-            'dish_id' => $this->dishB->id,
-            'rating' => 5,
-        ]);
+        // Verify Admin reviews page shows the order review
+        $adminResponse = $this->actingAs($this->admin)->get(route('quanly_reviews'));
+        $adminResponse->assertStatus(200);
+        $adminResponse->assertSee('#FDL-' . $order->id);
 
-        // Verify dish detail page shows the review
+        // Verify client dish detail page does NOT display the order review (internal for admin only)
         $detailResponse = $this->get(route('dish.detail', $this->dishA->id));
         $detailResponse->assertStatus(200);
-        $detailResponse->assertSee('Món ăn giao nhanh, gà rất giòn rụm và burger phô mai cực thơm ngon!');
-        $detailResponse->assertSee($this->customer->fullname);
+        $detailResponse->assertDontSee('Món ăn giao nhanh, gà rất giòn rụm');
     }
 
     /**
