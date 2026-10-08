@@ -35,25 +35,11 @@ class ShopController extends Controller
             })->values();
         }
 
-        // Lấy các danh mục và các món ăn thuộc danh mục đó
-        $categories = Category::with(['dishes' => function ($q) use ($query) {
-            $q->where('is_available', true);
-            if ($query) {
-                $q->where('dish_name', 'like', '%'.$query.'%');
-            }
-        }])->get();
-
-        // Sắp xếp các món trong từng danh mục theo số sao đánh giá cao nhất
+        // Lấy các danh mục và liên kết với các món ăn đã được tải và sắp xếp sẵn (tiết kiệm truy vấn database)
+        $categories = Category::all();
         foreach ($categories as $cat) {
-            if ($sort === 'price_asc') {
-                $cat->setRelation('dishes', $cat->dishes->sortBy('price')->values());
-            } elseif ($sort === 'price_desc') {
-                $cat->setRelation('dishes', $cat->dishes->sortByDesc('price')->values());
-            } else {
-                $cat->setRelation('dishes', $cat->dishes->sortByDesc(function ($dish) {
-                    return $dish->rating_score * 1000 + $dish->reviews_count;
-                })->values());
-            }
+            $catDishes = $allDishes->where('category_id', $cat->id)->values();
+            $cat->setRelation('dishes', $catDishes);
         }
 
         // 1. THUẬT TOÁN: Đề xuất món ăn cùng loại (Cùng category_id với món đang chọn/xem)
@@ -66,10 +52,12 @@ class ShopController extends Controller
 
         // Nếu chưa chọn món cụ thể, mặc định lấy món đầu tiên hoặc món bán chạy
         if (!$currentSelectedDish) {
-            $topDishId = \App\Models\OrderItem::select('dish_id', \Illuminate\Support\Facades\DB::raw('SUM(quantity) as total_qty'))
-                ->groupBy('dish_id')
-                ->orderByDesc('total_qty')
-                ->value('dish_id');
+            $topDishId = \Illuminate\Support\Facades\Cache::remember('shop_top_dish_id', 900, function () {
+                return \App\Models\OrderItem::select('dish_id', \Illuminate\Support\Facades\DB::raw('SUM(quantity) as total_qty'))
+                    ->groupBy('dish_id')
+                    ->orderByDesc('total_qty')
+                    ->value('dish_id');
+            });
 
             if ($topDishId) {
                 $currentSelectedDish = \App\Models\Dish::with('category')->where('is_available', true)->find($topDishId);
@@ -98,10 +86,14 @@ class ShopController extends Controller
         }
 
         if ($frequentDishes->isEmpty()) {
-            $topDishIds = \App\Models\OrderItem::select('dish_id', \Illuminate\Support\Facades\DB::raw('SUM(quantity) as total_qty'))
-                ->groupBy('dish_id')
-                ->orderByDesc('total_qty')
-                ->pluck('dish_id');
+            $topDishIds = \Illuminate\Support\Facades\Cache::remember('shop_top_dish_ids', 900, function () {
+                return \App\Models\OrderItem::select('dish_id', \Illuminate\Support\Facades\DB::raw('SUM(quantity) as total_qty'))
+                    ->groupBy('dish_id')
+                    ->orderByDesc('total_qty')
+                    ->take(4)
+                    ->pluck('dish_id')
+                    ->toArray();
+            });
 
             $frequentDishes = \App\Models\Dish::whereIn('id', $topDishIds)->where('is_available', true)->take(4)->get();
 
@@ -121,46 +113,51 @@ class ShopController extends Controller
         if ($hour >= 5 && $hour < 11) {
             $timeRecommendation['period'] = 'Sáng';
             $timeRecommendation['title'] = '🌅 Bữa Sáng Dinh Dưỡng Cân Bằng';
-            $timeRecommendation['dishes'] = \App\Models\Dish::where('is_available', true)
-                ->where(function($q) {
-                    $q->where('dish_name', 'like', '%cháo%')
-                      ->orWhere('dish_name', 'like', '%bánh mì%')
-                      ->orWhere('dish_name', 'like', '%sữa%')
-                      ->orWhere('dish_name', 'like', '%sinh tố%')
-                      ->orWhere('category_id', 1);
-                })->take(4)->get();
+            $timeRecommendation['dishes'] = $allDishes->filter(function($d) {
+                $name = mb_strtolower($d->dish_name);
+                return str_contains($name, 'cháo')
+                    || str_contains($name, 'bánh mì')
+                    || str_contains($name, 'sữa')
+                    || str_contains($name, 'sinh tố')
+                    || $d->category_id == 1;
+            })->take(4)->values();
         } elseif ($hour >= 11 && $hour < 14) {
             $timeRecommendation['period'] = 'Trưa';
             $timeRecommendation['title'] = '☀️ Bữa Trưa Đậm Đà Năng Lượng';
-            $timeRecommendation['dishes'] = \App\Models\Dish::where('is_available', true)
-                ->where(function($q) {
-                    $q->where('dish_name', 'like', '%cơm%')
-                      ->orWhere('dish_name', 'like', '%bún%')
-                      ->orWhere('dish_name', 'like', '%ức gà%');
-                })->take(4)->get();
+            $timeRecommendation['dishes'] = $allDishes->filter(function($d) {
+                $name = mb_strtolower($d->dish_name);
+                return str_contains($name, 'cơm')
+                    || str_contains($name, 'bún')
+                    || str_contains($name, 'ức gà');
+            })->take(4)->values();
         } elseif ($hour >= 14 && $hour < 17) {
             $timeRecommendation['period'] = 'Chiều';
             $timeRecommendation['title'] = '🍰 Thức Uống & Món Nhẹ Tráng Miệng Chiều';
-            $timeRecommendation['dishes'] = \App\Models\Dish::where('is_available', true)
-                ->where(function($q) {
-                    $q->where('dish_name', 'like', '%bánh%')
-                      ->orWhere('dish_name', 'like', '%thạch%')
-                      ->orWhere('dish_name', 'like', '%chè%')
-                      ->orWhere('category_id', 2);
-                })->take(4)->get();
+            $timeRecommendation['dishes'] = $allDishes->filter(function($d) {
+                $name = mb_strtolower($d->dish_name);
+                return str_contains($name, 'bánh')
+                    || str_contains($name, 'thạch')
+                    || str_contains($name, 'chè')
+                    || $d->category_id == 2;
+            })->take(4)->values();
         } else {
             $timeRecommendation['period'] = 'Tối';
             $timeRecommendation['title'] = '🌙 Bữa Tối Thưởng Thức Ấm Cúng';
-            $timeRecommendation['dishes'] = \App\Models\Dish::where('is_available', true)->take(4)->get();
+            $timeRecommendation['dishes'] = $allDishes->take(4)->values();
         }
 
-        // 4. Đề xuất từ lịch sử tìm kiếm gần nhất
+        if ($timeRecommendation['dishes']->isEmpty()) {
+            $timeRecommendation['dishes'] = $allDishes->take(4)->values();
+        }
+
+        // 4. Đề xuất từ lịch sử tìm kiếm gần nhất (Lấy trực tiếp từ in-memory $allDishes)
         $lastSearchQuery = session('last_search_query');
         $lastSearchDishes = collect();
         if ($lastSearchQuery && !$query) {
-            $lastSearchDishes = \App\Models\Dish::where('is_available', true)
-                ->where('dish_name', 'like', '%'.$lastSearchQuery.'%')
-                ->take(4)->get();
+            $searchKey = mb_strtolower($lastSearchQuery);
+            $lastSearchDishes = $allDishes->filter(function($d) use ($searchKey) {
+                return str_contains(mb_strtolower($d->dish_name), $searchKey);
+            })->take(4)->values();
         }
 
         // 5. Lịch sử món đã xem gần đây (Recently Viewed Dishes)
@@ -361,6 +358,35 @@ class ShopController extends Controller
         return view('client.track_order', compact('myOrders', 'selectedOrder', 'orderIdInput', 'email', 'phone'));
     }
 
+    // API Đồng Bộ Realtime Món Ăn Cho Giao Diện Người Dùng (Live Feed Sync)
+    public function liveFeedDishes(Request $request)
+    {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_write_close();
+        }
+
+        $sinceTime = (float) $request->query('last_time', 0);
+        $lastMutationTime = \App\Services\DishSyncService::getLastMutationTimestamp();
+
+        // Nếu client đã có dữ liệu mới nhất (không có thay đổi kể từ last_time) -> trả về ngay siêu nhanh (< 2ms)
+        if ($sinceTime > 0 && $lastMutationTime <= $sinceTime) {
+            return response()->json([
+                'has_changes' => false,
+                'timestamp' => microtime(true),
+                'last_mutation' => $lastMutationTime,
+            ]);
+        }
+
+        $mutations = \App\Services\DishSyncService::getMutationsSince($sinceTime);
+
+        return response()->json([
+            'has_changes' => !empty($mutations),
+            'mutations' => $mutations,
+            'timestamp' => microtime(true),
+            'last_mutation' => $lastMutationTime,
+        ]);
+    }
+
     // AJAX Polling for settings and data changes (Cached 15s)
     public function pollSettings(Request $request)
     {
@@ -440,17 +466,21 @@ class ShopController extends Controller
         $cleanId = trim(str_ireplace('FDL-', '', $orderId));
         $query = \App\Models\Order::where('id', $cleanId);
 
-        // Validate that this order belongs to the user matching the email or phone
-        $query->whereHas('user', function($q) use ($email, $phone) {
-            $q->where(function($sub) use ($email, $phone) {
-                if ($email) {
-                    $sub->where('email', trim($email));
-                }
-                if ($phone) {
-                    $sub->orWhere('phone', trim($phone));
-                }
+        // Validate ownership if logged in or if email/phone is provided
+        if (auth()->check()) {
+            $query->where('user_id', auth()->id());
+        } elseif ($email || $phone) {
+            $query->whereHas('user', function($q) use ($email, $phone) {
+                $q->where(function($sub) use ($email, $phone) {
+                    if ($email) {
+                        $sub->where('email', trim($email));
+                    }
+                    if ($phone) {
+                        $sub->orWhere('phone', trim($phone));
+                    }
+                });
             });
-        });
+        }
 
         $order = $query->first();
 

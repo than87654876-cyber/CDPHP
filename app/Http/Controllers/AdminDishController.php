@@ -77,8 +77,7 @@ class AdminDishController extends Controller
         }
 
         $dish = Dish::create($data);
-        \Illuminate\Support\Facades\Cache::forget('gemini_dishes_menu');
-        Dish::clearReviewsSummaryCache();
+        \App\Services\DishSyncService::recordMutation('created', $dish);
 
         return redirect()->route('quanly_monandon')->with('success', 'Đã thêm món ăn mới thành công!');
     }
@@ -122,8 +121,7 @@ class AdminDishController extends Controller
         }
 
         $dish->update($data);
-        \Illuminate\Support\Facades\Cache::forget('gemini_dishes_menu');
-        Dish::clearReviewsSummaryCache();
+        \App\Services\DishSyncService::recordMutation('updated', $dish);
 
         return redirect()->route('quanly_monandon')->with('success', 'Đã cập nhật món ăn thành công!');
     }
@@ -132,6 +130,8 @@ class AdminDishController extends Controller
     public function destroy($id)
     {
         $dish = Dish::findOrFail($id);
+        $dishId = $dish->id;
+        $dishCopy = clone $dish;
 
         // Delete image file if exists
         if ($dish->image_url && file_exists(public_path($dish->image_url))) {
@@ -139,8 +139,7 @@ class AdminDishController extends Controller
         }
 
         $dish->delete();
-        \Illuminate\Support\Facades\Cache::forget('gemini_dishes_menu');
-        Dish::clearReviewsSummaryCache();
+        \App\Services\DishSyncService::recordMutation('deleted', $dishCopy, $dishId);
 
         return redirect()->route('quanly_monandon')->with('success', 'Đã xóa món ăn thành công!');
     }

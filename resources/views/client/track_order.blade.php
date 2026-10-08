@@ -66,16 +66,18 @@
 
                                     <!-- Status Badge -->
                                     @php $st = $ord->order_status; @endphp
-                                    @if($st === 'pending')
-                                        <span class="px-2.5 py-0.5 bg-blue-50 text-blue-600 font-bold text-[10px] rounded-full">Tiếp nhận</span>
+                                    @if(in_array($st, ['pending', 'confirmed']))
+                                        <span class="px-2.5 py-0.5 bg-blue-50 text-blue-600 font-bold text-[10px] rounded-full">{{ $st === 'confirmed' ? 'Đã xác nhận' : 'Tiếp nhận' }}</span>
                                     @elseif(in_array($st, ['preparing', 'cooked']))
                                         <span class="px-2.5 py-0.5 bg-purple-50 text-purple-600 font-bold text-[10px] rounded-full">Đang chế biến</span>
-                                    @elseif($st === 'shipping')
+                                    @elseif(in_array($st, ['shipping', 'delivering']))
                                         <span class="px-2.5 py-0.5 bg-amber-50 text-amber-600 font-bold text-[10px] rounded-full">Đang giao</span>
                                     @elseif($st === 'completed')
                                         <span class="px-2.5 py-0.5 bg-emerald-50 text-emerald-600 font-bold text-[10px] rounded-full">Hoàn tất</span>
+                                    @elseif($st === 'cancelled')
+                                        <span class="px-2.5 py-0.5 bg-rose-50 text-rose-600 font-bold text-[10px] rounded-full">Đã hủy</span>
                                     @else
-                                        <span class="px-2.5 py-0.5 bg-slate-100 text-slate-500 font-bold text-[10px] rounded-full">Đã hủy</span>
+                                        <span class="px-2.5 py-0.5 bg-slate-100 text-slate-500 font-bold text-[10px] rounded-full">{{ $st }}</span>
                                     @endif
                                 </div>
                             </div>
@@ -110,42 +112,80 @@
 
                     @php $status = $selectedOrder->order_status; @endphp
 
-                    <div class="grid grid-cols-4 gap-2 relative my-6">
-                        @if($status === 'cancelled')
-                            <div class="col-span-4 bg-rose-50 border border-rose-200 text-rose-700 p-4 rounded-2xl text-center font-bold text-sm flex items-center justify-center gap-2">
-                                <i class="fas fa-circle-xmark text-lg"></i> Đơn hàng đã bị hủy
+                    @if($status === 'cancelled')
+                        <div class="my-6 bg-rose-50 border border-rose-200 text-rose-700 p-4 rounded-2xl text-center font-bold text-sm flex items-center justify-center gap-2">
+                            <i class="fas fa-circle-xmark text-lg"></i>
+                            <span>Đơn hàng đã bị hủy</span>
+                            @if($selectedOrder->cancellation_reason)
+                                <span class="text-xs font-semibold text-rose-600">({{ $selectedOrder->cancellation_reason }})</span>
+                            @endif
+                        </div>
+                    @else
+                        <div class="relative my-8">
+                            <!-- Đường tiến độ nối giữa các bước -->
+                            <div class="absolute top-6 left-[12.5%] right-[12.5%] h-1 bg-slate-100 -z-0">
+                                @php
+                                    $progressWidth = '0%';
+                                    if (in_array($status, ['pending', 'confirmed'])) {
+                                        $progressWidth = '0%';
+                                    } elseif (in_array($status, ['preparing', 'cooked'])) {
+                                        $progressWidth = '33.3%';
+                                    } elseif (in_array($status, ['delivering', 'shipping'])) {
+                                        $progressWidth = '66.6%';
+                                    } elseif ($status === 'completed') {
+                                        $progressWidth = '100%';
+                                    }
+                                @endphp
+                                <div class="h-full bg-emerald-500 transition-all duration-500 rounded-full" style="width: {{ $progressWidth }};"></div>
                             </div>
-                        @else
-                            <!-- Step 1 -->
-                            <div class="text-center">
-                                <div class="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center font-bold text-lg transition-all {{ in_array($status, ['pending', 'preparing', 'cooked', 'shipping', 'completed']) ? 'bg-emerald-500 text-white shadow-md' : 'bg-slate-100 text-slate-400' }}">
-                                    <i class="fas fa-file-invoice"></i>
+
+                            <div class="grid grid-cols-4 gap-2 relative z-10">
+                                <!-- Step 1: Tiếp nhận / Xác nhận -->
+                                @php $isStep1 = in_array($status, ['pending', 'confirmed', 'preparing', 'cooked', 'delivering', 'shipping', 'completed']); @endphp
+                                <div class="text-center">
+                                    <div class="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center font-bold text-lg transition-all {{ $isStep1 ? 'bg-emerald-500 text-white shadow-md' : 'bg-slate-100 text-slate-400' }}">
+                                        <i class="fas fa-file-invoice"></i>
+                                    </div>
+                                    <p class="text-xs font-bold mt-3 {{ in_array($status, ['pending', 'confirmed']) ? 'text-[#ee4d2d]' : ($isStep1 ? 'text-slate-800' : 'text-slate-400') }}">
+                                        1. {{ $status === 'confirmed' ? 'Đã xác nhận' : 'Tiếp nhận' }}
+                                    </p>
                                 </div>
-                                <p class="text-xs font-bold mt-3 {{ $status === 'pending' ? 'text-[#ee4d2d]' : 'text-slate-700' }}">1. Tiếp nhận</p>
-                            </div>
-                            <!-- Step 2 -->
-                            <div class="text-center">
-                                <div class="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center font-bold text-lg transition-all {{ in_array($status, ['preparing', 'cooked', 'shipping', 'completed']) ? 'bg-emerald-500 text-white shadow-md' : 'bg-slate-100 text-slate-400' }}">
-                                    <i class="fas fa-fire-burner"></i>
+
+                                <!-- Step 2: Chế biến -->
+                                @php $isStep2 = in_array($status, ['preparing', 'cooked', 'delivering', 'shipping', 'completed']); @endphp
+                                <div class="text-center">
+                                    <div class="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center font-bold text-lg transition-all {{ $isStep2 ? 'bg-emerald-500 text-white shadow-md' : 'bg-slate-100 text-slate-400' }}">
+                                        <i class="fas fa-fire-burner"></i>
+                                    </div>
+                                    <p class="text-xs font-bold mt-3 {{ in_array($status, ['preparing', 'cooked']) ? 'text-[#ee4d2d]' : ($isStep2 ? 'text-slate-800' : 'text-slate-400') }}">
+                                        2. Chế biến
+                                    </p>
                                 </div>
-                                <p class="text-xs font-bold mt-3 {{ in_array($status, ['preparing', 'cooked']) ? 'text-[#ee4d2d]' : 'text-slate-700' }}">2. Chế biến</p>
-                            </div>
-                            <!-- Step 3 -->
-                            <div class="text-center">
-                                <div class="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center font-bold text-lg transition-all {{ in_array($status, ['shipping', 'completed']) ? 'bg-emerald-500 text-white shadow-md' : 'bg-slate-100 text-slate-400' }}">
-                                    <i class="fas fa-motorcycle"></i>
+
+                                <!-- Step 3: Đang giao -->
+                                @php $isStep3 = in_array($status, ['delivering', 'shipping', 'completed']); @endphp
+                                <div class="text-center">
+                                    <div class="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center font-bold text-lg transition-all {{ $isStep3 ? 'bg-emerald-500 text-white shadow-md' : 'bg-slate-100 text-slate-400' }}">
+                                        <i class="fas fa-motorcycle"></i>
+                                    </div>
+                                    <p class="text-xs font-bold mt-3 {{ in_array($status, ['delivering', 'shipping']) ? 'text-[#ee4d2d]' : ($isStep3 ? 'text-slate-800' : 'text-slate-400') }}">
+                                        3. Đang giao
+                                    </p>
                                 </div>
-                                <p class="text-xs font-bold mt-3 {{ $status === 'shipping' ? 'text-[#ee4d2d]' : 'text-slate-700' }}">3. Đang giao</p>
-                            </div>
-                            <!-- Step 4 -->
-                            <div class="text-center">
-                                <div class="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center font-bold text-lg transition-all {{ $status === 'completed' ? 'bg-emerald-500 text-white shadow-md' : 'bg-slate-100 text-slate-400' }}">
-                                    <i class="fas fa-check"></i>
+
+                                <!-- Step 4: Hoàn tất -->
+                                @php $isStep4 = ($status === 'completed'); @endphp
+                                <div class="text-center">
+                                    <div class="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center font-bold text-lg transition-all {{ $isStep4 ? 'bg-emerald-500 text-white shadow-md' : 'bg-slate-100 text-slate-400' }}">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <p class="text-xs font-bold mt-3 {{ $isStep4 ? 'text-emerald-600' : 'text-slate-400' }}">
+                                        4. Hoàn tất
+                                    </p>
                                 </div>
-                                <p class="text-xs font-bold mt-3 {{ $status === 'completed' ? 'text-emerald-600' : 'text-slate-700' }}">4. Hoàn tất</p>
                             </div>
-                        @endif
-                    </div>
+                        </div>
+                    @endif
 
                     @if($status === 'completed')
                         <div class="mt-6 p-4 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-amber-500/10 to-rose-500/10 border border-emerald-300 flex flex-col sm:flex-row items-center justify-between gap-4">

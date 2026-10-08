@@ -1,0 +1,151 @@
+
+
+Bài Báo Cáo Dự Án
+Nhóm 12
+Đề Tài : Website bán linh kiện máy tính, laptop
+Chương 1: Tổng quan1.1 Giới thiệu
+Hiện nay, thương mại điện tử đang phát triển mạnh mẽ, đặc biệt là các website bán hàng trực tuyến.
+Một hệ thống bán máy tính cần hỗ trợ tốt các tính năng như tra cứu sản phẩm, giỏ hàng, thanh toán, quản lý đơn hàng và quản trị nội dung.
+Dự án này tập trung xây dựng website bán máy tính bằng Laravel, với mục tiêu tạo một nền tảng thương mại điện tử cơ bản nhưng đầy đủ chức năng.
+1.2 Lý do chọn đề tài
+Nhu cầu mua sắm trực tuyến ngày càng tăng.
+Thị trường công nghệ máy tính, linh kiện và thiết bị văn phòng đang có nhu cầu lớn.
+Laravel là framework phù hợp để xây dựng hệ thống bán hàng nhanh, rõ cấu trúc và dễ mở rộng.
+Dự án có thể phục vụ như một nền tảng thực tế cho học tập, nghiên cứu và phát triển tiếp theo.
+1.3 Mục tiêu đề tài
+Xây dựng website bán máy tính với giao diện thân thiện và dễ sử dụng.
+Tạo hệ thống quản lý sản phẩm, giỏ hàng, đơn hàng và thanh toán.
+Cung cấp chức năng kiểm tra và quản trị đối với admin.
+Nâng cao trải nghiệm khách hàng trong quá trình mua sắm.
+1.4 Phạm vi nghiên cứu
+Quản lý danh mục sản phẩm và thương hiệu
+Hiển thị sản phẩm theo danh mục / bộ lọc / tìm kiếm
+Giỏ hàng và cập nhật số lượng
+Mã giảm giá
+Xử lý thanh toán với PayOS
+Quản lý đơn hàng và trạng thái
+Quản lý dashboard cho admin
+Review khách hàng và hỗ trợ AI
+1.5 Đối tượng và phạm vi ứng dụng
+Khách hàng mua hàng trực tuyến
+Quản trị viên / admin
+Cửa hàng bán máy tính, linh kiện và thiết bị công nghệ
+1.6 Cấu trúc báo cáo
+Chương 1: Tổng quan
+Chương 2: Phương pháp thực hiện
+Chương 3: Thực nghiệm và kết quả
+Chương 4: Kết luận
+Chương 2: Phương pháp thực hiện2.1 Phương pháp nghiên cứu
+Nghiên cứu các hệ thống thương mại điện tử hiện có
+Phân tích chức năng cơ bản của website bán hàng
+Xác định yêu cầu nghiệp vụ cần có
+Thiết kế mô hình dữ liệu và luồng người dùng
+Lập trình theo mô hình MVC trong Laravel
+2.2 Công nghệ sử dụng
+Backend: Laravel
+Frontend: Blade, Tailwind CSS, Vite, JavaScript
+Database: SQLite trong môi trường phát triển
+Testing: PHPUnit
+Payment: PayOS
+AI: Gemini API
+Quản lý dependency: Composer, npm
+2.3 Quy trình xây dựng hệ thống
+Bước 1: Khảo sát yêu cầu và xác định chức năng hệ thống
+Bước 2: Thiết kế cơ sở dữ liệu và mô hình dữ liệu
+Bước 3: Xây dựng route, controller, model
+Bước 4: Thiết kế giao diện cho khách hàng và admin
+Bước 5: Tích hợp giỏ hàng, checkout và thanh toán
+Bước 6: Thêm tính năng review, AI chat và flash sale
+Bước 7: Kiểm thử và sửa lỗi
+Bước 8: Đánh giá hiệu quả và đề xuất cải tiến
+2.4 Thiết kế hệ thống2.4.1 Kiến trúc hệ thống
+Mô hình MVC
+Tách lớp Controller, Model, View
+Router xử lý request và route
+Eloquent ORM truy cập dữ liệu
+2.4.2 Các module chính
+Module sản phẩm
+Module giỏ hàng
+Module đơn hàng
+Module thanh toán
+Module quản trị
+Module đánh giá và hỗ trợ khách hàng
+2.5 Mô hình dữ liệu
+Product: quản lý sản phẩm
+Category: phân loại sản phẩm
+Brand: thương hiệu
+Order: đơn đặt hàng
+OrderItem: chi tiết đơn hàng
+Coupon: mã giảm giá
+Review: đánh giá sản phẩm
+User: người dùng
+Cart (session): giỏ hàng lưu tạm
+2.6 Các chức năng chính được triển khai
+Hiển thị sản phẩm
+Tìm kiếm và lọc sản phẩm
+Thêm và cập nhật giỏ hàng
+Áp dụng mã giảm giá
+Thanh toán online
+Xem và quản lý đơn hàng
+Quản lý sản phẩm và danh mục cho admin
+Chương 3: Thực nghiệm và kết quả3.1 Môi trường thực nghiệm
+Hệ điều hành: Windows / Laravel local environment
+PHP: 8.3
+Laravel: 13
+Database: SQLite
+Server: local development
+Công cụ hỗ trợ: Composer, npm, Vite, Artisan
+3.2 Các ca kiểm thử
+Kiểm tra hiển thị trang chủ
+Kiểm tra danh sách sản phẩm và bộ lọc
+Kiểm tra thêm sản phẩm vào giỏ hàng
+Kiểm tra cập nhật số lượng trong giỏ hàng
+Kiểm tra xóa sản phẩm khỏi giỏ hàng
+Kiểm tra tính năng review sản phẩm
+Kiểm tra đăng nhập, đăng ký, quản lý tài khoản
+Kiểm tra chức năng thanh toán và webhook
+3.3 Kết quả thực nghiệm3.3.1 Giao diện
+Giao diện hiện tại rõ ràng, có bố cục chuyên nghiệp, thân thiện với người dùng.
+Các trang sản phẩm, giỏ hàng và tóm tắt đơn hàng được thiết kế hợp lý.
+3.3.2 Chức năng
+Hệ thống có thể thêm sản phẩm vào giỏ hàng và cập nhật số lượng.
+Mã giảm giá được áp dụng trong tổng đơn hàng.
+Người dùng có thể xem đơn hàng và tiến hành thanh toán.
+Admin có thể quản lý sản phẩm, thương hiệu, danh mục và đơn hàng.
+3.3.3 Kết quả đạt được
+Dự án đã xây dựng được một phiên bản website eCommerce cơ bản hoạt động ổn định.
+Hệ thống đáp ứng được các tính năng cốt lõi của một cửa hàng bán máy tính.
+Tỷ lệ hoàn thiện chức năng ở mức tốt cho giai đoạn MVP.
+3.4 Đánh giá hiệu quả
+Ưu điểm:
+Cấu trúc rõ ràng
+Dễ phát triển
+Tương tác tốt với người dùng
+Có nhiều tính năng phù hợp cho eCommerce
+Hạn chế:
+Logic business còn dàn trải trong controller
+Cart lưu session chưa tối ưu
+Quản lý stock và payment cần nâng cấp
+Chưa có mô hình phân quyền và báo cáo chuyên sâu
+3.5 Đề xuất cải tiến sau thực nghiệm
+Tách logic sang service layer
+Cải thiện cart persistence
+Xử lý tồn kho theo transaction
+Tăng cường báo cáo doanh thu
+Nâng cấp tính năng marketing và AI
+Chương 4: Kết luận4.1 Tổng kết
+Dự án website bán máy tính đã được triển khai với nhiều chức năng quan trọng của một hệ thống thương mại điện tử.
+Hệ thống có thể phục vụ được mục tiêu mua hàng trực tuyến cơ bản và có tiềm năng phát triển mạnh mẽ.
+4.2 Đánh giá chung
+Dự án đạt được mục tiêu ban đầu về việc xây dựng một website bán hàng trực tuyến với các chức năng cơ bản.
+Laravel là công nghệ phù hợp cho hệ thống này nhờ khả năng phát triển nhanh và dễ mở rộng.
+Giao diện và chức năng đáp ứng tốt yêu cầu học tập và triển khai thử nghiệm.
+4.3 Hướng phát triển tiếp theo
+Nâng cấp hệ thống từ MVP sang sản phẩm thương mại điện tử chuyên nghiệp
+Tăng cường khóa học về stock, payment, security, phân quyền
+Xây dựng hệ thống dashboard quản lý toàn diện
+Tích hợp thêm các tính năng như marketing, CRM, AI recommendation, wishlist, bảo mật cao hơn
+4.4 Kết luận cuối cùng
+Dự án này là một nền tảng eCommerce có triển vọng phát triển tốt, đặc biệt trong lĩnh vực công nghệ và máy tính.
+Với các cải tiến về kiến trúc, bảo mật, quản lý kho và nâng cấp trải nghiệm người dùng, dự án có thể phát triển thành hệ thống bán hàng thương mại điện tử chuyên nghiệp và hiệu quả.
+

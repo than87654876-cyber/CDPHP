@@ -43,6 +43,7 @@ Route::get('/api/nhom/{code}/poll', [GroupOrderController::class, 'pollItems'])-
 // API Hệ thống & Thanh toán & Chatbot
 Route::get('/api/dishes/search', [ShopController::class, 'searchDishesApi'])->name('api.dishes.search');
 Route::get('/api/dishes/spin', [ShopController::class, 'spinDishesApi'])->name('api.spin_dishes');
+Route::get('/api/dishes/live-feed', [ShopController::class, 'liveFeedDishes'])->name('api.dishes.live-feed');
 
 Route::post('/api/chatbot/ask', [ShopController::class, 'chatbotAsk'])->name('api.chatbot.ask');
 Route::get('/api/orders/{id}/payment-status', [CartController::class, 'getPaymentStatus'])->name('api.orders.payment-status');

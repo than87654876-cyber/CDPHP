@@ -45,19 +45,27 @@
 <body id="page-top" class="font-sans antialiased text-slate-800 bg-[#f8fafc] min-h-full selection:bg-[#ee4d2d] selection:text-white">
     <div id="wrapper" class="flex min-h-screen">
 
-        <!-- REALTIME COUNTS FOR SIDEBAR BADGES -->
+        <!-- REALTIME COUNTS FOR SIDEBAR BADGES (CACHED 15s) -->
         @php
-            $pendingOrdersCount = \App\Models\Order::where('order_status', 'preparing')->count();
-            $deliveringOrdersCount = \App\Models\Order::where('order_status', 'delivering')->count();
-            $kitchenCount = \App\Models\Order::whereIn('order_status', ['confirmed', 'preparing'])->count();
-            $lowStockInventoryCount = \App\Models\InventoryItem::where('current_stock', '<=', \Illuminate\Support\Facades\DB::raw('min_stock'))->count();
+            $adminSidebarCounts = \Illuminate\Support\Facades\Cache::remember('admin_sidebar_counts', 15, function() {
+                return [
+                    'pending' => (int) \App\Models\Order::where('order_status', 'preparing')->count(),
+                    'delivering' => (int) \App\Models\Order::where('order_status', 'delivering')->count(),
+                    'kitchen' => (int) \App\Models\Order::whereIn('order_status', ['confirmed', 'preparing'])->count(),
+                    'low_stock' => (int) \App\Models\InventoryItem::where('current_stock', '<=', \Illuminate\Support\Facades\DB::raw('min_stock'))->count(),
+                ];
+            });
+            $pendingOrdersCount = $adminSidebarCounts['pending'] ?? 0;
+            $deliveringOrdersCount = $adminSidebarCounts['delivering'] ?? 0;
+            $kitchenCount = $adminSidebarCounts['kitchen'] ?? 0;
+            $lowStockInventoryCount = $adminSidebarCounts['low_stock'] ?? 0;
         @endphp
 
-        <!-- Ultra-Modern Dark Sidebar Navigation -->
-        <aside class="w-64 bg-[#0f172a] text-slate-300 flex-shrink-0 flex flex-col justify-between z-30 border-r border-slate-800/80 shadow-2xl">
-            <div>
+        <!-- Ultra-Modern Dark Sidebar Navigation (Cố định toàn màn hình bên trái) -->
+        <aside class="fixed inset-y-0 left-0 w-64 bg-[#0f172a] text-slate-300 flex flex-col justify-between z-30 border-r border-slate-800/80 shadow-2xl h-screen">
+            <div class="flex flex-col h-full min-h-0">
                 <!-- Brand Header -->
-                <div class="h-20 flex items-center justify-between px-6 border-b border-slate-800/80">
+                <div class="h-20 shrink-0 flex items-center justify-between px-6 border-b border-slate-800/80">
                     <a class="flex items-center gap-3 group" href="{{ route('quanly') }}">
                         <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#ee4d2d] to-[#ff6b4a] flex items-center justify-center text-white shadow-lg shadow-rose-500/30 group-hover:scale-105 transition-all">
                             <i class="fas fa-utensils text-lg"></i>
@@ -70,15 +78,15 @@
                 </div>
 
                 <!-- Quick Link to Storefront -->
-                <div class="px-4 pt-3 pb-1">
+                <div class="shrink-0 px-4 pt-3 pb-1">
                     <a href="{{ route('trangchu') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-amber-400 hover:text-white text-xs font-bold transition-all border border-slate-700/80 shadow-xs group">
                         <span class="flex items-center gap-2.5"><i class="fas fa-store text-amber-400 group-hover:scale-110 transition-transform"></i>Xem Trang Chủ</span>
                         <i class="fas fa-arrow-up-right-from-square text-[10px] text-slate-400 group-hover:text-white"></i>
                     </a>
                 </div>
 
-                <!-- Navigation Links -->
-                <nav class="p-4 space-y-1.5 overflow-y-auto max-h-[calc(100vh-140px)]">
+                <!-- Navigation Links (Cuộn độc lập mượt mà) -->
+                <nav class="flex-1 min-h-0 p-4 space-y-1.5 overflow-y-auto">
                     @if(in_array(Auth::user()->role, ['superadmin', 'admin']))
                     <a href="{{ route('quanly') }}" class="flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all {{ Route::is('quanly') ? 'bg-[#ee4d2d] text-white shadow-lg shadow-rose-500/30' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
                         <div class="flex items-center gap-3">
@@ -230,7 +238,7 @@
             </div>
 
             <!-- Footer Sidebar Account Quick Action -->
-            <div class="p-4 border-t border-slate-800">
+            <div class="shrink-0 p-4 border-t border-slate-800">
                 <a href="{{ route('trangchu') }}" class="flex items-center justify-center gap-2 w-full py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 transition-colors">
                     <i class="fas fa-globe text-[#ee4d2d]"></i>
                     <span>Xem Trang Web</span>
@@ -238,8 +246,8 @@
             </div>
         </aside>
 
-        <!-- Main Content Area -->
-        <div class="flex-grow flex flex-col min-w-0 bg-[#f8fafc]">
+        <!-- Main Content Area (Thêm ml-64 để khớp với sidebar cố định 256px) -->
+        <div class="flex-grow flex flex-col min-w-0 bg-[#f8fafc] ml-64 min-h-screen">
 
             <!-- Topbar Header -->
             <header class="h-20 bg-white border-b border-slate-200/80 px-8 flex items-center justify-between shadow-xs sticky top-0 z-20">

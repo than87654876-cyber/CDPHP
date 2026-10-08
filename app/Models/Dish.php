@@ -86,6 +86,7 @@ class Dish extends Model
     public static function clearReviewsSummaryCache(): void
     {
         self::$reviewsSummaryCache = null;
+        \Illuminate\Support\Facades\Cache::forget('dishes_reviews_summary_cache');
     }
 
     protected static function loadReviewsSummary(): void
@@ -94,30 +95,33 @@ class Dish extends Model
             return;
         }
 
-        self::$reviewsSummaryCache = [];
-        try {
-            // Chỉ lấy các đánh giá chung cho món ăn (order_id IS NULL)
-            // Đánh giá từng đơn (order_id IS NOT NULL) là nội bộ dành cho Admin
-            $directReviews = \Illuminate\Support\Facades\DB::table('reviews')
-                ->whereNotNull('dish_id')
-                ->whereNull('order_id')
-                ->select(
-                    'dish_id',
-                    \Illuminate\Support\Facades\DB::raw('AVG(rating) as avg_rating'),
-                    \Illuminate\Support\Facades\DB::raw('COUNT(id) as total_reviews')
-                )
-                ->groupBy('dish_id')
-                ->get();
+        self::$reviewsSummaryCache = \Illuminate\Support\Facades\Cache::remember('dishes_reviews_summary_cache', 600, function () {
+            $summary = [];
+            try {
+                // Chỉ lấy các đánh giá chung cho món ăn (order_id IS NULL)
+                // Đánh giá từng đơn (order_id IS NOT NULL) là nội bộ dành cho Admin
+                $directReviews = \Illuminate\Support\Facades\DB::table('reviews')
+                    ->whereNotNull('dish_id')
+                    ->whereNull('order_id')
+                    ->select(
+                        'dish_id',
+                        \Illuminate\Support\Facades\DB::raw('AVG(rating) as avg_rating'),
+                        \Illuminate\Support\Facades\DB::raw('COUNT(id) as total_reviews')
+                    )
+                    ->groupBy('dish_id')
+                    ->get();
 
-            foreach ($directReviews as $row) {
-                self::$reviewsSummaryCache[(int) $row->dish_id] = [
-                    'avg' => round((float) $row->avg_rating, 1),
-                    'count' => (int) $row->total_reviews,
-                ];
+                foreach ($directReviews as $row) {
+                    $summary[(int) $row->dish_id] = [
+                        'avg' => round((float) $row->avg_rating, 1),
+                        'count' => (int) $row->total_reviews,
+                    ];
+                }
+            } catch (\Throwable $e) {
+                // Silently continue with fallbacks if tables don't exist yet
             }
-        } catch (\Throwable $e) {
-            // Silently continue with fallbacks if tables don't exist yet
-        }
+            return $summary;
+        });
     }
 
     /**

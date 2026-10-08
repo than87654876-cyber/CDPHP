@@ -38,4 +38,22 @@ class OrderUpdated implements ShouldBroadcastNow
             new PrivateChannel('App.Models.User.' . $this->order->user_id),
         ];
     }
+
+    /**
+     * Determine if this event should broadcast.
+     */
+    public function broadcastWhen(): bool
+    {
+        if (config('broadcasting.default') === 'reverb') {
+            $host = config('broadcasting.connections.reverb.options.host', '127.0.0.1');
+            $port = (int) config('broadcasting.connections.reverb.options.port', 8080);
+            $socket = @fsockopen($host, $port, $errno, $errstr, 0.05);
+            if ($socket) {
+                fclose($socket);
+                return true;
+            }
+            return false;
+        }
+        return true;
+    }
 }

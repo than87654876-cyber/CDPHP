@@ -38,6 +38,8 @@ class AdminCategoryController extends Controller
         ]);
 
         Category::create($request->only('category_name', 'description'));
+        \Illuminate\Support\Facades\Cache::forever('dishes_last_mutation_timestamp', microtime(true));
+        \Illuminate\Support\Facades\Cache::forget('gemini_dishes_menu');
 
         return redirect()->route('quanly_danhmuc')->with('success', 'Đã thêm danh mục mới thành công!');
     }
@@ -60,6 +62,8 @@ class AdminCategoryController extends Controller
 
         $category = Category::findOrFail($id);
         $category->update($request->only('category_name', 'description'));
+        \Illuminate\Support\Facades\Cache::forever('dishes_last_mutation_timestamp', microtime(true));
+        \Illuminate\Support\Facades\Cache::forget('gemini_dishes_menu');
 
         return redirect()->route('quanly_danhmuc')->with('success', 'Đã cập nhật danh mục thành công!');
     }
@@ -75,6 +79,8 @@ class AdminCategoryController extends Controller
         }
 
         $category->delete();
+        \Illuminate\Support\Facades\Cache::forever('dishes_last_mutation_timestamp', microtime(true));
+        \Illuminate\Support\Facades\Cache::forget('gemini_dishes_menu');
 
         return redirect()->route('quanly_danhmuc')->with('success', 'Đã xóa danh mục thành công!');
     }

@@ -204,11 +204,28 @@
                                     </div>
                                     <div class="flex items-center justify-between sm:justify-end gap-3 shrink-0">
                                         <span class="text-xs font-black text-[#ee4d2d]">{{ number_format($uOrder->final_amount) }}đ</span>
-                                        <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase
-                                            @if($uOrder->order_status == 'completed') bg-emerald-100 text-emerald-700
-                                            @elseif($uOrder->order_status == 'cancelled') bg-rose-100 text-rose-700
-                                            @else bg-amber-100 text-amber-700 @endif">
-                                            {{ $uOrder->order_status == 'preparing' ? 'Đang chế biến' : ($uOrder->order_status == 'delivering' ? 'Đang giao' : $uOrder->order_status) }}
+                                        @php
+                                            $bStatus = $uOrder->order_status;
+                                            $bStatusLabel = match($bStatus) {
+                                                'pending' => 'Chờ xác nhận',
+                                                'confirmed' => 'Đã xác nhận',
+                                                'preparing' => 'Đang chế biến',
+                                                'delivering' => 'Đang giao',
+                                                'completed' => 'Hoàn tất',
+                                                'cancelled' => 'Đã hủy',
+                                                default => $bStatus
+                                            };
+                                            $bBadgeClass = match($bStatus) {
+                                                'completed' => 'bg-emerald-100 text-emerald-700',
+                                                'cancelled' => 'bg-rose-100 text-rose-700',
+                                                'delivering' => 'bg-amber-100 text-amber-700',
+                                                'preparing' => 'bg-purple-100 text-purple-700',
+                                                'confirmed' => 'bg-blue-100 text-blue-700',
+                                                default => 'bg-slate-100 text-slate-700'
+                                            };
+                                        @endphp
+                                        <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase {{ $bBadgeClass }}">
+                                            {{ $bStatusLabel }}
                                         </span>
                                     </div>
                                 </div>
@@ -219,63 +236,63 @@
                 @endauth
             </div>
 
-            <!-- CỘT BÊN PHẢI: FORM THANH TOÁN & GIAO HÀNG (CỐ ĐỊNH BÊN PHẢI) -->
-            <div class="w-full lg:w-[440px] xl:w-[480px] shrink-0 space-y-6 lg:sticky lg:top-24 z-10">
-                <form action="{{ route('muahang.process') }}" method="POST" id="checkoutForm" class="bg-white rounded-3xl p-6 sm:p-7 shadow-xl border border-slate-200 space-y-5">
+            <!-- CỘT BÊN PHẢI: FORM THANH TOÁN & GIAO HÀNG (CỐ ĐỊNH & THU GỌN VỪA KHUNG HÌNH) -->
+            <div class="w-full lg:w-[380px] xl:w-[410px] shrink-0 space-y-4 lg:sticky lg:top-20 z-10">
+                <form action="{{ route('muahang.process') }}" method="POST" id="checkoutForm" class="bg-white rounded-2xl p-4 sm:p-5 shadow-lg border border-slate-200 space-y-3.5">
                     @csrf
                     
                     <!-- Hidden Inputs -->
                     <input type="hidden" name="cart_items" id="cart_items_input" value="[]">
                     <input type="hidden" name="coupon_code" id="hidden_coupon_code" value="">
 
-                    <div class="flex items-center gap-2.5 pb-4 border-b border-slate-100">
-                        <span class="w-9 h-9 rounded-2xl bg-rose-50 text-[#ee4d2d] flex items-center justify-center font-bold text-sm shadow-xs">
+                    <div class="flex items-center gap-2.5 pb-2.5 border-b border-slate-100">
+                        <span class="w-7 h-7 rounded-xl bg-rose-50 text-[#ee4d2d] flex items-center justify-center font-bold text-xs shadow-xs">
                             <i class="fas fa-truck-fast"></i>
                         </span>
                         <div>
-                            <h3 class="text-base font-extrabold text-slate-900">Thông Tin Nhận Hàng</h3>
-                            <p class="text-[11px] text-slate-400 font-medium">Điền địa chỉ giao hàng và phương thức</p>
+                            <h3 class="text-sm font-extrabold text-slate-900 leading-tight">Thông Tin Nhận Hàng</h3>
+                            <p class="text-[10px] text-slate-400 font-medium">Điền địa chỉ giao hàng và phương thức</p>
                         </div>
                     </div>
 
                     <!-- Form thông tin nhận hàng -->
                     @guest
-                        <div class="space-y-3">
+                        <div class="space-y-2">
                             <div>
-                                <label class="block text-[11px] font-extrabold text-slate-700 uppercase tracking-wider mb-1">
+                                <label class="block text-[10px] font-extrabold text-slate-700 uppercase tracking-wider mb-0.5">
                                     Họ và tên <span class="text-[#ee4d2d]">*</span>
                                 </label>
-                                <input type="text" name="cart_fullname" required placeholder="Nguyễn Văn A" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-[#ee4d2d] outline-none shadow-xs">
+                                <input type="text" name="cart_fullname" required placeholder="Nguyễn Văn A" class="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-[#ee4d2d] outline-none shadow-xs">
                             </div>
                             <div>
-                                <label class="block text-[11px] font-extrabold text-slate-700 uppercase tracking-wider mb-1">
+                                <label class="block text-[10px] font-extrabold text-slate-700 uppercase tracking-wider mb-0.5">
                                     Email nhận hóa đơn <span class="text-[#ee4d2d]">*</span>
                                 </label>
-                                <input type="email" name="cart_email" required placeholder="email@example.com" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-[#ee4d2d] outline-none shadow-xs">
+                                <input type="email" name="cart_email" required placeholder="email@example.com" class="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-[#ee4d2d] outline-none shadow-xs">
                             </div>
                         </div>
                     @endguest
 
-                    <div class="space-y-3">
+                    <div class="space-y-2">
                         <div>
-                            <label class="block text-[11px] font-extrabold text-slate-700 uppercase tracking-wider mb-1">
+                            <label class="block text-[10px] font-extrabold text-slate-700 uppercase tracking-wider mb-1">
                                 Số điện thoại nhận hàng <span class="text-[#ee4d2d]">*</span>
                             </label>
-                            <input type="tel" name="cart_phone" value="{{ auth()->check() ? auth()->user()->phone : '' }}" required placeholder="0901234567" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-[#ee4d2d] outline-none shadow-xs">
+                            <input type="tel" name="cart_phone" value="{{ auth()->check() ? auth()->user()->phone : '' }}" required placeholder="0901234567" class="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-[#ee4d2d] outline-none shadow-xs">
                         </div>
 
                         <div>
-                            <label class="block text-[11px] font-extrabold text-slate-700 uppercase tracking-wider mb-1">
+                            <label class="block text-[10px] font-extrabold text-slate-700 uppercase tracking-wider mb-1">
                                 Địa chỉ giao hàng <span class="text-[#ee4d2d]">*</span>
                             </label>
-                            <textarea name="cart_address" required rows="2" placeholder="Số nhà, tên đường, Phường/Quận, TP. HCM..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-900 focus:border-[#ee4d2d] outline-none shadow-xs leading-relaxed">{{ auth()->check() ? auth()->user()->notes : '' }}</textarea>
+                            <textarea name="cart_address" required rows="2" placeholder="Số nhà, tên đường, Phường/Quận, TP. HCM..." class="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-900 focus:border-[#ee4d2d] outline-none shadow-xs leading-normal resize-none">{{ auth()->check() ? auth()->user()->notes : '' }}</textarea>
                         </div>
 
                         <div>
-                            <label class="block text-[11px] font-extrabold text-slate-700 uppercase tracking-wider mb-1">
+                            <label class="block text-[10px] font-extrabold text-slate-700 uppercase tracking-wider mb-1">
                                 Thời gian nhận hàng
                             </label>
-                            <select name="cart_time" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-[#ee4d2d] outline-none shadow-xs">
+                            <select name="cart_time" class="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-[#ee4d2d] outline-none shadow-xs">
                                 <option value="now" selected>⚡ Giao siêu tốc 20 phút</option>
                                 <option value="h1">Hẹn giờ (30 - 45 phút tới)</option>
                                 <option value="h2">Hẹn giờ (Buổi trưa 11:30 - 12:30)</option>
@@ -285,26 +302,26 @@
                     </div>
 
                     <!-- Chọn hình thức thanh toán -->
-                    <div class="space-y-2 pt-3 border-t border-slate-100">
-                        <label class="block text-[11px] font-extrabold text-slate-700 uppercase tracking-wider mb-1.5">
+                    <div class="space-y-1.5 pt-2 border-t border-slate-100">
+                        <label class="block text-[10px] font-extrabold text-slate-700 uppercase tracking-wider mb-1">
                             Hình thức thanh toán
                         </label>
-                        <div class="space-y-2">
-                            <label class="flex items-center gap-3 p-3 rounded-2xl border border-slate-200 cursor-pointer hover:border-[#ee4d2d] transition-all bg-slate-50/50 has-checked:border-[#ee4d2d] has-checked:bg-rose-50/40">
-                                <input type="radio" name="cart_payment" value="cod" checked class="w-4 h-4 text-[#ee4d2d] focus:ring-[#ee4d2d]">
-                                <span class="text-xs font-bold text-slate-800 flex items-center gap-2">
+                        <div class="space-y-1.5">
+                            <label class="flex items-center gap-2.5 px-3 py-1.5 rounded-xl border border-slate-200 cursor-pointer hover:border-[#ee4d2d] transition-all bg-slate-50/50 has-checked:border-[#ee4d2d] has-checked:bg-rose-50/40">
+                                <input type="radio" name="cart_payment" value="cod" checked class="w-3.5 h-3.5 text-[#ee4d2d] focus:ring-[#ee4d2d]">
+                                <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                                     <span>💵 Tiền mặt khi nhận (COD)</span>
                                 </span>
                             </label>
-                            <label class="flex items-center gap-3 p-3 rounded-2xl border border-slate-200 cursor-pointer hover:border-[#ee4d2d] transition-all bg-slate-50/50 has-checked:border-[#ee4d2d] has-checked:bg-rose-50/40">
-                                <input type="radio" name="cart_payment" value="atm" class="w-4 h-4 text-[#ee4d2d] focus:ring-[#ee4d2d]">
-                                <span class="text-xs font-bold text-slate-800 flex items-center gap-2">
+                            <label class="flex items-center gap-2.5 px-3 py-1.5 rounded-xl border border-slate-200 cursor-pointer hover:border-[#ee4d2d] transition-all bg-slate-50/50 has-checked:border-[#ee4d2d] has-checked:bg-rose-50/40">
+                                <input type="radio" name="cart_payment" value="atm" class="w-3.5 h-3.5 text-[#ee4d2d] focus:ring-[#ee4d2d]">
+                                <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                                     <span>💳 Chuyển khoản VietQR Hỏa Tốc</span>
                                 </span>
                             </label>
-                            <label class="flex items-center gap-3 p-3 rounded-2xl border border-slate-200 cursor-pointer hover:border-[#ee4d2d] transition-all bg-slate-50/50 has-checked:border-[#ee4d2d] has-checked:bg-rose-50/40">
-                                <input type="radio" name="cart_payment" value="momo" class="w-4 h-4 text-[#ee4d2d] focus:ring-[#ee4d2d]">
-                                <span class="text-xs font-bold text-slate-800 flex items-center gap-2">
+                            <label class="flex items-center gap-2.5 px-3 py-1.5 rounded-xl border border-slate-200 cursor-pointer hover:border-[#ee4d2d] transition-all bg-slate-50/50 has-checked:border-[#ee4d2d] has-checked:bg-rose-50/40">
+                                <input type="radio" name="cart_payment" value="momo" class="w-3.5 h-3.5 text-[#ee4d2d] focus:ring-[#ee4d2d]">
+                                <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                                     <span>👛 Ví điện tử MoMo</span>
                                 </span>
                             </label>
@@ -312,31 +329,31 @@
                     </div>
 
                     <!-- Bảng tính tổng tiền -->
-                    <div class="pt-4 border-t border-slate-100 space-y-2.5 text-xs">
-                        <div class="flex justify-between text-slate-500 font-medium">
+                    <div class="pt-2.5 border-t border-slate-100 space-y-1 text-xs">
+                        <div class="flex justify-between text-slate-500 font-medium text-[11px]">
                             <span>Tạm tính món ăn:</span>
                             <span id="summary-subtotal" class="font-bold text-slate-800">0đ</span>
                         </div>
-                        <div class="flex justify-between text-slate-500 font-medium">
+                        <div class="flex justify-between text-slate-500 font-medium text-[11px]">
                             <span>Phí giao hàng:</span>
                             <span class="font-extrabold text-emerald-600">Miễn phí (Freeship)</span>
                         </div>
-                        <div class="flex justify-between text-slate-500 font-medium" id="discount-row" style="display:none;">
+                        <div class="flex justify-between text-slate-500 font-medium text-[11px]" id="discount-row" style="display:none;">
                             <span>Giảm giá voucher:</span>
                             <span id="summary-discount" class="font-black text-[#ee4d2d]">-0đ</span>
                         </div>
-                        <div class="flex justify-between items-center text-sm font-black text-slate-900 pt-3 border-t border-slate-100">
-                            <span>TỔNG THANH TOÁN:</span>
-                            <span id="summary-total" class="text-2xl font-black text-[#ee4d2d]">0đ</span>
+                        <div class="flex justify-between items-center text-xs font-black text-slate-900 pt-2 border-t border-slate-100">
+                            <span class="uppercase tracking-wider">TỔNG THANH TOÁN:</span>
+                            <span id="summary-total" class="text-xl font-black text-[#ee4d2d]">0đ</span>
                         </div>
                     </div>
 
                     <!-- Nút đặt hàng -->
-                    <button type="submit" id="btn-submit-order" class="w-full py-4 rounded-2xl text-white font-black text-sm shadow-lg shadow-rose-500/30 hover:brightness-110 active:scale-[0.99] transition-all uppercase tracking-wider cursor-pointer flex items-center justify-center gap-2" style="background: linear-gradient(135deg, #ee4d2d 0%, #ff5d3b 100%) !important; color: #ffffff !important; border: none !important;">
-                        <i class="fas fa-shield-check text-base"></i>
+                    <button type="submit" id="btn-submit-order" class="w-full py-2.5 sm:py-3 rounded-xl text-white font-black text-xs sm:text-sm shadow-md shadow-rose-500/25 hover:brightness-110 active:scale-[0.99] transition-all uppercase tracking-wider cursor-pointer flex items-center justify-center gap-2" style="background: linear-gradient(135deg, #ee4d2d 0%, #ff5d3b 100%) !important; color: #ffffff !important; border: none !important;">
+                        <i class="fas fa-shield-check text-sm"></i>
                         <span>ĐẶT HÀNG NGAY</span>
                     </button>
-                    <p class="text-[10px] text-center text-slate-400 font-medium">
+                    <p class="text-[9px] text-center text-slate-400 font-medium">
                         Cam kết giao hàng đúng hẹn & đảm bảo chất lượng món ăn
                     </p>
                 </form>
