@@ -42,15 +42,51 @@ class ShopController extends Controller
             $cat->setRelation('dishes', $catDishes);
         }
 
-        // 1. THUẬT TOÁN: Đề xuất món ăn cùng loại (Cùng category_id với món đang chọn/xem)
+        // 1. THUẬT TOÁN (HÌNH 1): Đề xuất món ăn cùng loại (Cùng category_id)
+        // Khi khách mua 1 lần thì lập tức hiển thị gợi ý theo món đã mua, không cần mua trên 2 lần
         $selectedDishId = $request->query('dish_id') ?? session('selected_dish_id') ?? session('added_dish.id');
         $currentSelectedDish = null;
+        $isPurchasedDish = false;
 
+        // Ưu tiên món đang được chọn qua URL hoặc trong session giỏ hàng
         if ($selectedDishId) {
             $currentSelectedDish = \App\Models\Dish::with('category')->where('is_available', true)->find($selectedDishId);
         }
 
-        // Nếu chưa chọn món cụ thể, mặc định lấy món đầu tiên hoặc món bán chạy
+        // Nếu chưa chọn món cụ thể: Kiểm tra lịch sử mua hàng của khách (Chỉ cần mua 1 lần là hiển thị luôn)
+        if (!$currentSelectedDish && auth()->check()) {
+            $userLastPurchasedDishId = \App\Models\OrderItem::whereHas('order', function($q) {
+                    $q->where('user_id', auth()->id())
+                      ->where('order_status', '!=', 'cancelled');
+                })
+                ->latest('id')
+                ->value('dish_id');
+
+            if ($userLastPurchasedDishId) {
+                $currentSelectedDish = \App\Models\Dish::with('category')->where('is_available', true)->find($userLastPurchasedDishId);
+                if ($currentSelectedDish) {
+                    $isPurchasedDish = true;
+                }
+            }
+        }
+
+        // Kiểm tra đối với khách vãng lai nếu vừa đặt hàng trong phiên (lưu qua session)
+        if (!$currentSelectedDish) {
+            $guestDishId = session('last_ordered_dish_id');
+            if (!$guestDishId && session()->has('placed_order_ids')) {
+                $guestDishId = \App\Models\OrderItem::whereIn('order_id', (array)session('placed_order_ids'))
+                    ->latest('id')
+                    ->value('dish_id');
+            }
+            if ($guestDishId) {
+                $currentSelectedDish = \App\Models\Dish::with('category')->where('is_available', true)->find($guestDishId);
+                if ($currentSelectedDish) {
+                    $isPurchasedDish = true;
+                }
+            }
+        }
+
+        // Nếu khách mới hoàn toàn chưa từng đặt món, mặc định đề xuất theo món bán chạy nhất hoặc món đầu tiên
         if (!$currentSelectedDish) {
             $topDishId = \Illuminate\Support\Facades\Cache::remember('shop_top_dish_id', 900, function () {
                 return \App\Models\OrderItem::select('dish_id', \Illuminate\Support\Facades\DB::raw('SUM(quantity) as total_qty'))
@@ -70,15 +106,16 @@ class ShopController extends Controller
 
         $sameCategoryDishes = $currentSelectedDish ? $currentSelectedDish->getRelatedDishes(6) : collect();
 
-        // 2. THUẬT TOÁN: Món hay mua (Lịch sử hoặc Top món)
+        // 2. THUẬT TOÁN: Món hay mua (Chỉ cần mua 1 lần là hiển thị luôn, không cần mua trên 2 lần)
         $frequentDishes = collect();
         if (auth()->check()) {
             $frequentDishIds = \App\Models\OrderItem::whereHas('order', function($q) {
-                    $q->where('user_id', auth()->id());
+                    $q->where('user_id', auth()->id())
+                      ->where('order_status', '!=', 'cancelled');
                 })
                 ->select('dish_id', \Illuminate\Support\Facades\DB::raw('SUM(quantity) as total_qty'))
                 ->groupBy('dish_id')
-                ->having('total_qty', '>=', 2)
+                ->having('total_qty', '>=', 1)
                 ->orderByDesc('total_qty')
                 ->pluck('dish_id');
 
@@ -102,53 +139,116 @@ class ShopController extends Controller
             }
         }
 
-        // 3. THUẬT TOÁN: Đề xuất theo khung giờ trong ngày
-        $hour = now()->hour;
-        $timeRecommendation = [
-            'period' => 'Sáng',
-            'title' => '🌅 Bữa Sáng Dinh Dưỡng Năng Lượng',
-            'dishes' => collect()
-        ];
+        // 3. THUẬT TOÁN (HÌNH 2): Đề xuất theo khung giờ thời gian thực tế chuẩn Việt Nam (Asia/Ho_Chi_Minh)
+        $vnNow = \Carbon\Carbon::now('Asia/Ho_Chi_Minh');
+        $hour = $vnNow->hour;
 
         if ($hour >= 5 && $hour < 11) {
-            $timeRecommendation['period'] = 'Sáng';
-            $timeRecommendation['title'] = '🌅 Bữa Sáng Dinh Dưỡng Cân Bằng';
-            $timeRecommendation['dishes'] = $allDishes->filter(function($d) {
+            $period = 'Sáng';
+            $timeRange = '05:00 - 11:00';
+            $periodTitle = '🌅 Bữa Sáng Thanh Nhẹ & Tràn Đầy Năng Lượng';
+            $periodSubtitle = 'Khởi đầu ngày mới với phở nóng hổi, bún bò, bánh mì giòn tan và cà phê tươi mát';
+            $icon = 'fa-sun';
+            $badgeColor = 'from-amber-500 to-orange-400';
+            $matchedDishes = $allDishes->filter(function($d) {
                 $name = mb_strtolower($d->dish_name);
-                return str_contains($name, 'cháo')
-                    || str_contains($name, 'bánh mì')
-                    || str_contains($name, 'sữa')
-                    || str_contains($name, 'sinh tố')
-                    || $d->category_id == 1;
-            })->take(4)->values();
-        } elseif ($hour >= 11 && $hour < 14) {
-            $timeRecommendation['period'] = 'Trưa';
-            $timeRecommendation['title'] = '☀️ Bữa Trưa Đậm Đà Năng Lượng';
-            $timeRecommendation['dishes'] = $allDishes->filter(function($d) {
-                $name = mb_strtolower($d->dish_name);
-                return str_contains($name, 'cơm')
+                return in_array($d->category_id, [9, 2, 10, 3])
+                    || str_contains($name, 'phở')
                     || str_contains($name, 'bún')
-                    || str_contains($name, 'ức gà');
-            })->take(4)->values();
-        } elseif ($hour >= 14 && $hour < 17) {
-            $timeRecommendation['period'] = 'Chiều';
-            $timeRecommendation['title'] = '🍰 Thức Uống & Món Nhẹ Tráng Miệng Chiều';
-            $timeRecommendation['dishes'] = $allDishes->filter(function($d) {
+                    || str_contains($name, 'bánh mì')
+                    || str_contains($name, 'cháo')
+                    || str_contains($name, 'cà phê')
+                    || str_contains($name, 'sữa')
+                    || str_contains($name, 'sinh tố');
+            });
+        } elseif ($hour >= 11 && $hour < 14) {
+            $period = 'Trưa';
+            $timeRange = '11:00 - 14:00';
+            $periodTitle = '☀️ Bữa Trưa Tiếp Sức Năng Lượng Đậm Đà';
+            $periodSubtitle = 'Nạp đầy năng lượng giờ trưa với cơm văn phòng, mì phở đậm đà và các món ăn hấp dẫn';
+            $icon = 'fa-cloud-sun';
+            $badgeColor = 'from-orange-500 to-rose-500';
+            $matchedDishes = $allDishes->filter(function($d) {
                 $name = mb_strtolower($d->dish_name);
-                return str_contains($name, 'bánh')
-                    || str_contains($name, 'thạch')
+                return in_array($d->category_id, [10, 9, 1, 8, 3])
+                    || str_contains($name, 'cơm')
+                    || str_contains($name, 'gà')
+                    || str_contains($name, 'bò')
+                    || str_contains($name, 'sườn')
+                    || str_contains($name, 'phở')
+                    || str_contains($name, 'bún')
+                    || str_contains($name, 'sushi');
+            });
+        } elseif ($hour >= 14 && $hour < 17) {
+            $period = 'Chiều';
+            $timeRange = '14:00 - 17:00';
+            $periodTitle = '🍰 Trà Chiều & Món Ăn Vặt Thanh Mát';
+            $periodSubtitle = 'Giải lao giờ chiều với trà sữa thơm lừng, bánh ngọt mềm mịn, chè mát và đồ ăn vặt giòn rụm';
+            $icon = 'fa-cookie-bite';
+            $badgeColor = 'from-pink-500 to-rose-400';
+            $matchedDishes = $allDishes->filter(function($d) {
+                $name = mb_strtolower($d->dish_name);
+                return in_array($d->category_id, [2, 4, 5, 6])
+                    || str_contains($name, 'trà sữa')
+                    || str_contains($name, 'bánh')
                     || str_contains($name, 'chè')
-                    || $d->category_id == 2;
-            })->take(4)->values();
+                    || str_contains($name, 'kem')
+                    || str_contains($name, 'nước ép')
+                    || str_contains($name, 'khoai tây')
+                    || str_contains($name, 'sinh tố');
+            });
+        } elseif ($hour >= 17 && $hour < 22) {
+            $period = 'Tối';
+            $timeRange = '17:00 - 22:00';
+            $periodTitle = '🌙 Bữa Tối Thịnh Soạn & Ấm Cúng Quây Quần';
+            $periodSubtitle = 'Thưởng thức bữa tối đầm ấm cùng gia đình, bạn bè với món lẩu nghi ngút khói, nướng thơm lừng';
+            $icon = 'fa-moon';
+            $badgeColor = 'from-indigo-500 to-purple-500';
+            $matchedDishes = $allDishes->filter(function($d) {
+                $name = mb_strtolower($d->dish_name);
+                return in_array($d->category_id, [7, 1, 6, 8, 10])
+                    || str_contains($name, 'lẩu')
+                    || str_contains($name, 'nướng')
+                    || str_contains($name, 'gà rán')
+                    || str_contains($name, 'pizza')
+                    || str_contains($name, 'bò')
+                    || str_contains($name, 'hải sản');
+            });
         } else {
-            $timeRecommendation['period'] = 'Tối';
-            $timeRecommendation['title'] = '🌙 Bữa Tối Thưởng Thức Ấm Cúng';
-            $timeRecommendation['dishes'] = $allDishes->take(4)->values();
+            $period = 'Khuya';
+            $timeRange = '22:00 - 05:00';
+            $periodTitle = '🌌 Bữa Khuya Nóng Hổi Cứu Đói Nhanh Chóng';
+            $periodSubtitle = 'Tiếp sức cho cú đêm làm việc, học tập với mì phở, gà rán và đồ ăn khuya giao thần tốc';
+            $icon = 'fa-meteor';
+            $badgeColor = 'from-purple-600 to-slate-700';
+            $matchedDishes = $allDishes->filter(function($d) {
+                $name = mb_strtolower($d->dish_name);
+                return in_array($d->category_id, [9, 1, 6, 2])
+                    || str_contains($name, 'mì')
+                    || str_contains($name, 'gà rán')
+                    || str_contains($name, 'khoai tây')
+                    || str_contains($name, 'burger')
+                    || str_contains($name, 'nước');
+            });
         }
 
-        if ($timeRecommendation['dishes']->isEmpty()) {
-            $timeRecommendation['dishes'] = $allDishes->take(4)->values();
+        // Đảm bảo luôn lấy đủ 4 món phong phú
+        $recommendDishes = $matchedDishes->take(4)->values();
+        if ($recommendDishes->count() < 4) {
+            $existingIds = $recommendDishes->pluck('id')->toArray();
+            $fillers = $allDishes->whereNotIn('id', $existingIds)->take(4 - $recommendDishes->count());
+            $recommendDishes = $recommendDishes->concat($fillers)->values();
         }
+
+        $timeRecommendation = [
+            'period' => $period,
+            'time_range' => $timeRange,
+            'title' => $periodTitle,
+            'subtitle' => $periodSubtitle,
+            'icon' => $icon,
+            'badge_color' => $badgeColor,
+            'dishes' => $recommendDishes,
+        ];
 
         // 4. Đề xuất từ lịch sử tìm kiếm gần nhất (Lấy trực tiếp từ in-memory $allDishes)
         $lastSearchQuery = session('last_search_query');
@@ -193,7 +293,7 @@ class ShopController extends Controller
         $expiringCoupons = $activeCoupons->filter(fn($c) => $c->is_expiring_soon)->values();
 
         return view('client.shop', compact(
-            'categories', 'allDishes', 'query', 'currentSelectedDish',
+            'categories', 'allDishes', 'query', 'currentSelectedDish', 'isPurchasedDish',
             'sameCategoryDishes', 'frequentDishes', 'timeRecommendation',
             'lastSearchQuery', 'lastSearchDishes', 'recentlyViewedDishes', 'settings',
             'activeCoupons', 'savedCouponIds', 'expiringCoupons'

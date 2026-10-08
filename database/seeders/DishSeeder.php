@@ -404,6 +404,14 @@ class DishSeeder extends Seeder
                 'description' => 'Lớp thạch xoài dẻo tươi quyện mousse cốt dừa béo thơm mềm mịn',
                 'is_available' => true,
             ],
+            [
+                'category_id' => 4,
+                'dish_name' => 'Bánh Kem Bắp Phô Mai Hạnh Nhân (Size 16cm)',
+                'image_url' => 'https://images.unsplash.com/photo-1535141192574-5d4897c13136?w=600&auto=format&fit=crop&q=80',
+                'price' => 250000.00,
+                'description' => 'Cốt bánh bông lan mềm mịn xen kẽ lớp kem bắp non thơm ngọt rắc hạnh nhân lát giòn rụm',
+                'is_available' => true,
+            ],
 
             // ==========================================
             // 5. TRÁNG MIỆNG (category_id = 5) - 12 món
@@ -694,6 +702,14 @@ class DishSeeder extends Seeder
                 'image_url' => 'https://images.unsplash.com/photo-1548946526-f69e2424cf45?w=600&auto=format&fit=crop&q=80',
                 'price' => 299000.00,
                 'description' => 'Nước dùng riêu cua giấm bỗng chua dịu ăn kèm hoa chuối bào và đậu hũ rán',
+                'is_available' => true,
+            ],
+            [
+                'category_id' => 7,
+                'dish_name' => 'Lẩu Tứ Xuyên Cay Nồng Trùng Khánh',
+                'image_url' => 'https://images.unsplash.com/photo-1547928576-a4a33237cbc3?w=600&auto=format&fit=crop&q=80',
+                'price' => 319000.00,
+                'description' => 'Nước lẩu hầm xương đậm vị ớt hoa tiêu tê cay chuẩn vị Tứ Xuyên ăn kèm thịt bò và hải sản',
                 'is_available' => true,
             ],
 

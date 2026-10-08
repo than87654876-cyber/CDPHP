@@ -62,4 +62,11 @@ return [
         'bot_token' => env('TELEGRAM_BOT_TOKEN'),
         'chat_id' => env('TELEGRAM_CHAT_ID'),
     ],
+
+    'sepay' => [
+        'api_key' => env('SEPAY_API_KEY'),
+        'account_number' => env('SEPAY_ACCOUNT_NUMBER', '8899408675'),
+        'bank' => env('SEPAY_BANK', 'BIDV'),
+        'account_name' => env('SEPAY_ACCOUNT_NAME', 'Tran Le Than'),
+    ],
 ];

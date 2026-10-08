@@ -8,6 +8,16 @@
 
     <link rel="icon" href="{{ asset('logo.jpg') }}">
     
+    <!-- PWA & Mobile Web App Meta Tags -->
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <meta name="theme-color" content="#ee4d2d">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="FOODDAILY">
+    <link rel="apple-touch-icon" href="{{ asset('icons/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('icons/icon-192x192.png') }}">
+    
     <!-- Fonts & FontAwesome -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -59,7 +69,7 @@
     </style>
     @yield('styles')
 </head>
-<body class="font-sans antialiased site-bg-overlay text-slate-800 flex flex-col min-h-screen selection:bg-rose-500 selection:text-white">
+<body class="font-sans antialiased site-bg-overlay text-slate-800 flex flex-col min-h-screen selection:bg-rose-500 selection:text-white pb-16 md:pb-0">
 
     <!-- ShopeeFood Style Navigation Header -->
     <header class="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50 shadow-xs">
@@ -75,12 +85,6 @@
                             <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest -mt-1.5">Food Delivery</span>
                         </div>
                     </a>
-
-                    <!-- City Selector Pill -->
-                    <div class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 cursor-pointer hover:bg-slate-200/80 transition-all">
-                        <span>TP. HCM</span>
-                        <i class="fas fa-chevron-down text-[10px] text-slate-400"></i>
-                    </div>
                 </div>
 
                 <!-- Center: ShopeeFood Navigation Tabs -->
@@ -129,30 +133,67 @@
                             </a>
                         @endif
 
-                        <!-- User Profile Dropdown -->
-                        <div class="relative group">
-                            <button class="flex items-center gap-2 p-1 pl-2 pr-2.5 bg-slate-100 hover:bg-slate-200/80 rounded-full border border-slate-200 transition-all">
-                                <div class="w-6 h-6 rounded-full bg-[#ee4d2d] text-white flex items-center justify-center font-bold text-[11px]">
-                                    {{ strtoupper(substr(Auth::user()->fullname ?? Auth::user()->name ?? 'U', 0, 1)) }}
-                                </div>
+                        <!-- User Profile Dropdown (Hỗ trợ cả chạm/click trên mobile và hover trên desktop) -->
+                        <div class="relative group" id="user-profile-container">
+                            <button type="button" id="user-profile-toggle-btn" onclick="toggleUserProfileDropdown(event)" class="flex items-center gap-2 p-1 pl-2 pr-2.5 bg-slate-100 hover:bg-slate-200/80 rounded-full border border-slate-200 transition-all cursor-pointer">
+                                @if(Auth::user()->avatar)
+                                    <img src="{{ Auth::user()->avatar_url }}" alt="Avatar" class="w-6 h-6 rounded-full object-cover border border-rose-200">
+                                @else
+                                    <div class="w-6 h-6 rounded-full bg-[#ee4d2d] text-white flex items-center justify-center font-bold text-[11px]">
+                                        {{ strtoupper(substr(Auth::user()->fullname ?? Auth::user()->name ?? 'U', 0, 1)) }}
+                                    </div>
+                                @endif
                                 <span class="text-xs font-bold text-slate-800 hidden sm:inline">{{ Auth::user()->fullname ?? Auth::user()->name }}</span>
                                 <i class="fas fa-chevron-down text-[10px] text-slate-400"></i>
                             </button>
-                            <div class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-100 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                                <div class="px-4 py-2 border-b border-slate-100">
-                                    <p class="text-xs font-bold text-slate-900 truncate">{{ Auth::user()->fullname ?? Auth::user()->name }}</p>
-                                    <p class="text-[10px] text-slate-400 truncate">{{ Auth::user()->email }}</p>
-                                    @if(Auth::user()->role === 'superadmin')
-                                        <span class="inline-block mt-1 px-2 py-0.5 rounded-md bg-purple-100 text-purple-700 text-[10px] font-black uppercase">👑 Super Admin</span>
-                                    @elseif(Auth::user()->role === 'admin')
-                                        <span class="inline-block mt-1 px-2 py-0.5 rounded-md bg-rose-100 text-[#ee4d2d] text-[10px] font-black uppercase">⭐ Admin</span>
-                                    @endif
+                            <div id="user-profile-menu" class="hidden md:group-hover:block absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-200 py-2 transition-all duration-200 z-50 overflow-hidden">
+                                <div class="flex items-center gap-3 px-4 py-3 border-b border-slate-100 bg-slate-50/70">
+                                    <img src="{{ Auth::user()->avatar_url }}" alt="Avatar" class="w-10 h-10 rounded-full object-cover border border-rose-200 shrink-0">
+                                    <div class="min-w-0 flex-1">
+                                        <p class="text-xs font-extrabold text-slate-900 truncate">{{ Auth::user()->fullname ?? Auth::user()->name }}</p>
+                                        <p class="text-[10px] text-slate-400 truncate">{{ Auth::user()->email }}</p>
+                                        <div class="flex items-center gap-1.5 mt-1">
+                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[9px] font-black {{ Auth::user()->membership_details['bg'] ?? 'bg-amber-100 text-amber-800' }}">
+                                                <i class="fas {{ Auth::user()->membership_details['icon'] ?? 'fa-shield-halved' }} text-[8px]"></i> {{ Auth::user()->membership_details['badge'] ?? 'Thành viên' }}
+                                            </span>
+                                            <span class="text-[10px] font-black text-[#ee4d2d]">{{ number_format(Auth::user()->points ?? 0) }} xu</span>
+                                        </div>
+                                    </div>
                                 </div>
+
                                 @if(in_array(Auth::user()->role, ['superadmin', 'admin', 'staff', 'kitchen', 'shipper']) || (method_exists(Auth::user(), 'hasAnyRole') && Auth::user()->hasAnyRole(['superadmin', 'admin', 'staff', 'kitchen', 'shipper'])))
-                                    <a href="{{ in_array(Auth::user()->role, ['superadmin', 'admin']) ? route('quanly') : (Auth::user()->role === 'kitchen' ? route('quanly_bep') : route('quanly_banlamviec')) }}" class="flex items-center gap-2 px-4 py-2.5 text-xs font-extrabold text-[#ee4d2d] bg-rose-50/50 hover:bg-rose-50 border-b border-rose-100">
+                                    <a href="{{ in_array(Auth::user()->role, ['superadmin', 'admin']) ? route('quanly') : (Auth::user()->role === 'kitchen' ? route('quanly_bep') : route('quanly_banlamviec')) }}" class="flex items-center gap-2 px-4 py-2 text-xs font-extrabold text-[#ee4d2d] bg-rose-50/60 hover:bg-rose-50 border-b border-rose-100">
                                         <i class="fas fa-shield-halved text-[#ee4d2d]"></i>Vào trang Quản trị (Admin)
                                     </a>
                                 @endif
+
+                                <!-- HỒ SƠ TÀI KHOẢN -->
+                                <a href="{{ route('hoso') }}" class="flex items-center justify-between px-4 py-2.5 text-xs font-bold text-slate-800 hover:bg-rose-50 hover:text-[#ee4d2d] transition-colors border-b border-slate-100">
+                                    <div class="flex items-center gap-2.5">
+                                        <span class="w-6 h-6 rounded-lg bg-rose-100 text-[#ee4d2d] flex items-center justify-center text-xs">
+                                            <i class="fas fa-id-card"></i>
+                                        </span>
+                                        <span>Hồ sơ tài khoản</span>
+                                    </div>
+                                    <i class="fas fa-chevron-right text-[10px] text-slate-300"></i>
+                                </a>
+
+                                <!-- Nhóm các mục con của Hồ sơ -->
+                                <div class="py-1 px-2 space-y-0.5 text-[11px] font-semibold text-slate-600 bg-slate-50/50 rounded-xl mx-2 my-1 border border-slate-100">
+                                    <a href="{{ route('hoso', ['tab' => 'info']) }}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-white hover:text-[#ee4d2d] transition-colors">
+                                        <i class="fas fa-user text-slate-400 text-[10px] w-4"></i>Thông tin cá nhân
+                                    </a>
+                                    <a href="{{ route('hoso', ['tab' => 'address']) }}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-white hover:text-[#ee4d2d] transition-colors">
+                                        <i class="fas fa-map-location-dot text-slate-400 text-[10px] w-4"></i>Địa chỉ giao hàng
+                                    </a>
+                                    <a href="{{ route('hoso', ['tab' => 'account']) }}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-white hover:text-[#ee4d2d] transition-colors">
+                                        <i class="fas fa-key text-slate-400 text-[10px] w-4"></i>Tài khoản & Bảo mật
+                                    </a>
+                                    <a href="{{ route('hoso', ['tab' => 'member']) }}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-white hover:text-[#ee4d2d] transition-colors">
+                                        <i class="fas fa-gem text-amber-500 text-[10px] w-4"></i>Thành viên & Voucher
+                                    </a>
+                                </div>
+
                                 <a href="{{ route('giohang') }}" class="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">
                                     <i class="fas fa-receipt text-slate-400"></i>Đơn hàng của tôi
                                 </a>
@@ -173,12 +214,6 @@
                             Đăng nhập
                         </a>
                     @endauth
-
-                    <!-- Language Flag Badge -->
-                    <div class="flex items-center gap-1 text-xs font-bold text-slate-600 pl-2 border-l border-slate-200">
-                        <span class="text-sm">🇻🇳</span>
-                        <i class="fas fa-chevron-down text-[9px] text-slate-400"></i>
-                    </div>
                 </div>
 
             </div>
@@ -209,10 +244,10 @@
         @yield('content')
     </main>
 
-    <!-- ===== VÒNG QUAY HÔM NAY MÌNH ĂN GÌ – FLOATING BUTTON (ĐẶT GÓC DƯỚI BÊN TRÁI ĐỂ TRÁNH ĐÈ LÊN MÃ KHUYẾN MÃI) ===== -->
+    <!-- ===== VÒNG QUAY HÔM NAY MÌNH ĂN GÌ – FLOATING BUTTON (Chỉ hiện trên máy tính, mobile đã có tab ở đáy) ===== -->
     <button type="button" id="spin-wheel-fab"
             onclick="openSpinWheelModal()"
-            class="fixed bottom-6 left-6 z-50 flex items-center gap-2 px-4 py-3 rounded-full font-black text-xs text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 select-none cursor-pointer border border-amber-300/40"
+            class="hidden md:flex fixed bottom-6 left-6 z-50 items-center gap-2 px-4 py-3 rounded-full font-black text-xs text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 select-none cursor-pointer border border-amber-300/40"
             style="background: linear-gradient(135deg, #f59e0b 0%, #ee4d2d 100%); box-shadow: 0 8px 24px rgba(238, 77, 45, 0.35);"
             title="Quay ngẫu nhiên chọn món ngon">
         <span class="text-base">🎡</span>
@@ -319,18 +354,18 @@
 
 
 
-    <!-- Floating AI Chatbot Widget (Chỉ hiện icon tròn gọn gàng) -->
-    <button type="button" onclick="toggleChatbot()" 
-            class="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-[#ee4d2d] hover:bg-red-600 text-white shadow-xl shadow-rose-500/40 flex items-center justify-center text-xl hover:scale-110 active:scale-95 transition-all cursor-pointer border-2 border-white" 
+    <!-- Floating AI Chatbot Widget (Tránh đè thanh điều hướng đáy và thanh đặt món trên Mobile) -->
+    <button type="button" id="chatbot-toggle-btn" onclick="toggleChatbot()" 
+            class="fixed bottom-32 right-3 md:bottom-6 md:right-6 z-50 w-11 h-11 md:w-12 md:h-12 rounded-full bg-[#ee4d2d] hover:bg-red-600 text-white shadow-xl shadow-rose-500/40 flex items-center justify-center text-lg md:text-xl hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer border-2 border-white" 
             title="Trợ lý AI FOODDAILY">
         <span class="relative flex items-center justify-center">
-            <i class="fas fa-robot text-lg"></i>
+            <i class="fas fa-robot text-base md:text-lg"></i>
             <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#ee4d2d] animate-pulse"></span>
         </span>
     </button>
 
     <!-- Chatbot Modal Window -->
-    <div id="chatbot-modal" class="hidden fixed bottom-20 right-6 z-50 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden transition-all duration-300">
+    <div id="chatbot-modal" class="hidden fixed bottom-36 right-3 left-3 sm:left-auto sm:right-6 md:bottom-20 z-50 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden transition-all duration-300">
         <!-- Chat Header -->
         <div class="bg-[#ee4d2d] text-white p-4 flex items-center justify-between">
             <div class="flex items-center gap-2.5">
@@ -395,13 +430,13 @@
                 <div>
                     <h4 class="font-extrabold text-slate-900 uppercase text-[11px] mb-3">Tải ứng dụng FOODDAILY</h4>
                     <div class="space-y-2">
-                        <div class="flex items-center gap-2 p-2 bg-slate-900 text-white rounded-lg w-36 cursor-pointer hover:bg-slate-800">
+                        <div onclick="triggerPWAInstall()" class="flex items-center gap-2 p-2 bg-slate-900 text-white rounded-lg w-36 cursor-pointer hover:bg-slate-800 transition-colors" title="Cài đặt trên iOS (PWA)">
                             <i class="fab fa-apple text-xl"></i>
-                            <div class="leading-none"><span class="text-[9px] block">App Store</span><span class="font-bold text-xs">iOS App</span></div>
+                            <div class="leading-none"><span class="text-[9px] block">Cài đặt App</span><span class="font-bold text-xs">iOS App</span></div>
                         </div>
-                        <div class="flex items-center gap-2 p-2 bg-slate-900 text-white rounded-lg w-36 cursor-pointer hover:bg-slate-800">
+                        <div onclick="triggerPWAInstall()" class="flex items-center gap-2 p-2 bg-slate-900 text-white rounded-lg w-36 cursor-pointer hover:bg-slate-800 transition-colors" title="Cài đặt trên Android (PWA)">
                             <i class="fab fa-google-play text-lg"></i>
-                            <div class="leading-none"><span class="text-[9px] block">Google Play</span><span class="font-bold text-xs">Android</span></div>
+                            <div class="leading-none"><span class="text-[9px] block">Cài đặt App</span><span class="font-bold text-xs">Android</span></div>
                         </div>
                     </div>
                 </div>
@@ -469,6 +504,224 @@
             </div>
         </div>
     </div>
+
+    <!-- MOBILE FLOATING QUICK CART BAR (Chuẩn ShopeeFood / GrabFood) -->
+    <div id="mobile-floating-cart-bar" class="hidden md:hidden fixed bottom-16 left-3 right-3 z-45 animate-in slide-in-from-bottom duration-200">
+        <a href="{{ route('muahang') }}" class="flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 text-white shadow-2xl border border-slate-700/60 active:scale-98 transition-all">
+            <div class="flex items-center gap-2.5">
+                <div class="relative w-8 h-8 rounded-xl bg-[#ee4d2d] flex items-center justify-center font-bold text-xs text-white shadow-inner">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span id="mobile-float-cart-count" class="absolute -top-1.5 -right-1.5 bg-amber-400 text-slate-900 text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">0</span>
+                </div>
+                <div>
+                    <span class="text-[9px] text-slate-400 block leading-none font-bold uppercase tracking-wider">Giỏ hàng của bạn</span>
+                    <span id="mobile-float-cart-total" class="text-xs font-black text-amber-300 leading-tight">0đ</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-1.5 text-xs font-black text-[#ee4d2d] bg-white px-3 py-1.5 rounded-xl shadow-xs">
+                <span>Đặt món</span>
+                <i class="fas fa-arrow-right text-[10px]"></i>
+            </div>
+        </a>
+    </div>
+
+    <!-- MOBILE BOTTOM NAVIGATION (Chuẩn App ShopeeFood / GrabFood) -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-1 py-1.5 flex items-center justify-around shadow-lg">
+        <a href="{{ route('trangchu') }}" class="flex flex-col items-center justify-center py-1 px-2 {{ request()->routeIs('trangchu') ? 'text-[#ee4d2d] font-bold' : 'text-slate-500 hover:text-[#ee4d2d]' }} transition-colors">
+            <i class="fas fa-utensils text-sm"></i>
+            <span class="text-[10px] mt-0.5 font-semibold">Đồ ăn</span>
+        </a>
+
+        <a href="{{ route('tracuu') }}" class="flex flex-col items-center justify-center py-1 px-2 {{ request()->routeIs('tracuu') ? 'text-[#ee4d2d] font-bold' : 'text-slate-500 hover:text-[#ee4d2d]' }} transition-colors">
+            <i class="fas fa-receipt text-sm"></i>
+            <span class="text-[10px] mt-0.5 font-semibold">Tra cứu</span>
+        </a>
+
+        <button type="button" onclick="openGlobalUserVoucherModal('all')" class="flex flex-col items-center justify-center py-1 px-2 text-slate-500 hover:text-[#ee4d2d] transition-colors cursor-pointer">
+            <i class="fas fa-ticket-alt text-sm"></i>
+            <span class="text-[10px] mt-0.5 font-semibold">Ưu đãi</span>
+        </button>
+
+        <a href="{{ route('muahang') }}" class="relative flex flex-col items-center justify-center py-1 px-2 {{ request()->routeIs('muahang') || request()->routeIs('giohang') ? 'text-[#ee4d2d] font-bold' : 'text-slate-500 hover:text-[#ee4d2d]' }} transition-colors">
+            <i class="fas fa-shopping-cart text-sm"></i>
+            <span id="mobile-nav-cart-badge" class="absolute top-0 right-2 bg-[#ee4d2d] text-white text-[9px] font-black min-w-[15px] h-3.5 px-1 rounded-full flex items-center justify-center border border-white shadow-xs hidden">
+                0
+            </span>
+            <span class="text-[10px] mt-0.5 font-semibold">Giỏ hàng</span>
+        </a>
+
+        @auth
+            <a href="{{ route('hoso') }}" class="flex flex-col items-center justify-center py-1 px-2 {{ request()->routeIs('hoso*') ? 'text-[#ee4d2d] font-bold' : 'text-slate-500 hover:text-[#ee4d2d]' }} transition-colors">
+                <i class="fas fa-user-circle text-sm"></i>
+                <span class="text-[10px] mt-0.5 font-semibold">Hồ sơ</span>
+            </a>
+        @else
+            <a href="{{ route('dangnhap') }}" class="flex flex-col items-center justify-center py-1 px-2 text-slate-500 hover:text-[#ee4d2d] transition-colors">
+                <i class="fas fa-user-circle text-sm"></i>
+                <span class="text-[10px] mt-0.5 font-semibold">Tài khoản</span>
+            </a>
+        @endauth
+    </nav>
+
+    <!-- PWA MOBILE INSTALL BANNER -->
+    <div id="pwa-mobile-install-banner" class="hidden fixed bottom-16 left-3 right-3 z-40 bg-white/95 backdrop-blur-md border border-orange-200 p-3 rounded-2xl shadow-xl animate-in slide-in-from-bottom duration-300 md:hidden">
+        <div class="flex items-center justify-between gap-3">
+            <img src="{{ asset('icons/icon-192x192.png') }}" alt="FOODDAILY App" class="w-10 h-10 rounded-xl shadow-xs shrink-0 object-cover border border-orange-100">
+            <div class="flex-1 min-w-0">
+                <h4 class="font-extrabold text-xs text-slate-900 leading-tight">Cài đặt App FOODDAILY</h4>
+                <p class="text-[11px] text-slate-500 truncate">Mở toàn màn hình & nhận ưu đãi giờ ăn</p>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+                <button type="button" onclick="triggerPWAInstall()" class="px-3 py-1.5 bg-[#ee4d2d] hover:bg-[#d03b1d] text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer">
+                    Cài đặt
+                </button>
+                <button type="button" onclick="dismissPWABanner()" class="w-7 h-7 text-slate-400 hover:text-slate-600 rounded-full flex items-center justify-center text-sm cursor-pointer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PWA iOS GUIDE MODAL -->
+    <div id="pwa-ios-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm hidden">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center animate-in zoom-in-95 duration-200">
+            <img src="{{ asset('icons/icon-192x192.png') }}" class="w-14 h-14 rounded-2xl mx-auto mb-3 shadow-md border border-orange-100">
+            <h3 class="text-base font-extrabold text-slate-900">Cài đặt FOODDAILY cho iPhone</h3>
+            <p class="text-xs text-slate-500 mt-1 mb-4 leading-relaxed">
+                Thêm vào màn hình chính để mở ứng dụng toàn màn hình như ứng dụng gốc:
+            </p>
+            <div class="bg-slate-50 rounded-2xl p-3.5 text-left text-xs text-slate-700 space-y-2.5 mb-5 border border-slate-100 font-medium">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-5 h-5 rounded-full bg-orange-100 text-[#ee4d2d] font-bold flex items-center justify-center text-[11px] shrink-0">1</span>
+                    <span>Nhấn biểu tượng <strong>Chia sẻ (Share) <i class="fas fa-arrow-up-from-bracket text-blue-500"></i></strong> trên thanh Safari dưới cùng.</span>
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <span class="w-5 h-5 rounded-full bg-orange-100 text-[#ee4d2d] font-bold flex items-center justify-center text-[11px] shrink-0">2</span>
+                    <span>Cuộn xuống và chọn <strong>"Thêm vào MH chính" (Add to Home Screen) <i class="far fa-plus-square"></i></strong>.</span>
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <span class="w-5 h-5 rounded-full bg-orange-100 text-[#ee4d2d] font-bold flex items-center justify-center text-[11px] shrink-0">3</span>
+                    <span>Nhấn <strong>Thêm (Add)</strong> ở góc trên bên phải để hoàn tất!</span>
+                </div>
+            </div>
+            <button type="button" onclick="closeIOSInstallGuideModal()" class="w-full py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-colors cursor-pointer">
+                Đã hiểu
+            </button>
+        </div>
+    </div>
+
+    <!-- PWA UNIVERSAL INSTALL MODAL (Desktop / Laptop / Mobile QR) -->
+    <div id="pwa-universal-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm hidden">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 text-center animate-in zoom-in-95 duration-200">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2.5">
+                    <img src="{{ asset('icons/icon-192x192.png') }}" class="w-10 h-10 rounded-xl shadow-xs border border-orange-100 object-cover" alt="FOODDAILY">
+                    <div class="text-left">
+                        <h3 class="text-sm font-extrabold text-slate-900 leading-tight">Cài Đặt App FOODDAILY (PWA)</h3>
+                        <p class="text-[11px] text-slate-500">Mở toàn màn hình & nhận thông báo giờ ăn</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeUniversalPWAModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-sm font-bold transition-colors cursor-pointer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Features Grid -->
+            <div class="grid grid-cols-3 gap-2 my-4 text-center">
+                <div class="p-2.5 bg-orange-50/60 border border-orange-100 rounded-2xl">
+                    <div class="text-base mb-1">⚡</div>
+                    <div class="text-[11px] font-black text-slate-800">Cực Nhanh</div>
+                    <div class="text-[9px] text-slate-500">Toàn màn hình</div>
+                </div>
+                <div class="p-2.5 bg-rose-50/60 border border-rose-100 rounded-2xl">
+                    <div class="text-base mb-1">🔔</div>
+                    <div class="text-[11px] font-black text-slate-800">Nhắc Giờ Ăn</div>
+                    <div class="text-[9px] text-slate-500">Báo giờ trưa/tối</div>
+                </div>
+                <div class="p-2.5 bg-amber-50/60 border border-amber-100 rounded-2xl">
+                    <div class="text-base mb-1">💾</div>
+                    <div class="text-[11px] font-black text-slate-800">Dưới 2MB</div>
+                    <div class="text-[9px] text-slate-500">Không tốn bộ nhớ</div>
+                </div>
+            </div>
+
+            <!-- Guides for Desktop & Phone -->
+            <div class="bg-slate-50 rounded-2xl p-4 text-left text-xs text-slate-700 space-y-3 mb-5 border border-slate-100">
+                <div>
+                    <h5 class="font-extrabold text-[#ee4d2d] flex items-center gap-1.5 mb-1 text-xs">
+                        <i class="fas fa-laptop"></i> Cách cài trên Máy tính (Chrome / Edge):
+                    </h5>
+                    <p class="text-[11px] text-slate-600 leading-relaxed">
+                        Nhấn vào biểu tượng <strong>Cài đặt ứng dụng</strong> (biểu tượng máy tính nhỏ hoặc dấu <strong>[+]</strong>) ở góc phải thanh địa chỉ URL của trình duyệt, hoặc chọn menu <strong>[⋮] → "Cài đặt FOODDAILY..."</strong>.
+                    </p>
+                </div>
+
+                <div class="pt-2 border-t border-slate-200">
+                    <h5 class="font-extrabold text-[#ee4d2d] flex items-center gap-1.5 mb-1 text-xs">
+                        <i class="fas fa-mobile-screen"></i> Trải nghiệm trên Điện thoại di động:
+                    </h5>
+                    <p class="text-[11px] text-slate-600 leading-relaxed mb-2">
+                        Quét mã QR bằng Camera điện thoại hoặc truy cập trên trình duyệt di động:
+                    </p>
+                    <div class="flex items-center gap-3 p-2 bg-white rounded-xl border border-slate-200">
+                        <img src="{{ asset('qr_code.png') }}" class="w-14 h-14 rounded-lg object-contain shrink-0 border border-slate-100" alt="QR App">
+                        <div class="text-[11px] text-slate-600">
+                            <span class="font-bold text-slate-800 block">Quét mã mở trên điện thoại</span>
+                            Trình duyệt sẽ tự động hiện thanh: <em>"Cài đặt App FOODDAILY"</em>!
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" onclick="closeUniversalPWAModal()" class="w-full py-2.5 bg-gradient-to-r from-[#ee4d2d] to-orange-500 text-white rounded-xl text-xs font-black shadow-xs hover:opacity-95 transition-all cursor-pointer">
+                Đã hiểu
+            </button>
+        </div>
+    </div>
+
+    <!-- PWA MEAL NOTIFICATION PROMPT BANNER -->
+    <div id="pwa-notification-prompt-banner" class="hidden fixed top-20 right-4 z-40 max-w-sm w-full bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-2xl border border-orange-200 animate-in slide-in-from-top-4 duration-300">
+        <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl bg-orange-100 text-[#ee4d2d] flex items-center justify-center text-lg shrink-0">
+                🔔
+            </div>
+            <div class="flex-1 min-w-0">
+                <h4 class="font-extrabold text-xs text-slate-900 leading-tight">Bật thông báo giờ ăn?</h4>
+                <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                    Nhận thông báo nhắc bữa trưa (11:00) & tối (18:00) kèm mã giảm giá đặc quyền mỗi ngày!
+                </p>
+                <div class="flex items-center gap-2 mt-3">
+                    <button type="button" onclick="requestMealNotificationPermission()" class="px-3 py-1.5 bg-[#ee4d2d] hover:bg-[#d03b1d] text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer">
+                        Bật thông báo
+                    </button>
+                    <button type="button" onclick="dismissNotificationPrompt()" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold transition-colors cursor-pointer">
+                        Để sau
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleUserProfileDropdown(event) {
+            if (event) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+            const menu = document.getElementById('user-profile-menu');
+            if (menu) {
+                menu.classList.toggle('hidden');
+            }
+        }
+
+        document.addEventListener('click', function(event) {
+            const container = document.getElementById('user-profile-container');
+            const menu = document.getElementById('user-profile-menu');
+            if (menu && container && !container.contains(event.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+    </script>
 
     @yield('scripts')
 </body>

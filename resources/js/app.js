@@ -1,6 +1,8 @@
 import './echo';
 import './client-features';
 import './shop-realtime';
+import './pwa';
+import './notifications';
 
 // Lắng nghe sự kiện Realtime thay đổi món ăn từ admin (Reverb / Pusher)
 if (window.Echo) {

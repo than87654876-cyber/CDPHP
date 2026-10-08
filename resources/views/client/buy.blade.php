@@ -138,106 +138,10 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Thẻ 2: Gợi ý món cùng loại có thể bạn thích -->
-                @if(isset($relatedDishes) && $relatedDishes->isNotEmpty())
-                <div class="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-sm border border-slate-200/80 space-y-4">
-                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                        <div class="flex items-center gap-2.5">
-                            <span class="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#ee4d2d] to-amber-500 text-white flex items-center justify-center text-xs font-bold shadow-xs">
-                                <i class="fas fa-utensils"></i>
-                            </span>
-                            <div>
-                                <h3 class="text-sm font-extrabold text-slate-900">
-                                    Có thể bạn cũng thích ({{ $currentDish->category->category_name ?? 'Món cùng loại' }})
-                                </h3>
-                                <p class="text-[11px] text-slate-400 font-medium">Gợi ý các món ăn ngon cùng danh mục</p>
-                            </div>
-                        </div>
-                        <a href="{{ route('trangchu') }}#menu" class="text-xs font-bold text-[#ee4d2d] hover:underline">≡ Xem thực đơn</a>
-                    </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        @foreach($relatedDishes as $rDish)
-                            <div class="bg-slate-50 hover:bg-rose-50/50 rounded-2xl p-3 border border-slate-200/80 flex flex-col justify-between transition-all group">
-                                <a href="{{ route('dish.detail', $rDish->id) }}" class="space-y-2 block">
-                                    <div class="aspect-square w-full rounded-xl bg-slate-200 overflow-hidden relative border border-slate-200">
-                                        <img src="{{ $rDish->display_image }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                                    </div>
-                                    <h4 class="font-extrabold text-slate-900 text-xs truncate group-hover:text-[#ee4d2d]">{{ $rDish->dish_name }}</h4>
-                                    <p class="text-xs text-[#ee4d2d] font-black">{{ number_format($rDish->price) }}đ</p>
-                                </a>
-                                <div class="pt-2">
-                                    <button type="button" onclick="quickAddDish({{ $rDish->id }}, '{{ addslashes($rDish->dish_name) }}', {{ $rDish->price }}, '{{ addslashes($rDish->display_image) }}')" class="w-full py-1.5 bg-[#ee4d2d] hover:bg-red-600 text-white rounded-xl text-xs font-extrabold shadow-2xs transition-colors flex items-center justify-center gap-1 cursor-pointer">
-                                        <i class="fas fa-plus text-[10px]"></i> Thêm
-                                    </button>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-                @endif
-
-                <!-- Thẻ 3: Đơn hàng vừa đặt gần đây -->
-                @auth
-                    @php
-                        $userOrders = \App\Models\Order::where('user_id', auth()->id())->with('orderItems.dish')->orderBy('created_at', 'desc')->take(3)->get();
-                    @endphp
-                    @if($userOrders->isNotEmpty())
-                    <div class="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-sm border border-slate-200/80 space-y-4">
-                        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                            <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-                                <i class="fas fa-clock-rotate-left text-[#ee4d2d]"></i> Đơn Hàng Vừa Đặt Gần Đây
-                            </h3>
-                            <a href="{{ route('tracuu') }}" class="text-xs font-bold text-[#ee4d2d] hover:underline">Xem tất cả</a>
-                        </div>
-                        <div class="space-y-3">
-                            @foreach($userOrders as $uOrder)
-                                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                                    <div class="space-y-1">
-                                        <div class="flex items-center gap-2">
-                                            <span class="px-2.5 py-0.5 rounded-lg bg-rose-100 text-[#ee4d2d] text-[10px] font-black">#FDL-{{ $uOrder->id }}</span>
-                                            <span class="text-xs font-bold text-slate-700">{{ $uOrder->created_at->format('H:i d/m/Y') }}</span>
-                                        </div>
-                                        <p class="text-xs text-slate-600 font-semibold truncate max-w-sm">
-                                            {{ $uOrder->orderItems->pluck('dish.dish_name')->filter()->implode(', ') }}
-                                        </p>
-                                    </div>
-                                    <div class="flex items-center justify-between sm:justify-end gap-3 shrink-0">
-                                        <span class="text-xs font-black text-[#ee4d2d]">{{ number_format($uOrder->final_amount) }}đ</span>
-                                        @php
-                                            $bStatus = $uOrder->order_status;
-                                            $bStatusLabel = match($bStatus) {
-                                                'pending' => 'Chờ xác nhận',
-                                                'confirmed' => 'Đã xác nhận',
-                                                'preparing' => 'Đang chế biến',
-                                                'delivering' => 'Đang giao',
-                                                'completed' => 'Hoàn tất',
-                                                'cancelled' => 'Đã hủy',
-                                                default => $bStatus
-                                            };
-                                            $bBadgeClass = match($bStatus) {
-                                                'completed' => 'bg-emerald-100 text-emerald-700',
-                                                'cancelled' => 'bg-rose-100 text-rose-700',
-                                                'delivering' => 'bg-amber-100 text-amber-700',
-                                                'preparing' => 'bg-purple-100 text-purple-700',
-                                                'confirmed' => 'bg-blue-100 text-blue-700',
-                                                default => 'bg-slate-100 text-slate-700'
-                                            };
-                                        @endphp
-                                        <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase {{ $bBadgeClass }}">
-                                            {{ $bStatusLabel }}
-                                        </span>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                    @endif
-                @endauth
             </div>
 
             <!-- CỘT BÊN PHẢI: FORM THANH TOÁN & GIAO HÀNG (CỐ ĐỊNH & THU GỌN VỪA KHUNG HÌNH) -->
-            <div class="w-full lg:w-[380px] xl:w-[410px] shrink-0 space-y-4 lg:sticky lg:top-20 z-10">
+            <div class="w-full lg:w-[420px] xl:w-[450px] shrink-0 space-y-4 lg:sticky lg:top-20 z-10">
                 <form action="{{ route('muahang.process') }}" method="POST" id="checkoutForm" class="bg-white rounded-2xl p-4 sm:p-5 shadow-lg border border-slate-200 space-y-3.5">
                     @csrf
                     
@@ -273,7 +177,22 @@
                         </div>
                     @endguest
 
-                    <div class="space-y-2">
+                    @auth
+                        @php
+                            $checkoutUser = auth()->user();
+                            $coDefaultType = $checkoutUser->default_address_type ?: 'home';
+                            $coHomeAddr = $checkoutUser->address ?: '';
+                            $coCompanyAddr = $checkoutUser->company_address ?: '';
+                            $coOtherAddr = $checkoutUser->other_address ?: '';
+                            $coInitialAddr = match($coDefaultType) {
+                                'company' => $coCompanyAddr ?: ($coHomeAddr ?: $coOtherAddr),
+                                'other' => $coOtherAddr ?: ($coHomeAddr ?: $coCompanyAddr),
+                                default => $coHomeAddr ?: ($coCompanyAddr ?: $coOtherAddr),
+                            };
+                        @endphp
+                    @endauth
+
+                    <div class="space-y-2.5">
                         <div>
                             <label class="block text-[10px] font-extrabold text-slate-700 uppercase tracking-wider mb-1">
                                 Số điện thoại nhận hàng <span class="text-[#ee4d2d]">*</span>
@@ -282,10 +201,44 @@
                         </div>
 
                         <div>
-                            <label class="block text-[10px] font-extrabold text-slate-700 uppercase tracking-wider mb-1">
-                                Địa chỉ giao hàng <span class="text-[#ee4d2d]">*</span>
-                            </label>
-                            <textarea name="cart_address" required rows="2" placeholder="Số nhà, tên đường, Phường/Quận, TP. HCM..." class="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-900 focus:border-[#ee4d2d] outline-none shadow-xs leading-normal resize-none">{{ auth()->check() ? auth()->user()->notes : '' }}</textarea>
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="block text-[10px] font-extrabold text-slate-700 uppercase tracking-wider">
+                                    Địa chỉ giao hàng <span class="text-[#ee4d2d]">*</span>
+                                </label>
+                                @auth
+                                    <a href="{{ route('hoso', ['tab' => 'address']) }}" target="_blank" class="text-[10px] font-bold text-[#ee4d2d] hover:underline flex items-center gap-1" title="Quản lý sổ địa chỉ trong hồ sơ">
+                                        <i class="fas fa-id-card text-[9px]"></i> Sổ địa chỉ
+                                    </a>
+                                @endauth
+                            </div>
+
+                            @auth
+                                <!-- Address Quick Switcher Pills -->
+                                <div class="flex items-center gap-1.5 mb-1.5">
+                                    <input type="hidden" name="active_address_type" id="active_address_type" value="{{ $coDefaultType }}">
+                                    
+                                    <button type="button" onclick="selectCheckoutAddress('home')" id="btn-addr-home" class="checkout-addr-pill flex-1 py-1 px-1.5 rounded-lg text-[10px] font-bold border transition-all flex items-center justify-center gap-1 cursor-pointer {{ $coDefaultType === 'home' ? 'bg-rose-50 text-[#ee4d2d] border-[#ee4d2d] font-black' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100' }}">
+                                        <span>🏠 Nhà</span>
+                                    </button>
+
+                                    <button type="button" onclick="selectCheckoutAddress('company')" id="btn-addr-company" class="checkout-addr-pill flex-1 py-1 px-1.5 rounded-lg text-[10px] font-bold border transition-all flex items-center justify-center gap-1 cursor-pointer {{ $coDefaultType === 'company' ? 'bg-rose-50 text-[#ee4d2d] border-[#ee4d2d] font-black' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100' }}">
+                                        <span>🏢 Công ty</span>
+                                    </button>
+
+                                    <button type="button" onclick="selectCheckoutAddress('other')" id="btn-addr-other" class="checkout-addr-pill flex-1 py-1 px-1.5 rounded-lg text-[10px] font-bold border transition-all flex items-center justify-center gap-1 cursor-pointer {{ $coDefaultType === 'other' ? 'bg-rose-50 text-[#ee4d2d] border-[#ee4d2d] font-black' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100' }}">
+                                        <span>📍 Khác</span>
+                                    </button>
+                                </div>
+                            @endauth
+
+                            <textarea name="cart_address" id="checkout_cart_address" required rows="2" placeholder="Số nhà, tên đường, Phường/Quận, TP. HCM..." class="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-900 focus:border-[#ee4d2d] outline-none shadow-xs leading-normal resize-none">{{ auth()->check() ? $coInitialAddr : '' }}</textarea>
+
+                            @auth
+                                <label class="flex items-center gap-1.5 text-[10px] text-slate-500 font-semibold mt-1 cursor-pointer select-none">
+                                    <input type="checkbox" name="save_to_profile" value="1" checked class="rounded accent-[#ee4d2d]">
+                                    <span>Tự động lưu SĐT & địa chỉ này vào Hồ sơ</span>
+                                </label>
+                            @endauth
                         </div>
 
                         <div>
@@ -752,6 +705,40 @@
         const modal = document.getElementById('couponSelectorModal');
         if (modal) modal.classList.add('hidden');
     }
+
+    @auth
+        const userSavedAddresses = {
+            home: @json($coHomeAddr),
+            company: @json($coCompanyAddr),
+            other: @json($coOtherAddr)
+        };
+
+        function selectCheckoutAddress(type) {
+            const inputActiveType = document.getElementById('active_address_type');
+            const addressTextarea = document.getElementById('checkout_cart_address');
+            if (inputActiveType) inputActiveType.value = type;
+
+            ['home', 'company', 'other'].forEach(t => {
+                const btn = document.getElementById('btn-addr-' + t);
+                if (btn) {
+                    if (t === type) {
+                        btn.className = 'checkout-addr-pill flex-1 py-1 px-1.5 rounded-lg text-[10px] font-black border transition-all flex items-center justify-center gap-1 cursor-pointer bg-rose-50 text-[#ee4d2d] border-[#ee4d2d]';
+                    } else {
+                        btn.className = 'checkout-addr-pill flex-1 py-1 px-1.5 rounded-lg text-[10px] font-bold border transition-all flex items-center justify-center gap-1 cursor-pointer bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100';
+                    }
+                }
+            });
+
+            if (userSavedAddresses[type]) {
+                addressTextarea.value = userSavedAddresses[type];
+            }
+        }
+
+        document.getElementById('checkout_cart_address')?.addEventListener('input', function() {
+            const currentType = document.getElementById('active_address_type')?.value || 'home';
+            userSavedAddresses[currentType] = this.value;
+        });
+    @endauth
 
     document.addEventListener("DOMContentLoaded", function () {
         @if(session('added_dish'))

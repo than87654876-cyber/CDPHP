@@ -27,6 +27,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/payments/bank-transfer/notify',
             'api/payments/webhook',
             'api/payos/webhook',
+            'api/sepay/webhook',
+            'api/notifications/*',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

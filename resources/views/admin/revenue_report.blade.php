@@ -7,14 +7,14 @@
     <!-- Top Action Bar -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <h2 class="text-2xl font-extrabold text-slate-800 tracking-tight">Thống Kê & Báo Cáo Doanh Thu FOODDAILY</h2>
+            <h2 class="text-xl sm:text-2xl font-extrabold text-slate-800 tracking-tight">Thống Kê & Báo Cáo Doanh Thu FOODDAILY</h2>
             <p class="text-xs text-slate-500 mt-1">Theo dõi hoạt động kinh doanh, sản lượng món ăn và phát hiện các món bán chạy / tồn đọng</p>
         </div>
         
-        <div class="flex items-center gap-3">
+        <div class="flex flex-wrap items-center gap-2.5 sm:gap-3">
             <!-- Year Selector Form -->
             <form action="{{ route('quanly') }}" method="GET" class="flex items-center gap-2">
-                <span class="text-xs font-bold text-slate-500">Năm xem:</span>
+                <span class="text-xs font-bold text-slate-500">Năm:</span>
                 <select name="year" onchange="this.form.submit()" class="px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-500/20 shadow-xs cursor-pointer">
                     @foreach($availableYears as $y)
                         <option value="{{ $y }}" {{ $selectedYear == $y ? 'selected' : '' }}>Năm {{ $y }}</option>
@@ -23,8 +23,8 @@
             </form>
 
             <div class="relative group">
-                <button class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-2 shadow-md transition-all">
-                    <i class="fas fa-download text-rose-400"></i> Xuất báo cáo
+                <button class="px-4 sm:px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-2 shadow-md transition-all">
+                    <i class="fas fa-download text-rose-400"></i> <span class="hidden sm:inline">Xuất báo cáo</span><span class="sm:hidden">Xuất</span>
                     <i class="fas fa-chevron-down text-[10px]"></i>
                 </button>
                 <div class="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
@@ -43,17 +43,17 @@
     </div>
 
     <!-- Weather AI Business Widget -->
-    <div class="rounded-3xl food-gradient p-6 text-white shadow-xl shadow-rose-500/15 relative overflow-hidden">
-        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div class="rounded-3xl food-gradient p-5 sm:p-6 text-white shadow-xl shadow-rose-500/15 relative overflow-hidden">
+        <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
             <div class="space-y-2">
                 <div class="flex items-center gap-2 text-amber-300 font-extrabold text-xs uppercase tracking-wider">
                     <i class="fas fa-cloud-sun text-base"></i> Dự báo thời tiết kinh doanh AI
                 </div>
                 <p class="text-xs text-rose-100 font-medium" id="weather-text">Đang tải dữ liệu thời tiết khu vực...</p>
-                <p class="text-sm font-bold text-amber-200 bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl inline-block" id="weather-recommendation"></p>
+                <p class="text-xs sm:text-sm font-bold text-amber-200 bg-white/10 backdrop-blur-md px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl inline-block" id="weather-recommendation"></p>
             </div>
-            <div class="text-left md:text-right flex flex-col justify-center">
-                <span class="text-4xl font-extrabold tracking-tight" id="weather-temp">--°C</span>
+            <div class="text-left sm:text-right flex flex-col justify-center">
+                <span class="text-3xl sm:text-4xl font-extrabold tracking-tight" id="weather-temp">--°C</span>
                 <span class="text-xs font-semibold text-rose-100" id="weather-location">Hồ Chí Minh, VN</span>
             </div>
         </div>

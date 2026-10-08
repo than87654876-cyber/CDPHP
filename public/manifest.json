@@ -1,0 +1,63 @@
+{
+  "id": "/?source=pwa",
+  "name": "FOODDAILY - Đặt Đồ Ăn Trực Tuyến",
+  "short_name": "FOODDAILY",
+  "description": "Đặt đồ ăn giao hàng siêu tốc, tích điểm đổi quà và ngập tràn khuyến mãi cùng FOODDAILY.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#ee4d2d",
+  "lang": "vi",
+  "categories": ["food", "shopping", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Thực đơn món ngon",
+      "short_name": "Thực đơn",
+      "description": "Xem thực đơn các món ăn hôm nay",
+      "url": "/trangchu",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Giỏ hàng",
+      "short_name": "Giỏ hàng",
+      "description": "Xem các món đã chọn trong giỏ",
+      "url": "/giohang",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Tra cứu đơn hàng",
+      "short_name": "Tra cứu",
+      "description": "Kiểm tra trạng thái đơn đang giao",
+      "url": "/tracuu",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    }
+  ]
+}

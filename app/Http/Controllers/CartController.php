@@ -146,6 +146,8 @@ class CartController extends Controller
                     'fullname' => $fullname ?: 'Khách vãng lai',
                     'email' => $email,
                     'phone' => $phone,
+                    'address' => $request->cart_address,
+                    'default_address_type' => 'home',
                     'password' => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(16)),
                     'role' => 'guest',
                     'status' => true,
@@ -237,6 +239,33 @@ class CartController extends Controller
             $order->delivery_time = $request->cart_time;
             $order->save();
 
+            // Tự động đồng bộ và lưu thông tin nhận hàng vào Hồ sơ người dùng
+            if ($userId) {
+                try {
+                    $profileUser = \App\Models\User::find($userId);
+                    if ($profileUser && $request->boolean('save_to_profile', true)) {
+                        if ($request->filled('cart_phone')) {
+                            $profileUser->phone = $request->cart_phone;
+                        }
+                        $addressType = $request->input('active_address_type', $profileUser->default_address_type ?: 'home');
+                        if (!in_array($addressType, ['home', 'company', 'other'])) {
+                            $addressType = 'home';
+                        }
+                        $profileUser->default_address_type = $addressType;
+                        if ($addressType === 'company') {
+                            $profileUser->company_address = $request->cart_address;
+                        } elseif ($addressType === 'other') {
+                            $profileUser->other_address = $request->cart_address;
+                        } else {
+                            $profileUser->address = $request->cart_address;
+                        }
+                        $profileUser->save();
+                    }
+                } catch (\Exception $profileErr) {
+                    \Illuminate\Support\Facades\Log::warning('Auto save to profile warning: ' . $profileErr->getMessage());
+                }
+            }
+
             // Lưu danh sách sản phẩm của đơn hàng
             foreach ($orderItemsData as $itemData) {
                 $orderItem = new OrderItem;
@@ -250,6 +279,13 @@ class CartController extends Controller
             DB::commit();
 
             $request->session()->push('placed_order_ids', $order->id);
+
+            // Lưu món vừa mua để thuật toán đề xuất nhận diện ngay lập tức (chỉ cần mua 1 lần)
+            if (!empty($orderItemsData)) {
+                $orderedDishId = $orderItemsData[0]['dish_id'];
+                $request->session()->put('selected_dish_id', $orderedDishId);
+                $request->session()->put('last_ordered_dish_id', $orderedDishId);
+            }
 
             try {
                 event(new \App\Events\OrderUpdated($order, 'created'));
@@ -680,6 +716,142 @@ class CartController extends Controller
         }
 
         return response()->json(['success' => false, 'message' => 'Invalid signature'], 400);
+    }
+
+    /**
+     * Webhook tiếp nhận biến động số dư VietQR từ SePay (https://sepay.vn)
+     */
+    public function sepayWebhook(Request $request)
+    {
+        $sePayService = app(\App\Services\SePayService::class);
+
+        // 1. Kiểm tra xác thực (Authorization Header)
+        if (!$sePayService->validateAuthorization($request)) {
+            \Illuminate\Support\Facades\Log::warning('SePay Webhook: Chữ ký/API Key không hợp lệ', [
+                'auth_header' => $request->header('Authorization'),
+                'ip' => $request->ip(),
+            ]);
+            return response()->json(['success' => false, 'message' => 'Unauthorized: Invalid SePay API Key'], 401);
+        }
+
+        $rawPayload = $request->all();
+        \Illuminate\Support\Facades\Log::info('SePay Webhook Received', $rawPayload);
+
+        $parsed = $sePayService->parsePayload($rawPayload);
+
+        // SePay gửi biến động số dư: 'in' (tiền vào) và 'out' (tiền ra) -> Chỉ xử lý 'in'
+        if ($parsed['transfer_type'] !== 'in') {
+            return response()->json([
+                'success' => true,
+                'message' => 'Bỏ qua biến động tiền ra (transferType != in)',
+            ], 200);
+        }
+
+        $orderId = $parsed['order_id'];
+        $transferAmount = $parsed['transfer_amount'];
+        $referenceCode = $parsed['reference_code'] ?? ('SEPAY_' . time());
+        $gateway = $parsed['gateway'] ?? 'BIDV';
+
+        if (!$orderId) {
+            \Illuminate\Support\Facades\Log::notice('SePay Webhook: Không tìm thấy mã đơn hàng FDL trong nội dung', [
+                'content' => $parsed['content'],
+                'amount' => $transferAmount,
+                'reference' => $referenceCode,
+            ]);
+            // Trả về 200 OK để SePay không liên tục retry các giao dịch không thuộc về shop
+            return response()->json([
+                'success' => true,
+                'message' => 'Không tìm thấy mã đơn hàng phù hợp trong nội dung chuyển khoản.',
+            ], 200);
+        }
+
+        $order = Order::find($orderId);
+        if (!$order) {
+            \Illuminate\Support\Facades\Log::warning("SePay Webhook: Đơn hàng #FDL-{$orderId} không tồn tại.");
+            return response()->json([
+                'success' => true,
+                'message' => "Đơn hàng #FDL-{$orderId} không tồn tại.",
+            ], 200);
+        }
+
+        if ($order->payment_status === 'paid') {
+            return response()->json([
+                'success' => true,
+                'message' => "Đơn hàng #FDL-{$orderId} đã được thanh toán trước đó.",
+                'order_id' => $order->id,
+            ], 200);
+        }
+
+        $expectedAmount = (float) $order->final_amount;
+
+        // Kiểm tra số tiền chuyển có đủ đơn hàng không (cho phép sai số dưới 1đ)
+        if ($transferAmount < $expectedAmount && ($expectedAmount - $transferAmount) > 1.0) {
+            \Illuminate\Support\Facades\Log::warning("SePay Webhook: Đơn hàng #FDL-{$orderId} chuyển thiếu tiền.", [
+                'expected' => $expectedAmount,
+                'transferred' => $transferAmount,
+            ]);
+
+            try {
+                $telegram = app(\App\Services\TelegramService::class);
+                $telegram->sendMessage("⚠️ <b>SePay Cảnh Báo: Chuyển thiếu tiền đơn #FDL-{$order->id}</b>\nCần thanh toán: " . number_format($expectedAmount, 0, ',', '.') . " VNĐ\nKhách chuyển: " . number_format($transferAmount, 0, ',', '.') . " VNĐ\nNội dung: {$parsed['content']}");
+            } catch (\Exception $e) {}
+
+            return response()->json([
+                'success' => false,
+                'message' => "Số tiền chuyển khoản ({$transferAmount}) không đủ giá trị đơn hàng ({$expectedAmount}).",
+            ], 200);
+        }
+
+        // Cập nhật đơn hàng thành đã thanh toán
+        $order->payment_status = 'paid';
+        if ($order->order_status === 'pending') {
+            $order->order_status = 'preparing';
+        }
+        $order->payment_paid_at = now();
+        $order->payment_transaction_id = $referenceCode;
+        $order->payment_bank_reference = $referenceCode;
+        $order->payment_bank = $gateway;
+        $order->payment_amount = $transferAmount;
+        $order->payment_content = $parsed['content'];
+        $order->payment_method = 'bank_transfer';
+        $order->save();
+
+        // 1. Bắn sự kiện realtime Reverb/Pusher
+        try {
+            event(new \App\Events\OrderUpdated($order, 'paid'));
+        } catch (\Exception $broadcastException) {
+            \Illuminate\Support\Facades\Log::warning('SePay Broadcasting warning: ' . $broadcastException->getMessage());
+        }
+
+        // 2. Gửi email xác nhận
+        try {
+            if ($order->user && $order->user->email) {
+                Mail::to($order->user->email)->queue(new OrderPlacedMail($order));
+            }
+        } catch (\Exception $mailError) {
+            \Illuminate\Support\Facades\Log::warning('SePay OrderPlacedMail warning: ' . $mailError->getMessage());
+        }
+
+        // 3. Bắn thông báo Telegram cho chủ quán / bếp
+        try {
+            $telegram = app(\App\Services\TelegramService::class);
+            $msg = "⚡ <b>SePay: Nhận tiền chuyển khoản VietQR tự động thành công!</b>\n";
+            $msg .= "🆔 Đơn hàng: <b>#FDL-{$order->id}</b>\n";
+            $msg .= "💰 Số tiền: <b>" . number_format($transferAmount, 0, ',', '.') . " VNĐ</b>\n";
+            $msg .= "🏦 Ngân hàng: <b>{$gateway}</b>\n";
+            $msg .= "📝 Nội dung: <i>{$parsed['content']}</i>\n";
+            $msg .= "👨‍🍳 Trạng thái: Bếp đã nhận và bắt đầu nấu!";
+            $telegram->sendMessage($msg);
+        } catch (\Exception $telError) {
+            \Illuminate\Support\Facades\Log::warning('SePay Telegram sending warning: ' . $telError->getMessage());
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Thanh toán SePay xử lý thành công',
+            'order_id' => $order->id,
+            'payment_status' => 'paid',
+        ], 200);
     }
 
     // AJAX Polling for Order updates

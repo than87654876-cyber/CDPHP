@@ -13,6 +13,10 @@ Schedule::command('orders:cancel-overdue')->everyMinute();
 Schedule::command('subscription:dispatch-daily')->dailyAt('05:00');
 Schedule::command('backup:customers')->dailyAt('00:00');
 
+// Thông báo đẩy (Web Push) theo khung giờ ăn uống
+Schedule::command('notify:meal lunch')->dailyAt('11:00');
+Schedule::command('notify:meal dinner')->dailyAt('18:00');
+
 Artisan::command('mail:test {email? : Địa chỉ email nhận thử nghiệm}', function ($email = null) {
     $recipient = $email ?: env('MAIL_FROM_ADDRESS', 'than28112000@gmail.com');
     $this->info("Đang kiểm tra kết nối SMTP tới Google Gmail...");

@@ -34,12 +34,54 @@ export function updateGlobalHeaderCartBadge() {
     try {
         const cart = JSON.parse(localStorage.getItem('fooddelicious_cart') || '[]');
         const badge = document.getElementById('global-header-cart-badge');
-        if (badge) {
-            if (cart.length > 0) {
-                badge.innerText = cart.length;
-                badge.classList.remove('hidden');
+        const mobileBadge = document.getElementById('mobile-nav-cart-badge');
+        const count = cart.reduce((sum, item) => sum + (parseInt(item.quantity) || 1), 0);
+        const totalPrice = cart.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0);
+        
+        [badge, mobileBadge].forEach(el => {
+            if (el) {
+                if (count > 0) {
+                    el.innerText = count > 99 ? '99+' : count;
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            }
+        });
+
+        // Cập nhật Mobile Floating Quick Cart Bar (Chuẩn ShopeeFood / GrabFood)
+        const floatCartBar = document.getElementById('mobile-floating-cart-bar');
+        const floatCartCount = document.getElementById('mobile-float-cart-count');
+        const floatCartTotal = document.getElementById('mobile-float-cart-total');
+        const chatbotBtn = document.getElementById('chatbot-toggle-btn');
+        const chatbotModal = document.getElementById('chatbot-modal');
+
+        if (floatCartBar) {
+            const isCheckoutPage = window.location.pathname.includes('/muahang') || window.location.pathname.includes('/giohang');
+            if (count > 0 && !isCheckoutPage) {
+                if (floatCartCount) floatCartCount.innerText = count > 99 ? '99+' : count;
+                if (floatCartTotal) floatCartTotal.innerText = fmtMoney(totalPrice);
+                floatCartBar.classList.remove('hidden');
+
+                // Tự động đẩy Chatbot lên cao để không che nút "Đặt món"
+                if (chatbotBtn) {
+                    chatbotBtn.classList.remove('bottom-20');
+                    chatbotBtn.classList.add('bottom-32');
+                }
+                if (chatbotModal) {
+                    chatbotModal.classList.remove('bottom-24');
+                    chatbotModal.classList.add('bottom-36');
+                }
             } else {
-                badge.classList.add('hidden');
+                floatCartBar.classList.add('hidden');
+                if (chatbotBtn) {
+                    chatbotBtn.classList.remove('bottom-32');
+                    chatbotBtn.classList.add('bottom-20');
+                }
+                if (chatbotModal) {
+                    chatbotModal.classList.remove('bottom-36');
+                    chatbotModal.classList.add('bottom-24');
+                }
             }
         }
     } catch (e) {}

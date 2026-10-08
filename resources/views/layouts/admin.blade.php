@@ -61,11 +61,14 @@
             $lowStockInventoryCount = $adminSidebarCounts['low_stock'] ?? 0;
         @endphp
 
-        <!-- Ultra-Modern Dark Sidebar Navigation (Cố định toàn màn hình bên trái) -->
-        <aside class="fixed inset-y-0 left-0 w-64 bg-[#0f172a] text-slate-300 flex flex-col justify-between z-30 border-r border-slate-800/80 shadow-2xl h-screen">
+        <!-- Mobile Sidebar Overlay Backdrop -->
+        <div id="admin-sidebar-overlay" onclick="toggleAdminSidebar()" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-35 hidden lg:hidden transition-opacity"></div>
+
+        <!-- Ultra-Modern Dark Sidebar Navigation (Cố định trên PC, Drawer trượt trên Mobile) -->
+        <aside id="admin-sidebar" class="fixed inset-y-0 left-0 w-64 bg-[#0f172a] text-slate-300 flex flex-col justify-between z-40 border-r border-slate-800/80 shadow-2xl h-screen transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0">
             <div class="flex flex-col h-full min-h-0">
                 <!-- Brand Header -->
-                <div class="h-20 shrink-0 flex items-center justify-between px-6 border-b border-slate-800/80">
+                <div class="h-16 lg:h-20 shrink-0 flex items-center justify-between px-6 border-b border-slate-800/80">
                     <a class="flex items-center gap-3 group" href="{{ route('quanly') }}">
                         <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#ee4d2d] to-[#ff6b4a] flex items-center justify-center text-white shadow-lg shadow-rose-500/30 group-hover:scale-105 transition-all">
                             <i class="fas fa-utensils text-lg"></i>
@@ -75,6 +78,10 @@
                             <span class="text-[10px] font-extrabold text-[#ee4d2d] uppercase tracking-widest -mt-1">Admin Portal</span>
                         </div>
                     </a>
+                    <!-- Mobile Close Button -->
+                    <button type="button" onclick="toggleAdminSidebar()" class="lg:hidden w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center text-sm transition-colors cursor-pointer" title="Đóng menu">
+                        <i class="fas fa-xmark"></i>
+                    </button>
                 </div>
 
                 <!-- Quick Link to Storefront -->
@@ -246,34 +253,47 @@
             </div>
         </aside>
 
-        <!-- Main Content Area (Thêm ml-64 để khớp với sidebar cố định 256px) -->
-        <div class="flex-grow flex flex-col min-w-0 bg-[#f8fafc] ml-64 min-h-screen">
+        <!-- Main Content Area (ml-0 trên Mobile, ml-64 trên Desktop) -->
+        <div class="flex-grow flex flex-col min-w-0 bg-[#f8fafc] ml-0 lg:ml-64 min-h-screen transition-all">
 
             <!-- Topbar Header -->
-            <header class="h-20 bg-white border-b border-slate-200/80 px-8 flex items-center justify-between shadow-xs sticky top-0 z-20">
-                <div class="flex items-center gap-6">
-                    <h1 class="text-lg font-extrabold text-slate-900 tracking-tight">
+            <header class="h-16 lg:h-20 bg-white border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 flex items-center justify-between shadow-xs sticky top-0 z-20">
+                <div class="flex items-center gap-2.5 sm:gap-4 lg:gap-6 min-w-0">
+                    <!-- Hamburger Toggle Button for Mobile -->
+                    <button type="button" onclick="toggleAdminSidebar()" class="lg:hidden w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-sm shadow-2xs transition-colors shrink-0 cursor-pointer" title="Mở menu quản trị">
+                        <i class="fas fa-bars"></i>
+                    </button>
+
+                    <h1 class="text-sm sm:text-base lg:text-lg font-extrabold text-slate-900 tracking-tight truncate">
                         @yield('title', 'Bảng điều khiển Quản trị')
                     </h1>
 
-                    <span class="hidden md:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-bold">
+                    <span class="hidden xl:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-bold shrink-0">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Hệ thống Vận hành Tốt
                     </span>
                 </div>
 
                 <!-- User Profile & Quick Actions -->
-                <div class="flex items-center gap-3">
-                    <a href="{{ route('trangchu') }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold shadow-2xs hover:shadow-xs transition-all" title="Về trang chủ khách hàng">
+                <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                    <!-- Nút Bắn Thông Báo Giờ Ăn (Demo Web Push Notification) -->
+                    <button type="button" onclick="openAdminPushDemoModal()" class="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl bg-gradient-to-r from-orange-500 to-[#ee4d2d] text-white text-xs font-black shadow-xs hover:shadow-md hover:scale-102 transition-all cursor-pointer" title="Gửi thông báo đẩy (Web Push) theo khung giờ cho khách hàng">
+                        <i class="fas fa-bullhorn text-xs"></i>
+                        <span class="hidden md:inline">Bắn Noti Giờ Ăn</span>
+                        <span class="md:hidden text-[11px]">Bắn Noti</span>
+                    </button>
+
+                    <a href="{{ route('trangchu') }}" class="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl sm:rounded-2xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold shadow-2xs hover:shadow-xs transition-all" title="Về trang chủ khách hàng">
                         <i class="fas fa-store text-[#ee4d2d]"></i>
-                        <span class="hidden sm:inline">Xem Trang Chủ</span>
+                        <span class="hidden md:inline">Xem Trang Chủ</span>
                     </a>
 
-                    <div class="relative group">
-                        <button class="flex items-center gap-3 p-1.5 pr-3 rounded-full hover:bg-slate-100 transition-colors">
-                            <div class="w-9 h-9 rounded-full bg-[#ee4d2d] text-white flex items-center justify-center font-black text-sm shadow-md shadow-rose-500/20">
+                    <!-- User Profile Dropdown -->
+                    <div class="relative group" id="admin-user-container">
+                        <button type="button" onclick="toggleAdminUserMenu(event)" class="flex items-center gap-2 sm:gap-3 p-1 sm:p-1.5 sm:pr-3 rounded-full hover:bg-slate-100 transition-colors cursor-pointer">
+                            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#ee4d2d] text-white flex items-center justify-center font-black text-xs sm:text-sm shadow-md shadow-rose-500/20">
                                 {{ strtoupper(substr(Auth::user()->fullname ?? Auth::user()->name ?? 'A', 0, 1)) }}
                             </div>
-                            <div class="text-left hidden sm:block">
+                            <div class="text-left hidden md:block">
                                 <p class="text-xs font-bold text-slate-900">{{ Auth::user()->fullname ?? Auth::user()->name }}</p>
                                 @php
                                     $userRoleName = Auth::user()->role ?? '';
@@ -289,11 +309,18 @@
                                     {{ $roleLabelsMap[$userRoleName] ?? ('⚙️ ' . ucfirst($userRoleName)) }}
                                 </p>
                             </div>
-                            <i class="fas fa-chevron-down text-xs text-slate-400"></i>
+                            <i class="fas fa-chevron-down text-[10px] text-slate-400"></i>
                         </button>
-                        <div class="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                        <div id="admin-user-menu" class="hidden md:group-hover:block absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 transition-all duration-200 z-50">
+                            <div class="px-4 py-2 border-b border-slate-100 md:hidden">
+                                <p class="text-xs font-bold text-slate-900 truncate">{{ Auth::user()->fullname ?? Auth::user()->name }}</p>
+                                <p class="text-[10px] text-slate-400 truncate">{{ Auth::user()->email }}</p>
+                            </div>
                             <a class="flex items-center px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50" href="{{ route('trangchu') }}">
                                 <i class="fas fa-globe mr-2.5 text-[#ee4d2d] text-sm"></i>Xem trang web
+                            </a>
+                            <a class="flex items-center px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50" href="{{ route('hoso') }}">
+                                <i class="fas fa-id-card mr-2.5 text-[#ee4d2d] text-sm"></i>Hồ sơ cá nhân
                             </a>
                             <hr class="my-1 border-slate-100">
                             <a class="flex items-center px-4 py-2.5 text-xs font-semibold text-rose-600 hover:bg-rose-50" href="{{ route('dangxuat') }}">
@@ -305,12 +332,12 @@
             </header>
 
             <!-- Page Content Body -->
-            <main class="p-8 flex-grow">
+            <main class="p-4 sm:p-6 lg:p-8 flex-grow overflow-x-hidden">
                 @yield('content')
             </main>
 
             <!-- Footer -->
-            <footer class="bg-white border-t border-slate-200 py-4 px-8 text-center text-xs text-slate-500 font-medium">
+            <footer class="bg-white border-t border-slate-200 py-3 sm:py-4 px-4 sm:px-8 text-center text-xs text-slate-500 font-medium">
                 <span>© 2026 <strong>FOODDAILY Admin System</strong>. All rights reserved.</span>
             </footer>
 
@@ -368,6 +395,176 @@
         window.addEventListener('pageshow', function (event) {
             if (event.persisted || (window.performance && window.performance.navigation && window.performance.navigation.type === 2)) {
                 window.location.reload();
+            }
+        });
+
+        // Xử lý Modal Bắn Thông Báo Đẩy (Web Push)
+        function openAdminPushDemoModal() {
+            const modal = document.getElementById('admin-push-demo-modal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeAdminPushDemoModal() {
+            const modal = document.getElementById('admin-push-demo-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function executeAdminPush(type) {
+            const feedback = document.getElementById('admin-push-feedback');
+            if (feedback) {
+                feedback.className = 'p-3 rounded-xl text-xs font-bold text-center mb-3 bg-amber-50 text-amber-700 border border-amber-200 block';
+                feedback.innerText = '⏳ Đang phát sóng thông báo tới toàn bộ hệ thống...';
+            }
+
+            fetch('{{ route("api.notifications.trigger_demo") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ type: type })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    if (feedback) {
+                        feedback.className = 'p-3 rounded-xl text-xs font-bold text-center mb-3 bg-emerald-50 text-emerald-700 border border-emerald-200 block';
+                        feedback.innerHTML = `✅ Bắn thông báo thành công: <strong>${data.data.title}</strong>! Thiết bị khách hàng sẽ nhận ngay bây giờ.`;
+                    }
+                    // Nếu admin đã cấp quyền thông báo, hiển thị thử luôn trên máy admin
+                    if ('Notification' in window && Notification.permission === 'granted') {
+                        new Notification(data.data.title, {
+                            body: data.data.body,
+                            icon: '/icons/icon-192x192.png'
+                        });
+                    }
+                } else {
+                    throw new Error(data.message || 'Lỗi gửi');
+                }
+            })
+            .catch(err => {
+                if (feedback) {
+                    feedback.className = 'p-3 rounded-xl text-xs font-bold text-center mb-3 bg-rose-50 text-rose-700 border border-rose-200 block';
+                    feedback.innerText = '❌ Gửi thất bại: ' + err.message;
+                }
+            });
+        }
+    </script>
+
+    <!-- MODAL BẮN THÔNG BÁO ĐẨY WEB PUSH (DEMO CHO BÁO CÁO & ĐỒ ÁN) -->
+    <div id="admin-push-demo-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm hidden">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 text-left animate-in zoom-in-95 duration-200">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-10 h-10 rounded-xl bg-orange-100 text-[#ee4d2d] flex items-center justify-center text-lg">
+                        📢
+                    </span>
+                    <div>
+                        <h3 class="text-sm font-extrabold text-slate-900">Trung Tâm Phát Sóng Thông Báo (Web Push)</h3>
+                        <p class="text-[11px] text-slate-500 font-medium">Bắn thông báo theo khung giờ đến máy khách hàng & điện thoại PWA</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeAdminPushDemoModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-sm font-bold cursor-pointer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Scheduled Info Card -->
+            <div class="my-4 p-3 bg-slate-50 rounded-2xl border border-slate-100 text-xs text-slate-600 flex items-center justify-between">
+                <div>
+                    <span class="font-bold text-slate-800 block text-xs">⏰ Kịch bản Cronjob tự động:</span>
+                    <span class="text-[11px] text-slate-500">Đã cài đặt chạy tự động vào đúng <strong>11:00 Trưa</strong> và <strong>18:00 Tối</strong> mỗi ngày.</span>
+                </div>
+                <span class="px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase">Đang kích hoạt</span>
+            </div>
+
+            <p class="text-xs font-bold text-slate-700 mb-2.5">Chọn kịch bản để bắn thử nghiệm (Demo) ngay bây giờ:</p>
+            
+            <div class="space-y-2.5 mb-5">
+                <!-- Option 1: Lunch 11h -->
+                <div onclick="executeAdminPush('lunch')" class="group p-3.5 rounded-2xl border border-orange-200/80 bg-orange-50/30 hover:bg-orange-50 hover:border-orange-400 transition-all cursor-pointer flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">🍱</span>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h4 class="font-extrabold text-xs text-slate-900">Thông báo Giờ Cơm Trưa (11:00 AM)</h4>
+                                <span class="px-1.5 py-0.5 rounded-md bg-orange-100 text-[#ee4d2d] text-[9px] font-black">Khuyên dùng</span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">"Đến giờ cơm trưa rồi bạn ơi! Xem ngay thực đơn hôm nay và chọn món..."</p>
+                        </div>
+                    </div>
+                    <span class="px-3 py-1.5 rounded-xl bg-[#ee4d2d] text-white text-xs font-black shadow-2xs group-hover:scale-105 transition-transform shrink-0">
+                        Bắn ngay
+                    </span>
+                </div>
+
+                <!-- Option 2: Dinner 18h -->
+                <div onclick="executeAdminPush('dinner')" class="group p-3.5 rounded-2xl border border-blue-200/80 bg-blue-50/30 hover:bg-blue-50 hover:border-blue-400 transition-all cursor-pointer flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">🍲</span>
+                        <div>
+                            <h4 class="font-extrabold text-xs text-slate-900">Thông báo Bữa Ăn Tối (18:00 PM)</h4>
+                            <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">"Bữa tối ấm cúng cùng gia đình! Nghỉ ngơi thôi, hàng trăm món nóng hổi..."</p>
+                        </div>
+                    </div>
+                    <span class="px-3 py-1.5 rounded-xl bg-slate-900 text-white text-xs font-black shadow-2xs group-hover:scale-105 transition-transform shrink-0">
+                        Bắn ngay
+                    </span>
+                </div>
+
+                <!-- Option 3: Flash Sale Promo -->
+                <div onclick="executeAdminPush('promo')" class="group p-3.5 rounded-2xl border border-rose-200/80 bg-rose-50/30 hover:bg-rose-50 hover:border-rose-400 transition-all cursor-pointer flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">⚡</span>
+                        <div>
+                            <h4 class="font-extrabold text-xs text-slate-900">Flash Sale - Giờ Vàng Ưu Đãi</h4>
+                            <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">"Giảm giá tới 20% cho tất cả các món ăn HOT. Đặt ngay nhận ưu đãi!"</p>
+                        </div>
+                    </div>
+                    <span class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-red-500 to-amber-500 text-white text-xs font-black shadow-2xs group-hover:scale-105 transition-transform shrink-0">
+                        Bắn ngay
+                    </span>
+                </div>
+            </div>
+
+            <!-- Feedback Alert -->
+            <div id="admin-push-feedback" class="hidden p-3 rounded-xl text-xs font-bold text-center mb-3"></div>
+
+            <button type="button" onclick="closeAdminPushDemoModal()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors cursor-pointer">
+                Đóng
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Sidebar & Dropdown JS Handlers -->
+    <script>
+        function toggleAdminSidebar() {
+            const sidebar = document.getElementById('admin-sidebar');
+            const overlay = document.getElementById('admin-sidebar-overlay');
+            if (sidebar) {
+                sidebar.classList.toggle('-translate-x-full');
+            }
+            if (overlay) {
+                overlay.classList.toggle('hidden');
+            }
+        }
+
+        function toggleAdminUserMenu(event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            const menu = document.getElementById('admin-user-menu');
+            if (menu) {
+                menu.classList.toggle('hidden');
+            }
+        }
+
+        document.addEventListener('click', function (e) {
+            const container = document.getElementById('admin-user-container');
+            const menu = document.getElementById('admin-user-menu');
+            if (menu && container && !container.contains(e.target)) {
+                menu.classList.add('hidden');
             }
         });
     </script>

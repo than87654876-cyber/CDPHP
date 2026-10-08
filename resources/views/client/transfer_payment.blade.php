@@ -9,6 +9,9 @@
         @php
             $displayAmount = (float)($amount ?? ($order->final_amount ?? 0));
             $isPaid = isset($order) && $order->payment_status === 'paid';
+            $sepayBank = config('services.sepay.bank', 'BIDV');
+            $sepayAcc = config('services.sepay.account_number', '962477I87L');
+            $sepayName = config('services.sepay.account_name', 'Tran Le Than');
         @endphp
 
         <!-- Main QR Payment Card -->
@@ -106,7 +109,7 @@
                 <!-- VietQR Image Box -->
                 <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 max-w-xs mx-auto shadow-inner relative group">
                     <img id="vietqr-image"
-                         src="https://img.vietqr.io/image/BIDV-8899408675-compact2.jpg?amount={{ (int)$displayAmount }}&addInfo=FDL-{{ $order_id }}&accountName=Tran%20Le%20Than"
+                         src="https://img.vietqr.io/image/{{ $sepayBank }}-{{ $sepayAcc }}-compact2.jpg?amount={{ (int)$displayAmount }}&addInfo=FDL-{{ $order_id }}&accountName={{ urlencode($sepayName) }}"
                          onerror="this.onerror=null; this.src='{{ asset('qr_code.png') }}';"
                          alt="Mã VietQR Thanh Toán"
                          class="w-full h-auto rounded-xl shadow-xs transition-transform duration-300 group-hover:scale-102">
@@ -120,18 +123,18 @@
                     <div class="flex justify-between items-center pb-2 border-b border-slate-100">
                         <span class="text-slate-500 font-bold">Ngân hàng:</span>
                         <span class="font-extrabold text-slate-900 flex items-center gap-1.5">
-                            <i class="fas fa-building-columns text-[#ee4d2d]"></i> BIDV (Đầu tư & Phát triển)
+                            <i class="fas fa-building-columns text-[#ee4d2d]"></i> {{ $sepayBank }} (Đầu tư & Phát triển)
                         </span>
                     </div>
                     <div class="flex justify-between items-center pb-2 border-b border-slate-100">
                         <span class="text-slate-500 font-bold">Chủ tài khoản:</span>
-                        <span class="font-extrabold text-slate-900 uppercase">TRAN LE THAN</span>
+                        <span class="font-extrabold text-slate-900 uppercase">{{ $sepayName }}</span>
                     </div>
                     <div class="flex justify-between items-center pb-2 border-b border-slate-100">
                         <span class="text-slate-500 font-bold">Số tài khoản:</span>
                         <div class="flex items-center gap-2">
-                            <span class="font-black text-slate-900 text-sm tracking-wider font-mono">8899408675</span>
-                            <button type="button" onclick="copyToClipboard('8899408675', this)" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1">
+                            <span class="font-black text-slate-900 text-sm tracking-wider font-mono">{{ $sepayAcc }}</span>
+                            <button type="button" onclick="copyToClipboard('{{ $sepayAcc }}', this)" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1">
                                 <i class="far fa-copy text-[10px]"></i> <span>Chép</span>
                             </button>
                         </div>
@@ -175,21 +178,6 @@
                     <i class="far fa-clock"></i> Thời gian giữ mã giao dịch: <span id="timer" class="font-mono text-[#ee4d2d] font-black text-sm">10:00</span>
                 </div>
 
-                <!-- Check Payment Status Button & Simulator -->
-                <div class="pt-4 border-t border-slate-100 space-y-3">
-                    <button type="button" id="manual-check-btn" onclick="manualCheckStatus(this)" class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-extrabold text-xs transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer active:scale-98">
-                        <i class="fas fa-rotate"></i>
-                        <span>Tôi đã chuyển khoản xong (Kiểm tra giao dịch)</span>
-                    </button>
-
-                    <button type="button" id="simulate-btn" onclick="simulateBankWebhook(this)" class="w-full py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-extrabold text-xs transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer active:scale-98">
-                        <i class="fas fa-bolt text-amber-400"></i>
-                        <span>Mô Phỏng Ngân Hàng Gửi Webhook Báo Tiền Vào (Bấm để thử nghiệm)</span>
-                    </button>
-                    <div class="text-[11px] text-slate-400 leading-relaxed text-left">
-                        💡 <strong>Cách thức hoạt động:</strong> Sau khi bạn chuyển tiền thật trên App ngân hàng, ngân hàng sẽ tự động gửi Webhook về hệ thống. Với môi trường thử nghiệm localhost, bạn có thể ấn nút màu đen ở trên để mô phỏng Webhook thành công ngay lập tức!
-                    </div>
-                </div>
             @endif
 
         </div>
@@ -376,45 +364,48 @@
         window.simulateBankWebhook = function(btn) {
             if (btn) {
                 btn.disabled = true;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin text-amber-400"></i> Đang gửi Webhook ngân hàng...';
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin text-amber-400"></i> Đang gửi SePay Webhook...';
             }
 
-            fetch("{{ route('api.payments.bank-transfer.notify') }}", {
+            fetch("{{ route('api.sepay.webhook') }}", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "X-CSRF-TOKEN": "{{ csrf_token() }}"
                 },
                 body: JSON.stringify({
-                    order_id: orderId,
-                    amount: "{{ (int)$displayAmount }}",
-                    content: "FDL-" + orderId,
-                    status: "success",
-                    transaction_id: "TX_SIMULATED_" + Date.now(),
-                    bank_code: "BIDV",
-                    bank_reference: "REF" + Date.now()
+                    id: Math.floor(Math.random() * 900000) + 100000,
+                    gateway: "BIDV",
+                    transactionDate: new Date().toISOString().replace('T', ' ').substring(0, 19),
+                    accountNumber: "8899408675",
+                    content: "FDL-" + orderId + " thanh toan don hang",
+                    transferType: "in",
+                    description: "BIDV FDL-" + orderId + " thanh toan don hang",
+                    transferAmount: Number("{{ (int)$displayAmount }}"),
+                    referenceCode: "SEPAY_TEST_" + Date.now(),
+                    accumulated: 50000000
                 })
             })
             .then(res => res.json())
             .then(data => {
-                console.log('Simulated Bank Webhook response:', data);
+                console.log('SePay Webhook simulation response:', data);
                 if (data.success) {
-                    showToast('Đã nhận phản hồi thành công từ Ngân hàng!');
+                    showToast('Đã nhận SePay Webhook thành công! Đang kích hoạt đơn...');
                     window.checkPaymentStatus();
                 } else {
-                    showToast(data.message || 'Lỗi mô phỏng chuyển khoản');
+                    showToast(data.message || 'Lỗi mô phỏng SePay Webhook');
                     if (btn) {
                         btn.disabled = false;
-                        btn.innerHTML = '<i class="fas fa-bolt text-amber-400"></i> <span>Mô Phỏng Ngân Hàng Gửi Webhook Báo Tiền Vào (Thử lại)</span>';
+                        btn.innerHTML = '<i class="fas fa-bolt text-amber-400"></i> <span>Mô Phỏng SePay Bắn Webhook (Thử lại)</span>';
                     }
                 }
             })
             .catch(err => {
-                console.error('Simulation error:', err);
+                console.error('SePay simulation error:', err);
                 showToast('Lỗi gửi Webhook mô phỏng');
                 if (btn) {
                     btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-bolt text-amber-400"></i> <span>Mô Phỏng Ngân Hàng Gửi Webhook Báo Tiền Vào (Thử lại)</span>';
+                    btn.innerHTML = '<i class="fas fa-bolt text-amber-400"></i> <span>Mô Phỏng SePay Bắn Webhook (Thử lại)</span>';
                 }
             });
         };

@@ -14,6 +14,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CustomerBackupController;
 use App\Http\Controllers\GroupOrderController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\StaffWorkspaceController;
 use App\Http\Controllers\SubscriptionController;
@@ -50,6 +51,7 @@ Route::get('/api/orders/{id}/payment-status', [CartController::class, 'getPaymen
 Route::post('/api/payments/bank-transfer/notify', [CartController::class, 'notifyBankTransferPayment'])->name('api.payments.bank-transfer.notify');
 Route::post('/api/payments/webhook', [CartController::class, 'payosWebhook'])->name('api.payments.webhook');
 Route::post('/api/payos/webhook', [CartController::class, 'payosWebhook'])->name('api.payos.webhook');
+Route::post('/api/sepay/webhook', [CartController::class, 'sepayWebhook'])->name('api.sepay.webhook');
 Route::get('/api/orders/track/poll', [ShopController::class, 'pollTrackedOrder'])->name('api.orders.track.poll');
 Route::get('/api/settings/poll', [ShopController::class, 'pollSettings'])->name('api.settings.poll');
 Route::post('/api/coupon/validate', [CartController::class, 'validateCoupon'])->name('api.coupon.validate');
@@ -60,6 +62,10 @@ Route::get('/api/coupons/my', [ShopController::class, 'getMyCoupons'])->name('ap
 Route::post('/api/gemini/chat', [ShopController::class, 'geminiChat'])->name('api.gemini.chat');
 Route::get('/api/geocode', [ShopController::class, 'geocodeAddress'])->name('api.geocode');
 Route::post('/api/recently-viewed/clear', [ShopController::class, 'clearRecentlyViewed'])->name('api.recently_viewed.clear');
+
+// Thông báo đẩy (Web Push) & Demo Trigger
+Route::post('/api/notifications/trigger-demo', [\App\Http\Controllers\NotificationController::class, 'triggerDemo'])->name('api.notifications.trigger_demo');
+Route::get('/api/notifications/poll', [\App\Http\Controllers\NotificationController::class, 'poll'])->name('api.notifications.poll');
 
 // Tra cứu đơn hàng dành cho khách vãng lai
 Route::get('/tracuu', [ShopController::class, 'trackOrder'])->name('tracuu');
@@ -135,6 +141,13 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/goidichvu/huy', [SubscriptionController::class, 'cancel'])->name('goidichvu.cancel');
     Route::post('/goidichvu/danhgia', [SubscriptionController::class, 'review'])->name('goidichvu.review');
     Route::post('/goidichvu/mua', [SubscriptionController::class, 'buyPackage'])->name('goidichvu.buy');
+
+    // Phân hệ Hồ sơ tài khoản khách hàng (Hồ sơ, Sổ địa chỉ, Bảo mật, Thành viên & Voucher)
+    Route::get('/hoso', [ProfileController::class, 'index'])->name('hoso');
+    Route::post('/hoso/thong-tin', [ProfileController::class, 'updateInfo'])->name('hoso.update_info');
+    Route::post('/hoso/dia-chi', [ProfileController::class, 'updateAddress'])->name('hoso.update_address');
+    Route::post('/hoso/doi-mat-khau', [ProfileController::class, 'updatePassword'])->name('hoso.update_password');
+    Route::post('/hoso/bao-mat', [ProfileController::class, 'updateSecurity'])->name('hoso.update_security');
 });
 
 // --- Phân hệ Quản trị (Admin & Staff) ---

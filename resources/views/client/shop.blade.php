@@ -33,7 +33,7 @@
                         {{ $settings['banner_title'] ?? "Đặt Đồ ăn, giao hàng từ 20'..." }}
                     </h1>
                     <p class="text-xs sm:text-sm text-slate-200 font-medium leading-relaxed">
-                        {{ $settings['banner_subtitle'] ?? "Có 110.625 Địa Điểm Ở TP. HCM Từ 00:00 - 23:59" }}
+                        {{ $settings['banner_subtitle'] ?? "Đồng hành cùng bạn trên hành trình khám phá những món ngon tại TP. HCM" }}
                     </p>
 
                     <!-- Big Search Bar (ShopeeFood Style with Blue Button) -->
@@ -44,11 +44,11 @@
                         </button>
                     </form>
 
-                    <!-- Category Filter Pills Grid (ShopeeFood Style Tag Buttons) -->
-                    <div class="pt-2 flex flex-wrap gap-2 text-xs font-semibold">
-                        <a href="#menu" onclick="filterCategory('all')" id="hero-tab-all" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-[#ee4d2d] backdrop-blur-xs border border-white/20 text-white transition-all">Tất cả</a>
+                    <!-- Category Filter Pills Grid (ShopeeFood Style Tag Buttons - Vuốt ngang trên Mobile) -->
+                    <div class="pt-2 flex flex-nowrap sm:flex-wrap overflow-x-auto no-scrollbar gap-2 text-xs font-semibold pb-1">
+                        <a href="#menu" onclick="filterCategory('all')" id="hero-tab-all" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-[#ee4d2d] backdrop-blur-xs border border-white/20 text-white transition-all shrink-0">Tất cả</a>
                         @foreach($categories as $cat)
-                            <a href="#menu" onclick="filterCategory('cat-{{ $cat->id }}')" id="hero-tab-cat-{{ $cat->id }}" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-[#ee4d2d] backdrop-blur-xs border border-white/20 text-white transition-all">{{ $cat->category_name }}</a>
+                            <a href="#menu" onclick="filterCategory('cat-{{ $cat->id }}')" id="hero-tab-cat-{{ $cat->id }}" class="px-3.5 py-1.5 rounded-md bg-white/10 hover:bg-[#ee4d2d] backdrop-blur-xs border border-white/20 text-white transition-all shrink-0">{{ $cat->category_name }}</a>
                         @endforeach
                     </div>
                 </div>
@@ -57,8 +57,8 @@
                 <div class="pt-4 border-t border-white/10 flex items-center gap-3">
                     <span class="text-[11px] text-slate-300 font-medium">Sử dụng App FOODDAILY để có nhiều giảm giá hơn:</span>
                     <div class="flex gap-2">
-                        <span class="px-3 py-1 bg-black/60 rounded border border-white/20 text-[10px] font-bold cursor-pointer hover:bg-black"><i class="fab fa-apple mr-1"></i>App Store</span>
-                        <span class="px-3 py-1 bg-black/60 rounded border border-white/20 text-[10px] font-bold cursor-pointer hover:bg-black"><i class="fab fa-google-play mr-1"></i>Google Play</span>
+                        <span onclick="triggerPWAInstall()" class="px-3 py-1 bg-black/60 rounded border border-white/20 text-[10px] font-bold cursor-pointer hover:bg-black transition-colors" title="Cài đặt App PWA cho iOS"><i class="fab fa-apple mr-1"></i>App Store</span>
+                        <span onclick="triggerPWAInstall()" class="px-3 py-1 bg-black/60 rounded border border-white/20 text-[10px] font-bold cursor-pointer hover:bg-black transition-colors" title="Cài đặt App PWA cho Android"><i class="fab fa-google-play mr-1"></i>Google Play</span>
                     </div>
                 </div>
             </div>
@@ -80,8 +80,8 @@
                     <a href="#menu" class="text-xs font-bold text-[#0099ff] hover:underline">≡ Xem tất cả</a>
                 </div>
 
-                <!-- 2x3 Grid of 6 Promo Items với Logic Thêm Vào Giỏ Hàng -->
-                <div class="grid grid-cols-3 gap-3" id="hero-promo-grid">
+                <!-- 2x3 Grid of 6 Promo Items với Logic Thêm Vào Giỏ Hàng (2 cột trên Mobile, 3 cột trên PC) -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3" id="hero-promo-grid">
                     @php
                         $promoDishes = $allDishes->take(6);
                     @endphp
@@ -192,9 +192,9 @@
 </section>
 @endif
 
-<!-- KHO ƯU ĐÃI & MÃ GIẢM GIÁ ĐỘC QUYỀN (Promotional Coupons Section) -->
+<!-- KHO ƯU ĐÃI & MÃ GIẢM GIÁ ĐỘC QUYỀN (Ẩn hoàn toàn trên Mobile để nhường không gian cho món ăn) -->
 @if(isset($activeCoupons) && $activeCoupons->isNotEmpty())
-<section class="py-5 bg-transparent" id="coupons-section">
+<section class="hidden md:block py-5 bg-transparent" id="coupons-section">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="coupon-section-box bg-white rounded-3xl p-5 sm:p-7 border border-slate-200/90 shadow-xl relative overflow-hidden" style="background: #ffffff !important;">
             <!-- Dải màu gradient viền trên cao cấp -->
@@ -366,7 +366,7 @@
 </section>
 @endif
 
-<!-- THUẬT TOÁN ĐỀ XUẤT: Món ăn cùng loại (Cùng category_id với món đang chọn/xem) -->
+<!-- THUẬT TOÁN ĐỀ XUẤT: Món ăn cùng loại (Cùng category_id với món đang chọn/xem hoặc đã mua) -->
 @if(isset($sameCategoryDishes) && $sameCategoryDishes->isNotEmpty())
 <section class="py-4 bg-transparent">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -377,7 +377,7 @@
                         <i class="fas fa-utensils"></i>
                     </span>
                     <div>
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 flex-wrap">
                             <h3 class="font-extrabold text-slate-900 text-sm sm:text-base">
                                 {{ isset($currentSelectedDish) ? '🔥 Món Cùng Loại Bạn Có Thể Thích: ' . ($currentSelectedDish->category->category_name ?? 'Món Ăn') : '🔥 Món Cùng Loại Bạn Có Thể Thích' }}
                             </h3>
@@ -386,9 +386,20 @@
                                     {{ $currentSelectedDish->category->category_name }}
                                 </span>
                             @endif
+                            @if(!empty($isPurchasedDish))
+                                <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-black tracking-wide flex items-center gap-1 shadow-2xs">
+                                    <i class="fas fa-history text-[9px] text-amber-600"></i> Dựa trên món bạn đã đặt
+                                </span>
+                            @endif
                         </div>
                         <p class="text-[11px] text-slate-500 font-medium">
-                            {{ isset($currentSelectedDish) ? 'Tự động đề xuất các món ăn cùng danh mục với món "' . $currentSelectedDish->dish_name . '"' : 'Thuật toán tự động đề xuất các món ăn cùng danh mục' }}
+                            @if(!empty($isPurchasedDish))
+                                Tự động đề xuất các món ăn cùng danh mục với món "{{ $currentSelectedDish->dish_name }}" bạn đã từng mua
+                            @elseif(isset($currentSelectedDish))
+                                Tự động đề xuất các món ăn cùng danh mục với món "{{ $currentSelectedDish->dish_name }}"
+                            @else
+                                Thuật toán tự động đề xuất các món ăn cùng danh mục
+                            @endif
                         </p>
                     </div>
                 </div>
@@ -436,27 +447,88 @@
 </section>
 @endif
 
-<!-- THUẬT TOÁN: Đề xuất theo khung giờ -->
-@if(isset($timeRecommendation) && $timeRecommendation['dishes']->isNotEmpty())
+<!-- THUẬT TOÁN (HÌNH 2): Đề xuất món ngon theo khung giờ thời gian thực tế chuẩn Việt Nam -->
+@if(isset($timeRecommendation) && !empty($timeRecommendation['dishes']) && $timeRecommendation['dishes']->isNotEmpty())
 <section class="py-4 bg-transparent">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
-            <div class="flex items-center justify-between">
-                <h3 class="font-extrabold text-slate-900 text-sm">{{ $timeRecommendation['title'] }}</h3>
-                <span class="text-[11px] text-slate-400 font-bold">Khung giờ: {{ $timeRecommendation['period'] }}</span>
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200/80 space-y-4 relative overflow-hidden">
+            <!-- Header Khung Giờ Thực Tế -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-3">
+                    <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-tr {{ $timeRecommendation['badge_color'] ?? 'from-orange-500 to-rose-500' }} text-white text-base font-black shadow-xs shadow-orange-500/20">
+                        <i class="fas {{ $timeRecommendation['icon'] ?? 'fa-utensils' }}"></i>
+                    </span>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h3 class="font-extrabold text-slate-900 text-sm sm:text-base">
+                                {{ $timeRecommendation['title'] }}
+                            </h3>
+                            <span class="px-2.5 py-0.5 rounded-full bg-orange-50 text-[#ee4d2d] text-[10px] font-black tracking-wide border border-orange-100">
+                                Khung giờ: {{ $timeRecommendation['period'] }}
+                            </span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 font-medium mt-0.5">
+                            {{ $timeRecommendation['subtitle'] }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Badge Thời Gian Thực Tế & Đang Phục Vụ -->
+                <div class="flex items-center gap-2 shrink-0">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200/80 shadow-2xs">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>Đang phục vụ: {{ $timeRecommendation['time_range'] }}</span>
+                    </span>
+                </div>
             </div>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+
+            <!-- Grid 4 Card Món Ăn Thiết Kế Cao Cấp Hiện Đại (Đầy đủ ảnh, giá, rating, nút đặt) -->
+            <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 @foreach($timeRecommendation['dishes'] as $tDish)
-                    <div class="bg-slate-50 rounded-xl p-2.5 border border-slate-100 flex items-center justify-between">
-                        <a href="{{ route('dish.detail', $tDish->id) }}" class="truncate mr-2 block hover:text-[#ee4d2d]">
-                            <h4 class="font-extrabold text-slate-900 text-xs truncate hover:text-[#ee4d2d]">{{ $tDish->dish_name }}</h4>
-                            <span class="text-[11px] font-bold text-slate-700">{{ number_format($tDish->price) }}đ</span>
+                    <div class="bg-white hover:bg-orange-50/20 rounded-xl p-3 border border-slate-200/70 hover:border-[#ee4d2d]/40 flex flex-col justify-between shadow-2xs hover:shadow-md transition-all duration-300 group">
+                        <a href="{{ route('dish.detail', $tDish->id) }}" class="space-y-2.5 block" title="{{ $tDish->dish_name }}">
+                            <!-- Thumbnail ảnh món ăn -->
+                            <div class="aspect-4/3 w-full rounded-lg bg-slate-100 overflow-hidden relative border border-slate-100">
+                                <img src="{{ $tDish->display_image }}" alt="{{ $tDish->dish_name }}" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-300" loading="lazy">
+                                
+                                <!-- Badge Danh mục -->
+                                <span class="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-white/95 backdrop-blur-xs text-[#ee4d2d] text-[10px] font-extrabold shadow-xs">
+                                    {{ $tDish->category->category_name ?? 'Món ngon' }}
+                                </span>
+
+                                <!-- Đánh giá sao -->
+                                <div class="absolute bottom-2 left-2 px-1.5 py-0.5 rounded-md bg-black/60 backdrop-blur-xs text-white text-[10px] font-bold flex items-center gap-1">
+                                    <i class="fas fa-star text-amber-400 text-[9px]"></i>
+                                    <span>{{ number_format($tDish->rating_score ?? 5.0, 1) }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Tên và mô tả -->
+                            <div class="space-y-1">
+                                <h4 class="font-extrabold text-slate-900 text-xs sm:text-sm line-clamp-1 group-hover:text-[#ee4d2d] transition-colors">
+                                    {{ $tDish->dish_name }}
+                                </h4>
+                                <p class="text-[11px] text-slate-400 line-clamp-1 font-medium">
+                                    {{ $tDish->description ?? 'Hương vị thơm ngon, chế biến tươi mới mỗi ngày' }}
+                                </p>
+                            </div>
                         </a>
-                        <form action="{{ route('giohang.add') }}" method="POST">
-                            @csrf
-                            <input type="hidden" name="dish_id" value="{{ $tDish->id }}">
-                            <button type="submit" class="w-6 h-6 rounded bg-[#ee4d2d] text-white text-xs font-bold">+</button>
-                        </form>
+
+                        <!-- Giá tiền & Nút Đặt món -->
+                        <div class="pt-2.5 mt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+                            <div>
+                                <span class="text-xs sm:text-sm text-[#ee4d2d] font-black">{{ number_format($tDish->price) }}đ</span>
+                            </div>
+                            <form action="{{ route('giohang.add') }}" method="POST" class="shrink-0">
+                                @csrf
+                                <input type="hidden" name="dish_id" value="{{ $tDish->id }}">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="px-3 py-1.5 bg-[#ee4d2d] hover:bg-red-600 text-white rounded-lg text-xs font-extrabold shadow-2xs hover:shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95">
+                                    <i class="fas fa-cart-plus text-[11px]"></i>
+                                    <span>+ Đặt</span>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 @endforeach
             </div>
@@ -489,13 +561,13 @@
             </div>
         </div>
 
-        <!-- CATEGORY TABS (Tất cả, Đồ ăn, Đồ uống...) -->
-        <div class="flex items-center gap-2 overflow-x-auto pb-1 border-b border-slate-200 text-xs font-bold">
-            <button type="button" onclick="filterCategory('all')" id="tab-btn-all" class="cat-tab-btn px-4 py-2 rounded-lg bg-[#ee4d2d] text-white shrink-0">
+        <!-- CATEGORY TABS (Sticky cố định khi cuộn màn hình trên Mobile như App ShopeeFood/GrabFood) -->
+        <div class="sticky top-16 z-30 bg-white/95 backdrop-blur-md py-2.5 px-1 -mx-1 border-b border-slate-200 flex items-center gap-2 overflow-x-auto no-scrollbar text-xs font-bold shadow-2xs">
+            <button type="button" onclick="filterCategory('all')" id="tab-btn-all" class="cat-tab-btn px-4 py-2 rounded-xl bg-[#ee4d2d] text-white shrink-0 shadow-xs cursor-pointer">
                 Tất cả món ăn
             </button>
             @foreach($categories as $category)
-                <button type="button" onclick="filterCategory('cat-{{ $category->id }}')" id="tab-btn-cat-{{ $category->id }}" class="cat-tab-btn px-4 py-2 rounded-lg bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 shrink-0">
+                <button type="button" onclick="filterCategory('cat-{{ $category->id }}')" id="tab-btn-cat-{{ $category->id }}" class="cat-tab-btn px-4 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/60 shrink-0 transition-colors cursor-pointer">
                     {{ $category->category_name }}
                 </button>
             @endforeach
@@ -503,7 +575,7 @@
 
         <!-- TAB CONTENT: ALL DISHES -->
         <div id="cat-view-all" class="cat-view-pane">
-            <div id="all-dishes-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div id="all-dishes-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
                 @forelse($allDishes as $dIndex => $dish)
                     @include('client.partials.dish_card', ['dish' => $dish, 'dIndex' => $dIndex])
                 @empty
@@ -515,7 +587,7 @@
         <!-- TAB CONTENT: SPECIFIC CATEGORIES VIEW -->
         @foreach($categories as $category)
             <div id="cat-view-cat-{{ $category->id }}" class="cat-view-pane hidden">
-                <div id="cat-grid-{{ $category->id }}" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                <div id="cat-grid-{{ $category->id }}" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
                     @forelse($category->dishes as $cIndex => $dish)
                         @include('client.partials.dish_card', ['dish' => $dish, 'dIndex' => $cIndex])
                     @empty

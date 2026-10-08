@@ -119,7 +119,7 @@ class CustomerOrderHistorySeeder extends Seeder
 
         DB::beginTransaction();
         try {
-            for ($i = 1; $i <= 100; $i++) {
+            for ($i = 1; $i <= 5; $i++) {
                 $email = sprintf('customer%03d@test.com', $i);
                 $lName = $lastNames[array_rand($lastNames)];
                 $mName = $middleNames[array_rand($middleNames)];
@@ -151,8 +151,8 @@ class CustomerOrderHistorySeeder extends Seeder
                 $primaryDishes = $clusters[$primaryClusterIndex];
                 $secondaryDishes = $clusters[$secondaryClusterIndex];
 
-                // Xác định số đơn hàng cho khách hàng này (từ 3 đến 10 đơn hàng)
-                $numOrders = mt_rand(3, 10);
+                // Số đơn hàng mẫu gọn nhẹ (từ 2 đến 4 đơn hàng)
+                $numOrders = mt_rand(2, 4);
 
                 // Tạo danh sách thời gian phân bố tăng dần trong 365 ngày gần đây
                 $orderTimestamps = [];
@@ -298,7 +298,7 @@ class CustomerOrderHistorySeeder extends Seeder
             throw $e;
         }
 
-        $this->command->info("Đã tạo thành công 100 tài khoản khách hàng (customer001@test.com -> customer100@test.com)!");
+        $this->command->info("Đã tạo thành công 5 tài khoản khách hàng mẫu (customer001@test.com -> customer005@test.com)!");
         $this->command->info("Tổng số đơn hàng đã tạo: {$totalOrdersCount} đơn.");
         $this->command->info("Tổng số chi tiết món ăn (Order Items): {$totalOrderItemsCount} mục.");
     }
