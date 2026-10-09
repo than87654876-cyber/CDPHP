@@ -294,6 +294,20 @@ class CartController extends Controller
             }
 
             try {
+                \App\Services\NotificationService::sendToUser(
+                    $order->user_id,
+                    "🎉 Đặt đơn thành công #{$order->order_code}!",
+                    "Cảm ơn bạn đã đặt món tại FOODDAILY! Đơn hàng đang được nhà bếp tiếp nhận.",
+                    "/tracuu?order_code=" . $order->order_code,
+                    'order',
+                    '/icons/icon-192x192.png',
+                    ['order_id' => $order->id, 'order_code' => $order->order_code]
+                );
+            } catch (\Throwable $notiErr) {
+                \Illuminate\Support\Facades\Log::warning('Order notification error: ' . $notiErr->getMessage());
+            }
+
+            try {
                 if ($order->user && $order->user->email) {
                     Mail::to($order->user->email)->queue(new OrderPlacedMail($order));
                 }

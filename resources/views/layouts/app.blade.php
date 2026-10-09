@@ -37,7 +37,13 @@
                 couponsSaveAll: "{{ route('api.coupons.save_all') }}",
                 cartAdd: "{{ route('giohang.add') }}",
                 login: "{{ route('dangnhap') }}",
-                buy: "{{ route('muahang') }}"
+                buy: "{{ route('muahang') }}",
+                notificationsList: "{{ route('api.notifications.list') }}",
+                notificationsMarkRead: "{{ url('/api/notifications/mark-read') }}",
+                notificationsMarkAllRead: "{{ route('api.notifications.mark_all_read') }}",
+                notificationsSubscribePush: "{{ route('api.notifications.subscribe_push') }}",
+                notificationsTriggerDemo: "{{ route('api.notifications.trigger_demo') }}",
+                notificationsPoll: "{{ route('api.notifications.poll') }}"
             }
         };
     </script>
@@ -121,6 +127,9 @@
                             0
                         </span>
                     </a>
+
+                    <!-- Notification Bell Dropdown -->
+                    @include('layouts.notification_bell')
 
                     @auth
                         <!-- Nút truy cập nhanh Trang Admin cho Superadmin/Admin/Staff -->

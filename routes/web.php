@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\Route;
 // --- Các trang công khai / Client ---
 Route::get('/', [ShopController::class, 'index'])->name('trangchu');
 Route::get('/trangchu', [ShopController::class, 'index']);
+Route::get('/shop', [ShopController::class, 'index'])->name('shop');
 Route::get('/trangchu_dangnhap', [ShopController::class, 'shopLogged'])->name('trangchu_dangnhap');
 Route::get('/mon/{id}', [ShopController::class, 'dishDetail'])->name('dish.detail');
 Route::post('/mon/{id}/danhgia', [ShopController::class, 'submitDishReview'])->name('dish.review');
@@ -63,7 +64,11 @@ Route::post('/api/gemini/chat', [ShopController::class, 'geminiChat'])->name('ap
 Route::get('/api/geocode', [ShopController::class, 'geocodeAddress'])->name('api.geocode');
 Route::post('/api/recently-viewed/clear', [ShopController::class, 'clearRecentlyViewed'])->name('api.recently_viewed.clear');
 
-// Thông báo đẩy (Web Push) & Demo Trigger
+// Thông báo đẩy (Web Push) & Quản lý Thông báo Nội bộ
+Route::get('/api/notifications', [\App\Http\Controllers\NotificationController::class, 'list'])->name('api.notifications.list');
+Route::post('/api/notifications/mark-read/{id}', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('api.notifications.mark_read');
+Route::post('/api/notifications/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('api.notifications.mark_all_read');
+Route::post('/api/notifications/subscribe-push', [\App\Http\Controllers\NotificationController::class, 'savePushSubscription'])->name('api.notifications.subscribe_push');
 Route::post('/api/notifications/trigger-demo', [\App\Http\Controllers\NotificationController::class, 'triggerDemo'])->name('api.notifications.trigger_demo');
 Route::get('/api/notifications/poll', [\App\Http\Controllers\NotificationController::class, 'poll'])->name('api.notifications.poll');
 

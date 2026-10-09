@@ -122,13 +122,13 @@ self.addEventListener('push', (event) => {
     }
 
     const options = {
-        body: data.body,
+        body: data.message || data.body || 'Bạn có một thông báo mới từ FOODDAILY!',
         icon: data.icon || '/icons/icon-192x192.png',
         badge: data.badge || '/icons/icon-192x192.png',
         vibrate: [200, 100, 200],
-        data: data.data || { url: '/' },
+        data: (data.data && data.data.url) ? data.data : { url: data.url || '/' },
         actions: [
-            { action: 'open', title: 'Đặt món ngay' },
+            { action: 'open', title: 'Xem chi tiết' },
             { action: 'close', title: 'Để sau' }
         ]
     };

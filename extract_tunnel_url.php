@@ -4,8 +4,9 @@ if (!file_exists($logFile)) {
     exit(1);
 }
 $content = file_get_contents($logFile);
-if (preg_match('/https:\/\/[a-z0-9\-]+\.trycloudflare\.com/i', $content, $matches)) {
-    echo $matches[0] . '/api/sepay/webhook';
+if (preg_match_all('/https:\/\/[a-z0-9\-]+\.trycloudflare\.com/i', $content, $matches)) {
+    $latest = end($matches[0]);
+    echo $latest . '/api/sepay/webhook';
     exit(0);
 }
 exit(1);

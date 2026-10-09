@@ -304,30 +304,55 @@ export function saveAllCoupons() {
     .catch(err => console.error('Save all coupons error:', err));
 }
 
-export function openVoucherModal() {
+export function openVoucherModal(force = false) {
+    if (!force) {
+        try {
+            if (sessionStorage.getItem('fooddaily_voucher_dismissed') || localStorage.getItem('fooddaily_voucher_dismissed')) {
+                return;
+            }
+        } catch (e) {}
+    }
+
     const modal = document.getElementById('voucherModal');
     const content = document.getElementById('voucherModalContent');
     if (!modal) return;
+
     modal.classList.remove('hidden');
+    modal.style.removeProperty('display');
+    modal.style.display = 'flex';
+    modal.style.opacity = '1';
+
     setTimeout(() => {
         if (content) {
             content.classList.remove('scale-95', 'opacity-0');
             content.classList.add('scale-100', 'opacity-100');
+            content.style.opacity = '1';
+            content.style.transform = 'scale(1)';
         }
-    }, 10);
+    }, 20);
 }
 
 export function closeVoucherModal() {
+    try {
+        sessionStorage.setItem('fooddaily_voucher_dismissed', 'true');
+        localStorage.setItem('fooddaily_voucher_dismissed', 'true');
+    } catch (e) {}
+
     const modal = document.getElementById('voucherModal');
     const content = document.getElementById('voucherModalContent');
+
     if (!modal) return;
+
     if (content) {
         content.classList.remove('scale-100', 'opacity-100');
         content.classList.add('scale-95', 'opacity-0');
+        content.style.opacity = '0';
+        content.style.transform = 'scale(0.95)';
     }
-    setTimeout(() => {
-        modal.classList.add('hidden');
-    }, 200);
+
+    modal.style.setProperty('display', 'none', 'important');
+    modal.style.opacity = '0';
+    modal.classList.add('hidden');
 }
 
 // =========================================================================
@@ -593,8 +618,6 @@ document.addEventListener("DOMContentLoaded", function() {
     if (document.getElementById('all-dishes-grid')) {
         updateActiveTabVisibility();
         initInfiniteScrollObserver();
-
-        setTimeout(openVoucherModal, 600);
 
         window.addEventListener('dish:live_update', function(e) {
             if (e.detail) {

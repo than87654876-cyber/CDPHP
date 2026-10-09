@@ -645,28 +645,30 @@
             </div>
         </form>
     </div>
-    <!-- FLOATING ACTION BUTTON: KHO ƯU ĐÃI NỔI BẬT GÓC DƯỚI (Xếp trên nút Trợ lý AI) -->
-    @if(isset($activeCoupons) && $activeCoupons->isNotEmpty())
-    <div class="fixed bottom-28 right-4 sm:bottom-24 sm:right-6 z-40 group">
-        <button type="button" onclick="openVoucherModal()" 
-                class="relative w-12 h-12 rounded-full text-white shadow-xl hover:shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 border-2 border-white flex items-center justify-center cursor-pointer" 
-                style="background: linear-gradient(135deg, #ee4d2d 0%, #ff5722 100%) !important;"
-                title="Kho Ưu Đãi ({{ $activeCoupons->count() }} mã)">
-            <span class="text-xl animate-bounce">🎁</span>
-            <span class="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 rounded-full bg-white text-[#ee4d2d] font-black text-[10px] flex items-center justify-center shadow-md border border-rose-200">
-                {{ $activeCoupons->count() }}
-            </span>
-        </button>
-    </div>
+</div>
 
-    <!-- POP-UP MODAL: CHÀO MỪNG HÀNG LOẠT MÃ KHUYẾN MÃI (ShopeeFood Style) -->
-    <div id="voucherModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300 hidden">
+<!-- FLOATING ACTION BUTTON: KHO ƯU ĐÃI NỔI BẬT GÓC DƯỚI (Xếp trên nút Trợ lý AI) -->
+@if(isset($activeCoupons) && $activeCoupons->isNotEmpty())
+<div class="fixed bottom-28 right-4 sm:bottom-24 sm:right-6 z-40 group">
+    <button type="button" onclick="openVoucherModal(true)" 
+            class="relative w-12 h-12 rounded-full text-white shadow-xl hover:shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 border-2 border-white flex items-center justify-center cursor-pointer" 
+            style="background: linear-gradient(135deg, #ee4d2d 0%, #ff5722 100%) !important;"
+            title="Kho Ưu Đãi ({{ $activeCoupons->count() }} mã)">
+        <span class="text-xl animate-bounce">🎁</span>
+        <span class="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 rounded-full bg-white text-[#ee4d2d] font-black text-[10px] flex items-center justify-center shadow-md border border-rose-200">
+            {{ $activeCoupons->count() }}
+        </span>
+    </button>
+</div>
+
+<!-- POP-UP MODAL: CHÀO MỪNG HÀNG LOẠT MÃ KHUYẾN MÃI (ShopeeFood Style) -->
+<div id="voucherModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300 hidden">
         <div class="bg-white rounded-3xl max-w-xl w-full overflow-hidden shadow-2xl border border-rose-200 transform transition-all duration-300 scale-95 opacity-0 flex flex-col max-h-[90vh]" id="voucherModalContent">
             
             <!-- Header Pop-up với hình hộp quà hoạt họa và gradient đỏ cam -->
             <div class="p-6 text-white text-center relative overflow-hidden shrink-0" style="background: linear-gradient(135deg, #ee4d2d 0%, #ff5722 50%, #f59e0b 100%) !important;">
                 <!-- Nút đóng -->
-                <button type="button" onclick="closeVoucherModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-black/20 hover:bg-black/40 text-white flex items-center justify-center transition-colors text-lg font-bold cursor-pointer">
+                <button type="button" onclick="closeVoucherModal(); if(window.forceDismissVoucher) forceDismissVoucher();" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-black/20 hover:bg-black/40 text-white flex items-center justify-center transition-colors text-lg font-bold cursor-pointer">
                     &times;
                 </button>
 
@@ -735,7 +737,7 @@
                 <button type="button" onclick="saveAllCoupons()" class="w-full sm:w-auto px-5 py-2.5 text-white rounded-xl text-xs font-black shadow-xs flex items-center justify-center gap-1.5 cursor-pointer hover:opacity-95" style="background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%) !important;">
                     <i class="fas fa-bolt text-yellow-200"></i> Thu thập tất cả mã
                 </button>
-                <button type="button" onclick="closeVoucherModal()" class="w-full sm:w-auto px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-extrabold transition-colors cursor-pointer">
+                <button type="button" onclick="closeVoucherModal(); if(window.forceDismissVoucher) forceDismissVoucher();" class="w-full sm:w-auto px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-extrabold transition-colors cursor-pointer">
                     Khám phá món ngay →
                 </button>
             </div>
@@ -765,12 +767,47 @@
 
 @section('scripts')
 <script>
+    // Hàm đóng triệt để Modal Ưu Đãi (Hỗ trợ cả Session và LocalStorage)
+    window.forceDismissVoucher = function() {
+        try {
+            sessionStorage.setItem('fooddaily_voucher_dismissed', 'true');
+            localStorage.setItem('fooddaily_voucher_dismissed', 'true');
+        } catch (e) {}
+
+        const modal = document.getElementById('voucherModal');
+        const content = document.getElementById('voucherModalContent');
+
+        if (content) {
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            content.style.opacity = '0';
+            content.style.transform = 'scale(0.95)';
+        }
+
+        if (modal) {
+            modal.style.setProperty('display', 'none', 'important');
+            modal.style.opacity = '0';
+            modal.classList.add('hidden');
+        }
+    };
+
     // Hàm mở Modal Ưu Đãi độc quyền (Hoạt động 100% trên cả Desktop và Mobile)
-    window.openVoucherModal = function() {
+    window.openVoucherModal = function(force = false) {
         const modal = document.getElementById('voucherModal');
         const content = document.getElementById('voucherModalContent');
         if (!modal) return;
+
+        // Nếu là tự động bật (không phải người dùng chủ động bấm) và đã từng đóng thì không tự bật nữa
+        if (!force) {
+            try {
+                if (sessionStorage.getItem('fooddaily_voucher_dismissed') || localStorage.getItem('fooddaily_voucher_dismissed')) {
+                    return;
+                }
+            } catch (e) {}
+        }
+
         modal.classList.remove('hidden');
+        modal.style.removeProperty('display');
         modal.style.display = 'flex';
         modal.style.opacity = '1';
         setTimeout(() => {
@@ -784,29 +821,35 @@
     };
 
     window.closeVoucherModal = function() {
-        const modal = document.getElementById('voucherModal');
-        const content = document.getElementById('voucherModalContent');
-        if (!modal) return;
-        if (content) {
-            content.classList.remove('scale-100', 'opacity-100');
-            content.classList.add('scale-95', 'opacity-0');
-            content.style.opacity = '0';
-            content.style.transform = 'scale(0.95)';
-        }
-        setTimeout(() => {
-            modal.classList.add('hidden');
-            modal.style.display = 'none';
-        }, 200);
+        window.forceDismissVoucher();
     };
 
-    // Tự động bật Popup khi khách vừa vào trang (Delay 500ms mượt mà)
+    // Đóng khi click vào vùng nền mờ bên ngoài (Backdrop)
+    document.addEventListener('click', function(e) {
+        const modal = document.getElementById('voucherModal');
+        if (modal && !modal.classList.contains('hidden') && e.target === modal) {
+            window.forceDismissVoucher();
+        }
+    });
+
+    // Đóng khi bấm phím ESC (Escape)
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' || e.key === 'Esc') {
+            const modal = document.getElementById('voucherModal');
+            if (modal && !modal.classList.contains('hidden')) {
+                window.forceDismissVoucher();
+            }
+        }
+    });
+
+    // Tự động bật Popup khi khách vừa vào trang (Chỉ bật nếu chưa từng tắt)
     (function initAutoVoucherPopup() {
         function runPopup() {
             setTimeout(function() {
                 if (typeof window.openVoucherModal === 'function') {
-                    window.openVoucherModal();
+                    window.openVoucherModal(false);
                 }
-            }, 500);
+            }, 400);
         }
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', runPopup);

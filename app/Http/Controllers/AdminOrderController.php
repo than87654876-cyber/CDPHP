@@ -208,6 +208,29 @@ class AdminOrderController extends Controller
         }
 
         try {
+            $statusLabels = [
+                'pending' => 'Chờ xác nhận',
+                'confirmed' => 'Đã xác nhận',
+                'preparing' => 'Đang chuẩn bị món',
+                'delivering' => 'Đang giao hàng',
+                'completed' => 'Đã giao thành công',
+                'cancelled' => 'Đã hủy'
+            ];
+            $statusLabel = $statusLabels[$order->order_status] ?? $order->order_status;
+            \App\Services\NotificationService::sendToUser(
+                $order->user_id,
+                "🛵 Cập nhật đơn hàng #{$order->order_code}",
+                "Đơn hàng của bạn hiện đang: {$statusLabel}. Nhấn để theo dõi.",
+                "/tracuu?order_code=" . $order->order_code,
+                'order',
+                '/icons/icon-192x192.png',
+                ['order_id' => $order->id, 'order_code' => $order->order_code, 'status' => $order->order_status]
+            );
+        } catch (\Throwable $notiErr) {
+            \Illuminate\Support\Facades\Log::warning('Order status notification error: ' . $notiErr->getMessage());
+        }
+
+        try {
             $telegram = app(\App\Services\TelegramService::class);
             $statusLabels = [
                 'pending' => 'Chờ xác nhận',
