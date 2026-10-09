@@ -192,9 +192,9 @@
 </section>
 @endif
 
-<!-- KHO ƯU ĐÃI & MÃ GIẢM GIÁ ĐỘC QUYỀN (Ẩn hoàn toàn trên Mobile để nhường không gian cho món ăn) -->
+<!-- KHO ƯU ĐÃI & MÃ GIẢM GIÁ ĐỘC QUYỀN (Hiển thị mượt mà trên cả 2 giao diện Desktop & Mobile) -->
 @if(isset($activeCoupons) && $activeCoupons->isNotEmpty())
-<section class="hidden md:block py-5 bg-transparent" id="coupons-section">
+<section class="py-4 sm:py-6 bg-transparent" id="coupons-section">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="coupon-section-box bg-white rounded-3xl p-5 sm:p-7 border border-slate-200/90 shadow-xl relative overflow-hidden" style="background: #ffffff !important;">
             <!-- Dải màu gradient viền trên cao cấp -->
@@ -647,7 +647,7 @@
     </div>
     <!-- FLOATING ACTION BUTTON: KHO ƯU ĐÃI NỔI BẬT GÓC DƯỚI (Xếp trên nút Trợ lý AI) -->
     @if(isset($activeCoupons) && $activeCoupons->isNotEmpty())
-    <div class="fixed bottom-20 right-6 z-40 group">
+    <div class="fixed bottom-28 right-4 sm:bottom-24 sm:right-6 z-40 group">
         <button type="button" onclick="openVoucherModal()" 
                 class="relative w-12 h-12 rounded-full text-white shadow-xl hover:shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 border-2 border-white flex items-center justify-center cursor-pointer" 
                 style="background: linear-gradient(135deg, #ee4d2d 0%, #ff5722 100%) !important;"
@@ -761,5 +761,59 @@
         animation: dishCardFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 </style>
+@endsection
+
+@section('scripts')
+<script>
+    // Hàm mở Modal Ưu Đãi độc quyền (Hoạt động 100% trên cả Desktop và Mobile)
+    window.openVoucherModal = function() {
+        const modal = document.getElementById('voucherModal');
+        const content = document.getElementById('voucherModalContent');
+        if (!modal) return;
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
+        modal.style.opacity = '1';
+        setTimeout(() => {
+            if (content) {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+                content.style.opacity = '1';
+                content.style.transform = 'scale(1)';
+            }
+        }, 20);
+    };
+
+    window.closeVoucherModal = function() {
+        const modal = document.getElementById('voucherModal');
+        const content = document.getElementById('voucherModalContent');
+        if (!modal) return;
+        if (content) {
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            content.style.opacity = '0';
+            content.style.transform = 'scale(0.95)';
+        }
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+        }, 200);
+    };
+
+    // Tự động bật Popup khi khách vừa vào trang (Delay 500ms mượt mà)
+    (function initAutoVoucherPopup() {
+        function runPopup() {
+            setTimeout(function() {
+                if (typeof window.openVoucherModal === 'function') {
+                    window.openVoucherModal();
+                }
+            }, 500);
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', runPopup);
+        } else {
+            runPopup();
+        }
+    })();
+</script>
 @endsection
 

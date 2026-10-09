@@ -328,7 +328,6 @@ export function closeVoucherModal() {
     setTimeout(() => {
         modal.classList.add('hidden');
     }, 200);
-    sessionStorage.setItem('voucher_modal_dismissed', '1');
 }
 
 // =========================================================================
@@ -595,9 +594,7 @@ document.addEventListener("DOMContentLoaded", function() {
         updateActiveTabVisibility();
         initInfiniteScrollObserver();
 
-        if (!sessionStorage.getItem('voucher_modal_dismissed')) {
-            setTimeout(openVoucherModal, 800);
-        }
+        setTimeout(openVoucherModal, 600);
 
         window.addEventListener('dish:live_update', function(e) {
             if (e.detail) {

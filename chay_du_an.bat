@@ -1,26 +1,69 @@
 @echo off
+setlocal
 chcp 65001 >nul
-title KHỞI ĐỘNG HỆ THỐNG FOODDAILY & SEPAY WEBHOOK
+cd /d "%~dp0"
+title FOODDAILY - KHOI DONG HE THONG VA SEPAY
+color 0B
+
+echo ======================================================================
+echo                  HE THONG GIAO DO AN FOODDAILY
+echo ======================================================================
+echo.
+
+tasklist /FI "IMAGENAME eq mysqld.exe" 2>nul | find /I /N "mysqld.exe" >nul
+if "%ERRORLEVEL%"=="0" (
+    echo [OK] Co so du lieu MySQL dang hoat dong tot.
+) else (
+    echo [CHU Y] Ban chua bat Laragon!
+    echo Website can Database MySQL. Vui long mo Laragon va bam Start All!
+    echo.
+)
+
+echo [1/3] Dang khoi dong may chu Laravel (Port 8000)...
+start "FOODDAILY - Laravel Server" cmd /k "cd /d "%~dp0" && php artisan serve --port=8000"
+
+echo [2/3] Dang ket noi duong truyen Cloudflare Tunnel...
+if exist "storage\logs\cloudflared.log" del /f /q "storage\logs\cloudflared.log"
+start "FOODDAILY - Cloudflare Tunnel" cmd /k ""C:\Program Files (x86)\cloudflared\cloudflared.exe" tunnel --url http://127.0.0.1:8000 --logfile "%~dp0storage\logs\cloudflared.log""
+
+echo [3/3] Dang lay duong dan Webhook SePay moi...
+set "WEBHOOK_URL="
+
+for /L %%i in (1,1,12) do (
+    ping 127.0.0.1 -n 2 >nul
+    for /f "delims=" %%a in ('php extract_tunnel_url.php "%~dp0storage\logs\cloudflared.log" 2^>nul') do (
+        set "WEBHOOK_URL=%%a"
+    )
+    if defined WEBHOOK_URL goto FOUND_URL
+)
+
+:FOUND_URL
+cls
 color 0A
-
-echo ==============================================================
-echo         HỆ THỐNG GIAO ĐỒ ĂN FOODDAILY - SEPAY WEBHOOK
-echo ==============================================================
+echo ======================================================================
+echo                  HE THONG FOODDAILY DA SAN SANG!
+echo ======================================================================
 echo.
-echo [1/2] Đang khởi động máy chủ Laravel (Cổng 8000)...
-start "FOODDAILY - Laravel Server" cmd /k "php artisan serve --port=8000"
-
-timeout /t 3 >nul
-
-echo [2/2] Đang khởi động đường truyền Webhook Cloudflare...
-start "FOODDAILY - Cloudflare Tunnel" cmd /k ""C:\Program Files (x86)\cloudflared\cloudflared.exe" tunnel --url http://127.0.0.1:8000"
-
+echo  - Web Local:       http://localhost:8000
 echo.
-echo ==============================================================
-echo  ĐÃ KHỞI ĐỘNG HOÀN TẤT!
-echo  - Web đang chạy tại: http://localhost:8000
-echo  - Cửa sổ Cloudflare sẽ hiển thị đường link https://...trycloudflare.com
-echo    để bạn dán vào SePay (nếu link có thay đổi).
-echo ==============================================================
+if defined WEBHOOK_URL (
+    echo  - Webhook SePay:   %WEBHOOK_URL%
+    echo %WEBHOOK_URL%| clip
+    echo.
+    echo  ------------------------------------------------------------------
+    echo  [DA TU DONG COPY] Link Webhook da duoc luu vao bo nho tam!
+    echo.
+    echo  HUONG DAN:
+    echo  1. Mo trang quan tri https://my.sepay.vn
+    echo  2. Vao muc Webhook, dan [Ctrl + V] link nay vao o URL Webhook
+    echo  3. Bam nut "Gui kiem tra" va Luu lai
+    echo  ------------------------------------------------------------------
+) else (
+    echo  [!] Khong lay duoc link tu dong. Vui long xem tai cua so Cloudflare.
+)
 echo.
-pause
+echo ======================================================================
+echo  Nhan phim bat ky de mo trang my.sepay.vn tren trinh duyet...
+echo ======================================================================
+pause >nul
+start https://my.sepay.vn
