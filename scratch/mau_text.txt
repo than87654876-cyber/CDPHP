@@ -1,0 +1,224 @@
+HƯỚNG DẪN TRÌNH BÀY ĐỒ ÁN MÔN HỌC
+Để đánh giá trình độ và khả năng tự học theo nhóm. Bài đồ án nhằm giúp các em sinh viên tiếp cận theo hướng tự học.
+Để thống nhất cách trình bày Đồ án, giảng viên hướng dẫn một số vấn đề khi viết và trình bày như sau:
+Trang bìa (xem mẫu kèm theo) hình thức: Bìa cứng(kiến)màu xanh da trời
+Trang bìa trong (trình bày giống trang bìa)
+Trang lời mở đầu (không đánh số trang, xem mẫu kèm theo) - Viết ngắn gọn.
+Nói rõ lý do chọn đề tài, mục đích nghiên cứu, tình hình nghiên cứu, phạm vi và  phương pháp nghiên cứu, kết cấu của đề tài.
+Trang lời cảm ơn: (không đánh số trang, xem mẫu kèm theo)
+Trang nhận xét của giảng viên hướng dẫn: (không đánh số trang, xem mẫu kèm theo) - Kết cấu, phương pháp trình bày.
+Cơ sở lý luận.
+Tính thực tiễn và khả năng ứng dụng của đồ án
+Các hướng nghiên cứu của đồ án có thể tiếp tục phát triển cao hơn.
+Kết quả: Đạt ở mức nào. (hoặc không đạt).
+Trang mục lục: (không đánh số trang, mục lục Tự động (xem mẫu kèm theo)
+Cách thể hiện đồ án, luận văn (xem các mẫu kèm theo)
+Bắt đầu đánh số trang từ trang đầu tiên của Chương 1
+Đồ án, luận văn viết trên khổ giấy  A4
+Bìa là loại giấy cứng khổ giấy A4, màu xanh da trời
+Viết theo thứ tự Chương, Mục, các tiểu mục. (trình bày tối đa 4 cấp)
+Mỗi trang đươc trình bày theo quy định (xem mẫu kèm theo)
+Tài liệu tham khảo bắt buộc phải ghi, đưa vào sau phụ lục, xếp theo thứ tự abc - Đóng bằng đinh bấm, bọc gáy.
+(Không được trích các câu tục ngữ, thành ngữ, sử dụng các hoa văn, hình vẽ để trang trí hoặc làm đề dẫn ở đầu mỗi trang, mỗi chương, mục,…)
+Chữ in màu đen; hình vẽ, đồ thị, lôgô của trường Cao đẳng Công nghệ Thông tin Tp.HCM…có thể in màu.
+Các chú thích phải đánh số và viết ghi chú ở cuối mỗi trang.
+Hạn chế viết tắt, nếu phải viết tắt phải mở ngoặc và đóng ngoặc (…) để giải nghĩa ngay từ các chữ viết tắt đầu tiên, sau đó liệt kê thành trang, đưa vào sau các trang Danh mục các
+Bảng biểu, hình,…
+Cách đánh số các Chương, Mục, tiểu mục phải theo quy định (xem mẫu kèm theo) - Định dạng văn bản.
+Tất cả nội dung sử dụng Font: Times New Roman, Size: 13, các tiêu đề có Size 16  o Khổ giấy A4, in 1 mặt. o Lề trang in:  Top: 2.0 cm; Bottom: 2.0cm; Left: 3 cm; Right: 2.0 cm o Số thứ tự trang đánh ở gốc dưới bên phải mỗi trang.
+Line Spacing: 1,5 lines
+Phần đầu trang (Header): Tên đề tài canh trái, Tên Giảng viên hướng dẫn canh phải
+Phần cuối trang (Footer): Tên nhóm thực hiện canh trái (hoặc nhóm), số thứ trang trang canh phải.
+(Mẫu trang bìa và trang bìa lót)
+TRƯỜNG CAO ĐẲNG CÔNG NGHỆ THÔNG TIN TP.HCM
+(Bold, size 16)
+KHOA CÔNG NGHỆ THÔNG TIN – ĐIỆN TỬ
+(Bold, size 14)
+BÁO CÁO ĐỒ ÁN: LẬP TRÌNH PHP2
+(Bold, size 16)
+ĐỀ TÀI: XÂY DỰNG GIAO DIỆN WEBSITE GIỚI THIỆU
+CỬA HÀNG BÁN ĐIỆN THOẠI
+...........................................................................................................................................
+(Bold, size 18-30, tùy theo số chữ,… của tên đề tài)
+Hình minh họa (Nếu có) Hình minh họa (Nếu có)
+Hình minh họa
+(
+Nếu có
+)
+Hình minh họa
+(
+Nếu có
+)
+Giáo viên hướng dẫn : KS. Huỳnh Luân (Bold, size 14)
+Sinh viên thực hiện:    Trần Thị Tèo
+Trần Thị Tý
+Lớp       :    ………(Bold, in hoa, size 14)
+Khoá     :    .…........(Bold, in hoa, size 14)
+TP. Hồ Chí Minh, tháng 12 năm 2024 (Bold, size 13)
+(Mẫu)
+MỞ ĐẦU
+(Bold, size 14, xếp sau trang lót,)
+size 13, …………………………………………….. ………………………………………………………………………….. ………………………………………………………………………….. ………………………………………………………………………….. ………………………………………………………………………….. ………………………………………………………………………….. ………………………………………………………………………….. …………………………………………………………………………..                                 size 13, …………………………………………….. ………………………………………………………………………….. ………………………………………………………………………….. ………………………………………………………………………….. ………………………………………………………………………….. ………………………………………………………………………….. ………………………………………………………………………….. …………………………………………………………………………..
+size 13, ……………………………………………..
+…………………………………………………………………………..
+…………………………………………………………………………..
+…………………………………………………………………………..
+…………………………………………………………………………..
+…………………………………………………………………………..
+…………………………………………………………………………..
+…………………………………………………………………………..
+size 13, ……………………………………………..
+…………………………………………………………………………..
+…………………………………………………………………………..
+…………………………………………………………………………..
+…………………………………………………………………………..
+…………………………………………………………………………..
+…………………………………………………………………………..
+…………………………………………………………………………..
+(Mẫu)
+LỜI CẢM ƠN
+( bold, size 14, xếp sau trang lời mở đầu)
+size 13 …………………………………………………………………………….. …………………………………………………………………………………….. ……………………………………………………………………………..……… ……………………………………………………………………………..……… ……………………………………………………………………………..……… ……………………………………………………………………………..……… ……………………………………………………………………………..……… ……………………………………………………………………………..……… ……………………………………………………………………………..………     size 13 …………………………………………………………………………….. …………………………………………………………………………………….. ……………………………………………………………………………..……… ……………………………………………………………………………..……… ……………………………………………………………………………..……… ……………………………………………………………………………..……… ……………………………………………………………………………..……… ……………………………………………………………………………..……… ……………………………………………………………………………..………
+size
+13
+……………………………………………………………………………..
+……………………………………………………………………………
+………..
+……………………………………………………………………………..
+………
+……………………………………………………………………………..
+…
+……
+……………………………………………………………………………..
+…
+……
+……………………………………………………………………………..
+…
+……
+……………………………………………………………………………..
+…
+……
+……………………………………………………………………………..
+…
+……
+……………………………………………………………………………..
+…
+……
+size
+13
+……………………………………………………………………………..
+……………………………………………………………………………
+………..
+……………………………………………………………………………..
+………
+……………………………………………………………………………..
+…
+……
+……………………………………………………………………………..
+…
+……
+……………………………………………………………………………..
+…
+……
+……………………………………………………………………………..
+…
+……
+……………………………………………………………………………..
+…
+……
+……………………………………………………………………………..
+…
+……
+(Mẫu)
+NHẬN XÉT
+(Của giáo viên, nếu có)
+Bold, size 14, xếp sau trang Lời cảm ơn
+size 13 ...........................................................................................................................
+………………………………………………………………………………………
+………………………………………………………………………………………
+………………………………………………………………………………………
+………………………………………………………………………………………
+………………………………………………………………………………………
+………………………………………………………………………………………
+………………………………………………………………………………………
+………………………………………………………………………………………
+………………………………………………………………………………………
+………………………………………………………………………………………
+………………………………………………………………………………………
+………………………………………………………………………………………
+……………………………………………………………………………………… ………………………………………………………………………………………
+………………………………………………………………………………………
+Điểm   Điểm
+Điểm
+Điểm
+(Mẫu mục lục tự động)
+MỤC LỤC
+( Bold, size 14)
+Mở đầu: (size 13)
+Trang
+Chương 1...................................................
+1................................................................    1
+1.1.1
+1.1.2
+3............................................................
+......................................................................
+7
+1.2.1
+1.2.2….................................
+1.3........................................
+...............................................                22
+Chương 2.......................................................
+2.1…..
+2.1.1….
+1.2…..
+2.2
+….. …..
+Chương 3                   50
+3.1…..
+1.1….
+3.1.2….
+3.2
+………………
+KẾT LUẬN            120
+PHỤ LỤC
+DANH MỤC TÀI LIỆU THAM KHẢO
+Ghi chú:
+In đậm và in hoa  tiêu đề của các chương, mục lớn
+Chữ số thứ nhất chỉ thứ tự chương
+Chử số thứ 2 chỉ thứ tự mục trong chương
+Chữ số thứ 3,…,chỉ thứ tự các tiểu mục
+(Mẫu)
+KÍ HIỆU CÁC CỤM TỪ VIẾT TẮT (size 14)
+(Được xếp sau trang Danh mục Các bảng, sơ đồ, hình)
+SXKD: (size 13)    Sản xuất kinh doanh
+CTM :     Chế tạo máy
+QTKD……….    Quản trị kinh doanh
+……….
+Ghi chú:
+Cụm từ viết viết tắt là các chữ cái và các ký hiệu thay chữ được viết liền nhau, để thay cho một cụm từ có nghĩa thường được lặp nhiều lần trong văn bản hoặc được mọi người mặc nhiên chấp nhận.
+(Mẫu)
+Trình bày mỗi trang của tiểu luận
+Bắt đầu đánh số trang từ Chương 1, in đậm tiêu đề các chương, các mục
+( đánh số trang trên header, tên GVHD và SVTH trên Footer) size 12, Times New Roman
+Chương 1: size 13
+...........................................................................................................................
+.......................................................................................................
+............................................................................
+(Mẫu)
+PHỤ LỤC (kèm theo)
+Phần này bao gồm những nội dung cần thiết nhằm mimh họa hoặc hỗ trợ cho nội dung luận văn như: số liệu, mẫu biểu, tranh ảnh…
+Phụ lục không được dày hơn phần chính của tiểu luận
+(Mẫu)
+DANH MỤC TÀI LIỆU THAM KHẢO
+Tiếng Việt:
+An cư với lạc nghiệp, tập thể tác giả, Nhà xuất bản Văn hóa Thông tin, Hà Nội, 2004
+Chi tiết máy, tài liệu học tập, Đại học Công nghiệp Tp.HCM, lưu hành nội bộ, 2006.
+……………….
+Tiếng Anh:
+Bouding K.E (1995), Economics Analysis, Hamish Hamilton, London.
+Andeson, JE (1985), The RelativeIneffciency of Quota, The Cheese case, American Economic review, 74 (1), pp 78-90.
+………………..
+Ghi chú:
+Danh mục tài liệu tham khảo phải xếp theo abc tên tài liệu, tác giả, nơi và năm phát hành.
+Nếu xếp theo tên tác giả thì xếp abc theo họ, sau đó đến tên tài liệu, nơi và năm phát hành.
+Danh mục tài liệu tham khảo xếp cuối cùng, sau các trang phụ lục.

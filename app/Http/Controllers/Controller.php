@@ -19,7 +19,6 @@ abstract class Controller
     {
         $responseHeaders = [
             'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
         ];
 
         $callback = function () use ($headers, $records, $rowCallback) {
@@ -41,6 +40,6 @@ abstract class Controller
             fclose($file);
         };
 
-        return response()->stream($callback, 200, $responseHeaders);
+        return response()->streamDownload($callback, $filename, $responseHeaders);
     }
 }

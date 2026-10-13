@@ -201,16 +201,31 @@ class AdminUserController extends Controller
             'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
         ]);
 
+        $formatDate = function ($value, string $format = 'd/m/Y') {
+            if (empty($value)) {
+                return '';
+            }
+            if ($value instanceof \DateTimeInterface) {
+                return $value->format($format);
+            }
+            try {
+                return \Carbon\Carbon::parse($value)->format($format);
+            } catch (\Throwable) {
+                return (string) $value;
+            }
+        };
+
         $rowNumber = 5;
         foreach ($users as $index => $user) {
             $gender = $this->formatGender($user->gender ?? null);
-            $birthday = $user->birthday ? $user->birthday->format('d/m/Y') : '';
+            $birthday = $formatDate($user->birthday, 'd/m/Y');
             $address = $user->resolved_address;
             $statusText = $user->status ? 'Hoạt động' : 'Khóa';
             $totalOrders = $user->orders->count();
             $totalSpent = $user->orders->whereIn('payment_status', ['paid', 'completed'])->sum('final_amount');
             $membershipLabel = $this->formatMembership($user->membership);
-            $lastLogin = $user->last_login ? $user->last_login->format('d/m/Y H:i:s') : '';
+            $lastLogin = $formatDate($user->last_login, 'd/m/Y H:i:s');
+            $createdAt = $formatDate($user->created_at, 'd/m/Y H:i');
 
             $values = [
                 $index + 1,
@@ -221,7 +236,7 @@ class AdminUserController extends Controller
                 $gender,
                 $birthday,
                 $address,
-                $user->created_at->format('d/m/Y H:i'),
+                $createdAt,
                 $statusText,
                 $totalOrders,
                 $totalSpent,

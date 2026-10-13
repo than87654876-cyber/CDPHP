@@ -1,0 +1,3153 @@
+
+TRƯỜNG ĐẠI HỌC …
+KHOA …
+
+
+
+
+
+
+
+
+ĐỒ ÁN …
+NGÀNH: CÔNG NGHỆ THÔNG TIN
+
+ĐỀ TÀI: XÂY DỰNG WEBSITE THƯƠNG MẠI ĐIỆN TỬ MÔ HÌNH B2B
+
+
+
+
+Giảng viên hướng dẫn: …
+Sinh viên thực hiện:    …
+Lớp:    …
+Khoá:    …
+
+TP. Hồ Chí Minh, tháng .. năm …
+TRƯỜNG ĐẠI HỌC …
+KHOA …
+
+
+
+
+
+
+
+
+ĐỒ ÁN …
+CHUYÊN NGÀNH: CÔNG NGHỆ THÔNG TIN
+
+ĐỀ TÀI: XÂY DỰNG WEBSITE THƯƠNG MẠI ĐIỆN TỬ MÔ HÌNH B2B
+
+
+
+
+Giảng viên hướng dẫn: …
+Sinh viên thực hiện:    …
+Lớp:    …
+Khoá:    …
+
+TP. Hồ Chí Minh, tháng … năm …
+LỜI CẢM ƠN
+Để hoàn thành báo cáo tốt nghiệp này, tôi xin gửi lời cảm ơn chân thành đến quý thầy cô Khoa …- Trường Đại học …Thành Phố Hồ Chí Minh đã tận tình truyền đạt cho tôi những kiến thức, kinh nghiệm bổ ích trong suốt những năm được học tại trường. Những nền tảng kiến thức quý giá ấy giúp ích cho tôi rất nhiều trong quá trình hoàn thành luận văn tốt nghiệp, đồng thời là hành trang hữu ích cho công việc của tôi.
+Đặc biệt tôi xin gửi lời cảm ơn sâu sắc dành đến …vì cô đã tận tình hướng dẫn, góp ý, hỗ trợ tôi hết mình. Tôi cũng xin cảm ơn …, thầy đã hỗ trợ, chỉ dẫn tôi về công nghệ. Nhờ sự giúp đỡ hết lòng của thầy cô mà báo cáo của tôi mới được hoàn thiện như ngày hôm nay.
+Tuy nhiên, thời gian ngắn ngủi với kinh nghiệm hạn hẹp của bản thân mình, tôi đã cố gắng hết mình để tìm hiểu, phân tích, xây dựng hệ thống nhưng chắc chắn sẽ không tránh khỏi sự thiếu xót. Tôi rất mong nhận được sự thông cảm cũng như những lời góp ý và chỉ bảo tận tình của quý thầy cô, điều đó sẽ giúp tôi có thêm sự dày dặn trong kinh nghiện và kiến thức của mình.
+Cuối cùng, tôi xin kính chúc tập thể quý thầy cô trường của trường Đại học … Tp. Hồ Chí Minh luôn dồi dào sức khỏe và thành công trong công việc giảng dạy. 
+
+Tôi xin chân thành cảm ơn!
+LỜI CAM ĐOAN
+Tôi xin cam đoan đề tài: “Xây dựng website thương mại điện tử mô hình B2B” là một công trình nghiên cứu độc lập dưới sự hướng dẫn của giảng viên … và sự hỗ trợ, chỉ dạy công nghệ từ giảng viên ….  Ngoài ra không có bất cứ sự sao chép từ người khác. 
+Đề tài, nội dung báo cáo là sản phẩm mà tôi đã nỗ lực nghiên cứu trong quá trình học tập tại trường cũng như học hỏi trên mạng. Các số liệu, kết quả trình bày trong báo cáo hoàn toàn trung thực. Tôi xin cam đoan sẽ chịu hoàn toàn trách nhiệm, kỷ luật của bộ môn và nhà trường đề ra nếu sai sự thật.
+
+
+Sinh viên thực hiện
+
+NHẬN XÉT
+(Giảng viên hướng dẫn)
+																
+Kết luận: Đồng ý hoặc Không đồng ý cho sinh viên nộp báo cáo.
+	TP. Hồ Chí Minh, ngày .... tháng 06 năm 2022
+	GIẢNG VIÊN HƯỚNG DẪN
+	(Ký tên)
+
+	…
+NHẬN XÉT
+(Giảng viên phản biện)
+																		
+	TP. Hồ Chí Minh, ngày .... tháng 06 năm 2022
+	GIẢNG VIÊN HƯỚNG DẪN
+	(Ký tên)
+LỊCH LÀM VIỆC SINH VIÊN
+Giảng viên Hướng dẫn: …
+Sinh viên thực hiện: …
+Thời gian thực hiện: từ ngày .. tháng .. năm .. đến ngày .. tháng .. năm ...
+Thời gian (tháng)
+Nội dung
+Địa điểm thực hiện
+
+Tháng 3
+Xác định yêu cầu nghiệp vụ và hệ thống
+Trường ĐH ...
+
+Tháng 3
+Đặc tả hệ thống
+Trường ĐH ...
+
+Tháng 3
+Phân tích yêu cầu về các chức năng, giao diện
+Trường ĐH ...
+
+Tháng 4
+Xây dựng cơ sở dữ liệu
+Trường ĐH ...
+
+Tháng 4
+Thiết kế giao diện
+Trường ĐH ...
+
+Tháng 5 - 6
+Xây dựng các chức năng của hệ thống
+Trường ĐH ...
+
+Tháng 6 - 7
+Viết báo cáo
+Trường ĐH ...
+
+
+TÓM TẮT
+Vấn đề được đưa ra giải quyết
+Thiết kế hệ thống và các biểu đồ hệ thống.
+Xây dựng cơ sở dữ liệu.
+Thiết kế trang web xem thông tin doanh nghiệp và chatbox để liên hệ với doanh nghiệp ngay trên trang web.
+Thiết kế các trang quản lý cho doanh nghiệp.
+Mục tiêu đã đạt được
+Thiết kế hệ thống quản lý bán hàng thương mại điện tử theo mô hình B2B.
+Xây dựng được cơ sở dữ liệu tương đối hoàn chỉnh.
+Xây dựng được giao diện cho khách hàng xem thông tin với chatbox để liên hệ.
+Xây dựng được hệ thống quản lý cho doanh nghiệp.
+Kỹ thuật sử dụng
+Sử dụng ngôn ngữ PHP, Framework Laravel cùng HTML, CSS, Javascript.
+Sử dụng cơ sở dữ liệu SQL Server.
+Xây dựng nhờ vào công cụ Visual Studio Code.
+Kết quả thực hiện
+Đạt được website quản lý hệ thống bán hàng mô hình điện tử mô hình B2B.
+Hiểu được quy trình nghiệp vụ hệ thống.
+Xây dựng được các chức năng quản lý các phân hệ như:
+Xây dựng phân hệ quản lý người dùng truy cập vào hệ thống.
+Xây dựng phân hệ quản lý thông tin khách hàng.	
+Xây dựng phân hệ quản lý thông tin nhà cung cấp.
+Xây dựng phân hệ quản lý bán hàng.
+Xây dựng phân hệ quản lý mua hàng.
+Xuất báo cáo.
+Kết luận về khóa luận
+Hoàn thành được website quản lý bán hàng thương mại điện tử mô hình B2B với các chức năng đã đề ra.
+MỤC LỤC TOC \o "1-4" \h \z \u 
+LỜI MỞ ĐẦU	 PAGEREF _Toc108458782 \h 1
+Chương 1. TỔNG QUAN TÀI LIỆU	 PAGEREF _Toc108458783 \h 5
+1.1	Khảo sát bài toán	 PAGEREF _Toc108458784 \h 5
+1.1.1.	Đặt vấn đề	 PAGEREF _Toc108458787 \h 5
+1.1.2.	Giải pháp	 PAGEREF _Toc108458788 \h 5
+1.1.3.	Mục đích của đề tài	 PAGEREF _Toc108458789 \h 6
+1.2	Cơ sở lý thuyết	 PAGEREF _Toc108458790 \h 6
+1.2.1.	HTML5	 PAGEREF _Toc108458791 \h 6
+1.2.2.	CSS	 PAGEREF _Toc108458792 \h 6
+1.2.3.	Boostrap 4	 PAGEREF _Toc108458793 \h 7
+1.2.4.	Javascript	 PAGEREF _Toc108458794 \h 8
+1.2.5.	Jquery	 PAGEREF _Toc108458795 \h 8
+1.2.6.	PHP	 PAGEREF _Toc108458796 \h 9
+1.2.7.	Laravel	 PAGEREF _Toc108458797 \h 9
+1.2.8.	SQL Server	 PAGEREF _Toc108458798 \h 10
+1.2.9.	Visual Studio Code	 PAGEREF _Toc108458799 \h 10
+1.2.10.	Laragon	 PAGEREF _Toc108458800 \h 11
+Chương 2. PHƯƠNG PHÁP THỰC HIỆN	 PAGEREF _Toc108458801 \h 12
+2.1	Phân tích hệ thống	 PAGEREF _Toc108458802 \h 12
+2.1.1	Quy trình nghiệp vụ	 PAGEREF _Toc108458803 \h 12
+2.1.2	Thông tin yêu cầu	 PAGEREF _Toc108458804 \h 15
+2.1.3	Sơ đồ chức năng của hệ thống	 PAGEREF _Toc108458805 \h 16
+2.2	Các biểu đồ thiết kế hệ thống	 PAGEREF _Toc108458806 \h 20
+2.2.1	Lượt đồ Use case	 PAGEREF _Toc108458807 \h 20
+2.2.2.1	Đặc tả use case đăng nhập vào hệ thống.	 PAGEREF _Toc108458808 \h 21
+2.2.2.2	Đặc tả use case đăng xuất vào hệ thống.	 PAGEREF _Toc108458809 \h 21
+2.2.2.3	Đặc tả use case them thông tin yêu cầu khách hàng.	 PAGEREF _Toc108458810 \h 22
+2.2.2.4	Đặc tả use case chuyển thông tin sang nhà cung cấp	 PAGEREF _Toc108458811 \h 23
+2.2.2.5	Đặc tả use case cập nhật giá từ nhà cung cấp.	 PAGEREF _Toc108458812 \h 24
+2.2.2.6	Đặc tả use case tạo báo giá cho khách hàng.	 PAGEREF _Toc108458813 \h 25
+2.2.2.7	Đặc tả use case giám đốc chấp thuận báo giá.	 PAGEREF _Toc108458814 \h 26
+2.2.2.8	Đặc tả use case xuất báo giá cho khách hàng.	 PAGEREF _Toc108458815 \h 26
+2.2.2.9	Đặc tả use case đặt hàng từ nhà cung cấp.	 PAGEREF _Toc108458816 \h 27
+2.2.2.10	Đặc tả use case cập nhật trạng thái của quy trình bán hàng.	 PAGEREF _Toc108458817 \h 28
+2.2.2.11	Đặc tả usecase cập nhật hiển thị nội dung	 PAGEREF _Toc108458818 \h 29
+2.2.2	Lược đồ Activity	 PAGEREF _Toc108458819 \h 30
+2.2.2.1	Lược đồ chức năng đăng nhập	 PAGEREF _Toc108458820 \h 30
+2.2.2.3	Lược đồ chức năng reset password	 PAGEREF _Toc108458821 \h 31
+2.2.2.4	Lược đồ tìm kiếm	 PAGEREF _Toc108458822 \h 32
+2.2.2.5	Lược đồ quản lý thông tin yêu cầu khách hàng	 PAGEREF _Toc108458823 \h 32
+2.2.2.6	Lược đồ quản lý thông tin yêu cầu nhà cung cấp	 PAGEREF _Toc108458824 \h 33
+2.2.2.7	Lược đồ quản lý thông tin báo giá	 PAGEREF _Toc108458825 \h 34
+2.2.2.8	Lược đồ quản lý thông tin hóa đơn	 PAGEREF _Toc108458826 \h 35
+2.2.2.9	Lược đồ quản lý thông tin khách hàng	 PAGEREF _Toc108458827 \h 35
+2.2.2.10	Lược đồ quản lý thông tin nhân viên khách hàng	 PAGEREF _Toc108458828 \h 36
+2.2.2.11	Lược đồ quản lý thông tin nhà cung cấp	 PAGEREF _Toc108458829 \h 36
+2.2.2.12	Lược đồ quản lý thông tin nhân viên nhà cung cấp	 PAGEREF _Toc108458830 \h 37
+2.2.2.13	Lược đồ quản lý thông tin nhân viên	 PAGEREF _Toc108458831 \h 37
+2.2.3	Biểu đồ thành phần	 PAGEREF _Toc108458832 \h 38
+2.2.4.1	Biểu đồ thành phần hệ thống	 PAGEREF _Toc108458833 \h 38
+2.2.4.2	Biểu đồ thành phần quản trị viên	 PAGEREF _Toc108458834 \h 38
+2.2.4.4	Biểu đồ thành phần người dùng	 PAGEREF _Toc108458835 \h 39
+2.2.4	Biểu đồ triển khai	 PAGEREF _Toc108458836 \h 39
+2.3	Cơ sở dữ liệu	 PAGEREF _Toc108458837 \h 40
+Chương 3. CÀI ĐẶT THỰC NGHIỆM VÀ KẾT QUẢ	 PAGEREF _Toc108458838 \h 56
+3.1	Một số giao diện website	 PAGEREF _Toc108458839 \h 56
+3.1.1 Phần quản trị	 PAGEREF _Toc108458840 \h 56
+3.1.3.1	Giao diện đăng nhập	 PAGEREF _Toc108458841 \h 56
+3.1.3.2	Giao diện quản lý thông tin yêu cầu khách hàng	 PAGEREF _Toc108458842 \h 56
+3.1.3.3	Giao diện quản lý thông tin yêu cầu nhà cung cấp	 PAGEREF _Toc108458843 \h 61
+3.1.3.4	Giao diện quản lý thông tin báo giá	 PAGEREF _Toc108458844 \h 64
+3.1.3.5	Giao diện quản lý thông tin khách hàng	 PAGEREF _Toc108458845 \h 66
+3.1.3.6	Giao diện quản lý thông tin nhân viên khách hàng	 PAGEREF _Toc108458846 \h 67
+3.1.3.7	Giao diện quản lý thông tin nhà cung cấp	 PAGEREF _Toc108458847 \h 69
+3.1.3.8	Giao diện quản lý thông tin nhân viên nhà cung cấp	 PAGEREF _Toc108458848 \h 70
+3.1.3.9	Giao diện quản lý nhân viên	 PAGEREF _Toc108458849 \h 71
+3.1.3.10	Giao diện Reset Password	 PAGEREF _Toc108458850 \h 72
+3.1.2 File excel xuất ra từ quản trị	 PAGEREF _Toc108458851 \h 73
+3.1.3 Phần người dùng	 PAGEREF _Toc108458852 \h 75
+3.1.3.1	Giao diện người dùng ở thiết bị màn hình lớn	 PAGEREF _Toc108458853 \h 75
+3.1.3.2	Giao diện người dùng ở thiết bị màn hình nhỏ	 PAGEREF _Toc108458854 \h 78
+Chương 4: KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN	 PAGEREF _Toc108458855 \h 83
+4.1	Kết luận	 PAGEREF _Toc108458856 \h 83
+4.2	Định hướng phát triển	 PAGEREF _Toc108458857 \h 84
+PHỤ LỤC	 PAGEREF _Toc108458858 \h 85
+DANH MỤC TÀI LIỆU THAM KHẢO	 PAGEREF _Toc108458859 \h 86
+
+DANH MỤC SƠ ĐỒ, LƯỢC ĐỒ, BIỂU ĐỒ, HÌNH
+Sơ đồ: 
+ TOC \h \z \c "Sơ đồ 2." Sơ đồ 2.1 Sơ đồ chức năng của Admin.	 PAGEREF _Toc107227528 \h 17
+Sơ đồ 2.2 Sơ đồ chức năng nhân viên.	 PAGEREF _Toc107227529 \h 18
+Sơ đồ 2.3 Sơ đồ chức năng giám đốc.	 PAGEREF _Toc107227530 \h 19
+Lược đồ:
+ TOC \h \z \c "Lược đồ 2." Lược đồ 2.1 Lược đồ use case.	 PAGEREF _Toc107228146 \h 20
+Lược đồ 2.2 Lược đồ chức năng đăng nhập.	 PAGEREF _Toc107228147 \h 30
+Lược đồ 2.3 Lược đồ chức năng reset password.	 PAGEREF _Toc107228148 \h 31
+Lược đồ 2.4 Lược đồ tìm kiếm.	 PAGEREF _Toc107228149 \h 32
+Lược đồ 2.5 Lược đồ thông tin yêu cầu khách hàng.	 PAGEREF _Toc107228150 \h 32
+Lược đồ 2.6 Lược đồ thông tin yêu cầu nhà cung cấp.	 PAGEREF _Toc107228151 \h 33
+Lược đồ 2.7 Lược đồ quản lý thông tin báo giá.	 PAGEREF _Toc107228152 \h 34
+Lược đồ 2.8 Lược đồ quản lý thông tin hóa đơn.	 PAGEREF _Toc107228153 \h 35
+Lược đồ 2.9 Lược đồ quản lý thông tin khách hàng.	 PAGEREF _Toc107228154 \h 35
+Lược đồ 2.10 Lược đồ quản lý thông tin nhân viên khách hàng.	 PAGEREF _Toc107228155 \h 36
+Lược đồ 2.11 Lược đồ quản lý thông tin nhà cung cấp.	 PAGEREF _Toc107228156 \h 36
+Lược đồ 2.12 Lược đồ quản lý thông tin nhân viên nhà cung cấp.	 PAGEREF _Toc107228157 \h 37
+Lược đồ 2.13 Lược đồ quản lý thông tin nhân viên.	 PAGEREF _Toc107228158 \h 37
+Hình: 
+ TOC \h \z \c "Hình 1." Hình 1.1 Logo HTML5	 PAGEREF _Toc107227654 \h 6
+Hình 1.2 Logo CSS.	 PAGEREF _Toc107227655 \h 7
+Hình 1.3 Logo boostrap 4	 PAGEREF _Toc107227656 \h 7
+Hình 1.4 Logo Javascript.	 PAGEREF _Toc107227657 \h 8
+Hình 1.5 Logo Jquery	 PAGEREF _Toc107227658 \h 8
+Hình 1.6 Logo PHP.	 PAGEREF _Toc107227659 \h 9
+Hình 1.7 Logo Laravel	 PAGEREF _Toc107227660 \h 9
+Hình 1.8 Logo SQL Server.	 PAGEREF _Toc107227661 \h 10
+Hình 1.9 Logo Visual Studio Code.	 PAGEREF _Toc107227662 \h 10
+Hình 1.10 Logo Laragon.	 PAGEREF _Toc107227663 \h 11
+ TOC \h \z \c "Hình 2." 
+Hình 2.1 Mẫu đơn đặt hàng.	 PAGEREF _Toc107228331 \h 14
+Hình 2.2 Cơ sở dữ liệu.	 PAGEREF _Toc107228332 \h 40
+Hình 2.3 Tóm tắt ý nghĩa dữ liệu bảng Company.	 PAGEREF _Toc107228333 \h 42
+Hình 2.4 Tóm tắt ý nghĩa dữ liệu bảng Staff.	 PAGEREF _Toc107228334 \h 43
+Hình 2.5 Tóm tắt ý nghĩa dữ liệu bảng Customer.	 PAGEREF _Toc107228335 \h 43
+Hình 2.6 Tóm tắt ý nghĩa dữ liệu bảng Customer_Staff.	 PAGEREF _Toc107228336 \h 44
+Hình 2.7 Tóm tắt ý nghĩa dữ liệu bảng Supplier	 PAGEREF _Toc107228337 \h 45
+Hình 2.8 Tóm tắt ý nghĩa dữ liệu bảng Supplier_Staff.	 PAGEREF _Toc107228338 \h 46
+Hình 2.9 Tóm tắt ý nghĩa dữ liệu bảng Cust_Prv.	 PAGEREF _Toc107228339 \h 46
+Hình 2.10 Tóm tắt ý nghĩa dữ liệu bảng Cust_Model.	 PAGEREF _Toc107228340 \h 47
+Hình 2.11 Tóm tắt ý nghĩa dữ liệu bảng Cust_Item.	 PAGEREF _Toc107228341 \h 47
+Hình 2.12 Tóm tắt ý nghĩa dữ liệu bảng Status_Detail.	 PAGEREF _Toc107228342 \h 48
+Hình 2.13 Tóm tắt ý nghĩa dữ liệu bảng Status_List.	 PAGEREF _Toc107228343 \h 48
+Hình 2.14 Tóm tắt ý nghĩa dữ liệu bảng Suppl_Prv.	 PAGEREF _Toc107228344 \h 49
+Hình 2.15 Tóm tắt ý nghĩa dữ liệu bảng Suppl_Model.	 PAGEREF _Toc107228345 \h 49
+Hình 2.16 Tóm tắt ý nghĩa dữ liệu bảng Suppl_Item.	 PAGEREF _Toc107228346 \h 50
+Hình 2.17 Tóm tắt ý nghĩa dữ liệu bảng Cust_Quotation.	 PAGEREF _Toc107228347 \h 51
+Hình 2.18 Tóm tắt ý nghĩa dữ liệu bảng Cust_Quotation_Detail.	 PAGEREF _Toc107228348 \h 52
+Hình 2.19 Tóm tắt ý nghĩa dữ liệu bảng Cust_PO.	 PAGEREF _Toc107228349 \h 53
+Hình 2.20 Tóm tắt ý nghĩa dữ liệu bảng CusT_PO_Model.	 PAGEREF _Toc107228350 \h 54
+Hình 2.21 Tóm tắt ý nghĩa dữ liệu bảng Cust_PO_Item.	 PAGEREF _Toc107228351 \h 54
+Hình 2.22 Tóm tắt ý nghĩa dữ liệu bảng User_Group.	 PAGEREF _Toc107228352 \h 54
+Hình 2.23 Tóm tắt ý nghĩa dữ liệu bảng User.	 PAGEREF _Toc107228353 \h 55
+ TOC \h \z \c "Hình 3." 
+Hình 3.1 Giao diện đăng nhập từ phía quản trị.	 PAGEREF _Toc107228354 \h 56
+Hình 3.2 Giao diện danh sách thông tin yêu cầu khách hàng.	 PAGEREF _Toc107228355 \h 56
+Hình 3.3 Giao diện chi tiết các nhà cung cấp đã gửi thông tin yêu cầu.	 PAGEREF _Toc107228356 \h 57
+Hình 3.4 Giao diện chi tiết thông tin yêu cầu khách hàng.	 PAGEREF _Toc107228357 \h 57
+Hình 3.5 Giao diện cập nhật trạng thái quy trình bán hàng.	 PAGEREF _Toc107228358 \h 57
+Hình 3.6 Giao diện thông báo xóa thông tin yêu cầu.	 PAGEREF _Toc107228359 \h 58
+Hình 3.7 Giao diện thêm thông tin yêu cầu khách hàng.	 PAGEREF _Toc107228360 \h 58
+Hình 3.8 Giao diện đẩy yêu cầu khách hàng sang nhà cung cấp.	 PAGEREF _Toc107228361 \h 59
+Hình 3.9 Giao diện so sánh giá các model của các nhà cung cấp.	 PAGEREF _Toc107228362 \h 60
+Hình 3.10 Giao diện tạo thông tin báo giá.	 PAGEREF _Toc107228363 \h 60
+Hình 3.11 Giao diện danh sách thông tin yêu cầu nhà cung cấp.	 PAGEREF _Toc107228364 \h 61
+Hình 3.12 Giao diện chi tiết thông tin yêu cầu nhà cung cấp.	 PAGEREF _Toc107228365 \h 62
+Hình 3.13 Giao diện cập nhật giá trong yêu cầu nhà cung cấp.	 PAGEREF _Toc107228366 \h 63
+Hình 3.14 Giao diện danh sách các thông tin báo giá.	 PAGEREF _Toc107228367 \h 64
+Hình 3.15 Giao diện thông tin báo giá chi tiết.	 PAGEREF _Toc107228368 \h 64
+Hình 3.16 Giao diện thông tin báo giá chi tiết (bổ sung).	 PAGEREF _Toc107228369 \h 65
+Hình 3.17 Giao diện chi tiết thông tin Tern của báo giá.	 PAGEREF _Toc107228370 \h 65
+Hình 3.18 Giao diện danh sách thông tin khách hàng.	 PAGEREF _Toc107228371 \h 66
+Hình 3.19 Giao diện thêm thông tin khách hàng.	 PAGEREF _Toc107228372 \h 66
+Hình 3.20 Giao diện chỉnh sửa thông tin khách hàng.	 PAGEREF _Toc107228373 \h 67
+Hình 3.21 Giao diện danh sách thông tin nhân viên khách hàng.	 PAGEREF _Toc107228374 \h 67
+Hình 3.22 Giao diện thêm thông tin nhân viên khách hàng.	 PAGEREF _Toc107228375 \h 68
+Hình 3.23 Giao diện chỉnh sửa thêm thông nhân viên khách hàng.	 PAGEREF _Toc107228376 \h 68
+Hình 3.24 Giao diện danh sách thông tin nhà cung cấp.	 PAGEREF _Toc107228377 \h 69
+Hình 3.25 Giao diện chỉnh sửa thông tin nhà cung cấp.	 PAGEREF _Toc107228378 \h 69
+Hình 3.26 Giao diện danh sách thông tin nhà nhân viên nhà cung cấp.	 PAGEREF _Toc107228379 \h 70
+Hình 3.27 Giao diện thêm mới thông tin nhân viên nhà cung cấp.	 PAGEREF _Toc107228380 \h 70
+Hình 3.28 Giao diện chỉnh sửa thông tin nhân viên nhà cung cấp.	 PAGEREF _Toc107228381 \h 71
+Hình 3.29 Giao diện danh sách thông tin nhân viên.	 PAGEREF _Toc107228382 \h 71
+Hình 3.30 Giao diện thêm mới thông tin nhân viên.	 PAGEREF _Toc107228383 \h 72
+Hình 3.31 Giao diện chỉnh sửa thông tin nhân viên.	 PAGEREF _Toc107228384 \h 72
+Hình 3.32 Giao diện nhập email để khôi phục mật khẩu.	 PAGEREF _Toc107228385 \h 72
+Hình 3.33 Giao diện khôi phục tài khoản.	 PAGEREF _Toc107228386 \h 73
+Hình 3.34 File yêu cầu báo giá để gửi nhà cung cấp.	 PAGEREF _Toc107228387 \h 73
+Hình 3.35 File báo giá dành cho Polaris.	 PAGEREF _Toc107228388 \h 74
+Hình 3.36 File báo giá dành cho Polaris (bổ sung).	 PAGEREF _Toc107228389 \h 74
+Hình 3.37 File báo giá xuất cho khách hàng.	 PAGEREF _Toc107228390 \h 75
+Hình 3.38 Giao diện phần Header.	 PAGEREF _Toc107228391 \h 75
+Hình 3.39 Giao diện về phần thông tin doanh nghiệp.	 PAGEREF _Toc107228392 \h 76
+Hình 3.40 Giao diện về phần thông tin dịch vụ.	 PAGEREF _Toc107228393 \h 76
+Hình 3.41 Giao diện về phần thông tin sản phẩm.	 PAGEREF _Toc107228394 \h 76
+Hình 3.42 Giao diện về phần thông tin nhà cung cấp và khách hàng.	 PAGEREF _Toc107228395 \h 77
+Hình 3.43 Giao diện phần Footer.	 PAGEREF _Toc107228396 \h 77
+Hình 3.44 Giao diện phần Header và thông tin doanh nghiệp.	 PAGEREF _Toc107228397 \h 78
+Hình 3.45 Giao diện phần dich vụ doanh nghiệp.	 PAGEREF _Toc107228398 \h 79
+Hình 3.46 Giao diện phần sản phẩm đã bán của doanh nghiệp.	 PAGEREF _Toc107228399 \h 80
+Hình 3.47 Giao diện về phần nhà cung cấp cho doanh nghiệp.	 PAGEREF _Toc107228400 \h 81
+Hình 3.48 Giao diện về Footer.	 PAGEREF _Toc107228401 \h 82
+ 
+
+DANH MỤC BẢNG
+ TOC \h \z \c "Bảng 2." Bảng 2.1 Luồng sự kiện chính use case đăng nhập.	 PAGEREF _Toc107227749 \h 21
+Bảng 2.2 Luồng sự kiện chính của use case đăng xuất.	 PAGEREF _Toc107227750 \h 22
+Bảng 2.3 Luồng sự kiện chính của use case thêm thông tin yêu cầu khách hàng.	 PAGEREF _Toc107227751 \h 23
+Bảng 2.4 Luồng sự kiện chính của use case chuyển thông tin yêu cầu khách hàng sang nhà cung cấp.	 PAGEREF _Toc107227752 \h 24
+Bảng 2.5 Luồng sự kiện chính của use case cập nhật giá từ nhà cung cấp.	 PAGEREF _Toc107227753 \h 24
+Bảng 2.6 Luồng sự kiện chính use case tạo báo giá cho khách hàng.	 PAGEREF _Toc107227754 \h 25
+Bảng 2.7 Luồng sự kiện chính của use case chấp thuận giá.	 PAGEREF _Toc107227755 \h 26
+Bảng 2.8 Luồng sự kiện chính của use case xuất báo giá cho khách hàng.	 PAGEREF _Toc107227756 \h 27
+Bảng 2.9 Luồng sự kiện chính của use case đặt hàng từ nhà cung cấp.	 PAGEREF _Toc107227757 \h 28
+Bảng 2.10 Luồng sự kiện chính của use case cập nhật trạng thái quy trình bán hàng.	 PAGEREF _Toc107227758 \h 29
+Bảng 2.11 Luồng sự kiện chính của use case cập nhật hiển thị nội dung.	 PAGEREF _Toc107227759 \h 29
+
+KÍ HIỆU CÁC CỤM TỪ VIẾT TẮT
+
+B2B: 	Business To Business
+NCC: 	Nhà Cung Cấp
+MVC: 	Model – View – Controller
+HTML: 	HyperText Markup Language
+CSS: 	Cascading Style Sheets
+DOM: 	Document Object Model
+WAMP: 	Windown – Apache – MySQL, PHP
+
+
+LỜI MỞ ĐẦU
+Sự tác động mạnh mẽ của thời đại công nghệ điện tử 4.0 đã thúc đẩy thị trường thương mại điện tử phát triển nhanh chóng, dần thay thế cho thị trường bán hàng truyền thống. Nhận thấy được xu hướng thị trường B2B (business to business) thu hút được nhiều doanh nghiệp ngày càng đầu tư và phát triển, nhằm biến mô hình này trở thành công cụ thương mại điện tử quan trọng, đặc biệt trong thời kỳ dịch Covid-19.
+Mô hình B2B là mô hình kinh doanh mua bán trực tuyến mà tại đó cả khách hàng và người bán đều là doanh nghiệp. Các doanh nghiệp sẽ mua bán, trao đổi các sản phẩm, dịch vụ với nhau giúp khách hàng tiết kiệm thời gian, chi phí cũng như mở rộng cơ hội hợp tác, tăng lợi nhuận nhằm phát triển thị trường giữa các doanh nghiệp trong và ngoài nước với nhau. Do đó, hiệu quả và lợi ích trong việc hợp tác kinh doanh của doanh nghiệp sẽ được nâng cao và mở rộng, đặc biệt là khi yếu tố công nghệ đang được coi trọng. Khi đó, để vận hành tốt quy trình cần có sự quản lý chặt chẽ và hỗ trợ từ hệ thống quản lý.
+Chính vì thế mà tôi đã lựa chọn đề tài: “Xây dựng website thương mại điện tử mô hình B2B” hy vọng sẽ đem lại một website quản lý thương mại điện tử cho doanh nghiệp để quản lý một cách thuận tiện về quy trình bán hàng theo mô hình B2B. Đồng thời, khách hàng sẽ tiện lợi trong việc tham khảo các sản phẩm đã bán tại doanh nghiệp, dễ liên lạc trực tiếp với doanh nghiệp qua khung chat được đính kèm trong giao diện website. Với sự hướng dẫn tận tình của … - Giảng viên tại trường Đại học …  TP.HCM đã giúp tôi xây dựng website hoàn thành khóa luận tốt nghiệp.
+Tính cấp thiết của đề tài
+Số lượng cá nhân và tổ chức sử dụng Internet ngày càng tăng lên, nhu cầu tìm kiếm thông tin và mua bán trực tuyến trên phạm vi toàn cầu đã trở nên phổ biến và là một xu thế không thể đảo ngược. Việt Nam là một quốc gia có nhiều tiềm năng xuất khẩu nhiều mặt hàng có giá trị. Để đạt được kinh ngạch xuất khẩu cao và ổn định hơn nữa, một trong những vấn đề cơ bản mà các doanh nghiệp xuất khẩu cần có được đó chính là thông tin đối tác và các thông tin hỗ trợ hoạt động xuất khẩu. Tuy nhiên, cho đến nay các mô hình thương mại điện tử không đáp ứng được và chưa có sự hỗ trợ tích cực cho các doanh nghiệp xuất khẩu của Việt Nam. Thay vào đó là mô hình thương mại điện tử B2B sẽ hỗ trợ các doanh nghiệp đa quốc gia hợp tác xuất nhập khẩu tăng doanh thu, tăng cơ hội tạo ra các đơn hàng giá trị lớn. Để vận hành tốt mô hình B2B cần phải có hệ thống quản lý chặt chẽ. Chính vì vậy, để tìm ra các giải pháp hỗ trợ quản lý cho các doanh nghiệp thì việc nghiên cứu đề tài “Xây dựng mô hình thương mại điện tử B2B” là vô cùng cần thiết.
+Mục tiêu nghiên cứu của đề tài
+Đề tài nghiên cứu nhằm hướng đến các mục tiêu.
+Xây dựng một hệ thống quản lý bán hàng trực tuyến đáp ứng yêu cầu về quy trình, nghiệp vụ kinh doanh theo mô hình điện tử B2B gồm: Quản lý khách hàng, quản lý nhà cung cấp, quản lý hóa đơn, ... Giúp doanh nghiệp quản lý tốt quy trình bán hàng, tiếp cận nhiều khách hàng tiềm năng trên môi trường Internet. 
+Đồng thời cũng một phần nâng cao thêm kĩ năng sử dụng ngôn ngữ PHP và frameword Laravel và một số ngôn ngữ khác như HTML, CSS, Javascript và cơ sở dữ liệu SQL Server. Áp dụng vào trong mô hình thương mại điện tử để tạo ra Website mô hình thương mại điện tử B2B.
+Đối tượng và phạm vi nghiên cứu
+Đối tượng nghiên cứu đề tài.
+Quy trình hoạt động của doanh nghiệp thương mại điện tử theo mô hình B2B.
+Phạm vi nghiên cứu đề tài.
+Về phân tích hệ thống.
+Phân tích hệ thống doanh nghiệp thương mại điện tử mô hình B2B cho cá nhân.
+Về các chức năng.
+Xây dựng phân hệ người dùng truy cập vào hệ thống gồm: Admin, giám đốc, nhân viên.
+Xây dựng phân hệ quản lý thông tin khách hàng.
+Quản lý thông tin khách hàng.
+Quản lý thông tin yêu cầu của khách hàng.
+Tra cứu thông tin khách khàng: các lần yêu cầu, giá trị của mỗi yêu cầu, các lần đơn hàng, thông tin đơn hàng.
+Xây dựng phân hệ quản lý thông tin nhà cung cấp (NCC).
+Quản lý thông tin NCC.
+Tra cứu thông tin số lần mua hàng.
+Xây dựng phân hệ quản lý bán hàng.
+Cập nhật một số thông tin yêu cầu báo giá của khách hàng.
+Cập nhật thông tin yêu cầu báo giá gửi NCC.
+Quản lý chi tiết tất cả các bảng yêu cầu báo giá của NCC theo yêu cầu báo giá của khách hàng.
+Làm bảng costsheet dựa theo báo giá của NCC.
+Tạo báo giá cho khách hàng trực tiếp từ hệ thống.
+Quản lý chi tiết các bảng báo giá đàm phán với khách hàng.
+Quản lý đơn đặt hàng của khách hàng.
+Quản lý chi tiết tình trạng quá trình bán hàng: khách hàng gửi yêu cầu, đang đàm phán giá, đã đặt hàng, đã tạm ứng, …
+Cho phép giám đốc approve bảng báo giá đàm phán trước khi gửi báo giá cho khách hàng.
+Xây dựng phân hệ quản lý mua hàng.
+Quản lý chi tiết các bảng báo giá đàm phán với NCC.
+Quản lý đơn đặt hàng với NCC.
+Quản lý thông tin thanh toán tiền cho NCC.
+Quản lý chi tiết tình trạng quá trình mua hàng: giám đốc đã duyệt báo giá với NCC.
+Phương pháp nghiên cứu 
+Về lý thuyết.
+Tìm hiểu về quy trình, nghiệp vụ hoạt động của quản lý doanh nghiệp theo mô hình B2B.
+Tìm hiểu về ngôn ngữ lập trình PHP, Laravel Framwork.
+Tìm hiểu về cơ sở dữ liệu SQL Server.
+Tìm hiểu về mô hình MVC trong PHP.
+Về thực nghiệm.
+Phân chia hệ thống gồm nhiều module chức năng dựa vào quy trình, nghiệp vụ.
+Phân tích thiết kế, xây dựng lần lượt các module chức năng theo thứ tự độ ưu tiên.
+Kiểm thử các module đã hoàn thành và tích hợp vào hệ thống.
+Kết cấu của đề tài
+Ngoài phần mở đầu, kết luận, đề tài kết cấu thành 04 chương:
+Chương 1: TỔNG QUAN TÀI LIỆU
+Chương 2: PHƯƠNG PHÁP THỰC HIỆN
+Chương 3: CÀI ĐẶT THỰC NGHIỆM
+Chương 4: KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN
+
+Chương 1. TỔNG QUAN TÀI LIỆU	
+Khảo sát bài toán
+
+
+Đặt vấn đề
+Internet đã dần len lỏi vào mọi lĩnh vực của đời sống. Đại dịch Corona vừa qua cũng là một trong những yếu tố đẩy mạnh hơn nữa sức mạnh của công nghệ trong đời sống con người, khi mà mua sắm trực tuyến dần thay đổi hình thức mua sắm tại cửa hàng. Sự bùng nổ của các nền tảng chợ thương mại điện tử nơi cung cấp đa dạng chủng loại hàng hoá, nguồn gốc với giá cả cạnh tranh đã đáp ứng được nhu cầu tiêu dùng của phần lớn dân số.
+Theo dự báo của hãng nghiên cứu Forrester, thị trường B2B sẽ đạt 1,2 nghìn tỷ USD và chiếm 13,1% tổng doanh số B2B ở Mỹ vào năm 2021. Thương mại điện tử B2B được cho là có quy mô thị trường lớn gấp đôi B2C. Tương tự như những gì đã xảy ra với B2C vài năm trước, hiện nay, nhiều đơn hàng B2B đang chuyển dần sang trực tuyến.
+Trong đó, ngành sản xuất và bán buôn chính là hai ngành tạo ra sự tăng trưởng vượt trội cho thị trường B2B. Thực tế cho thấy, việc vẫn vận hành theo cách truyền thống đã làm chậm đi đà phát triển đáng ra phải có của ngành. Trong khi thương mại điện tử B2C đã phát triển tới mức trở thành một phần quan trọng không thể thiếu trong đời sống ngày nay, thương mại điện tử B2B vẫn đang ở bước chập chững và còn nhiều cơ hội để khai phá. Người mua và người bán trong mô hình thương mại điện tử B2B đang mong muốn có những trải nghiệm quy trình mua hàng tốt hơn, được hưởng những lợi ích của mua hàng trực tuyến mà từ lâu mô hình thương mại điện tử B2C đã mang lại. 
+Chính vì vậy, số lượng các doanh nghiệp chuyển sang mô hình B2B ngày càng nhiều, cần sự quản lý chặt chẽ và giảm thiểu thời gian cho các bên thì hệ thống website quản lý bán hàng thương mại điện tử là cách giải pháp tốt nhất.
+Giải pháp
+Tôi đã đưa ra giải pháp là xây dựng website thương mại điện mô hình B2B, để mang đến doanh nghiệp một giải pháp tốt nhất cho việc quản lý thông tin trong quy trình bán hàng thương mại điện tử một cách thiết thực.
+Thực trạng các website thương mại điện tử B2B hiện có.
+Mục đích của đề tài
+Xây dựng một hệ thống quản lý bán hàng trực tuyến đáp ứng một số yêu cầu về quy trình, nghiệp vụ thương mại điện điện tử B2B giúp doanh nghiệp quản lý quy trình bán hàng, tiếp cận nhiều khách hàng tiềm năng trên môi trường Internet.
+Đồng thời, đóng góp cho sự nghiên cứu, để nâng cao kĩ năng sử dụng PHP trên Frameword Laravel, nghiên cứu sử dụng một số Package hỗ trợ đẩy nhanh tốc độ code và một số ngôn ngữ khác như HTML, CSS, Javascript, Ajax và cơ sở dữ liệu SQL Server. Áp dụng vào trong mô hình thương mại điện tử B2B để tạo ra website hoàn chỉnh phục vụ cho doanh nghiệp theo mô hình B2B.
+ Cơ sở lý thuyết
+HTML5
+HTML là một ngôn ngữ giúp tạo ra các trang Web. Ngôn ngữ này dùng các thẻ (tag) hoặc cho phép người dùng mô tả các thành phần của trang Web. HTML là ngôn ngữ định dạng hay đánh dấu, một tập văn bản được đánh dấu bằng các thẻ. Các thẻ này đóng vai trò như các lệnh, báo cho trình duyệt web biết vị trí và phương thức hiển thị các thành phần của trang web. 
+HTML5 là một ngôn ngữ cấu trúc và trình bày nội dung cho World Wide Web. Đây là phiên bản thứ 5 của ngôn ngữ HTML. HTML5 vẫn sẽ giữ lại những đặc điểm cơ bản của HTML4 và bổ sung thêm các đặc tả nổi trội của XHTML, DOM, đặc biệt là JavaScript.
+
+Hình 1. SEQ Hình_1. \* ARABIC 1 Logo HTML5
+(Nguồn: https://www.w3.org/html/logo/)
+CSS
+CSS là ngôn ngữ tạo phong cách và định kiểu cho những yếu tố được viết dưới dạng ngôn ngữ đánh dấu như HTML. Nó có thể điều khiển định dạng của nhiều trang web cùng lúc để tiết kiệm công sức cho người viết web. Nó phân biệt cách hiển thị của trang web với nội dung chính của trang bằng cách điều khiển bố cục, màu sắc và font chữ. Với CSS không cần lặp lại các mô tả cho từng thành phần. Giúp tiết kiệm thời gian, làm code ngắn lại để chúng ta có thể kiểm soát lỗi dễ dàng hơn. CSS có mối tương quan mật thiết với HTML (HTML là ngôn ngữ nền tảng của website và CSS định hình phong cách tất cả những gì tạo nên giao diện website).
+
+Hình 1. SEQ Hình_1. \* ARABIC 2 Logo CSS.
+(Nguồn: https://en.wikipedia.org/wiki/CSS)
+Boostrap 4
+Bootstrap là một bộ sưu tập miễn phí của các mã nguồn mở và công cụ dùng để tạo ra một mẫu webiste hoàn chỉnh. Với các thuộc tính về giao diện được quy định sẵn như kích thước, màu sắc, độ cao, độ rộng…, các designer có thể sáng tạo nhiều sản phẩm mới mẻ nhưng vẫn tiết kiệm thời gian khi làm việc với framework này trong quá trình thiết kế giao diện website.
+
+Hình 1. SEQ Hình_1. \* ARABIC 3 Logo boostrap 4
+(Nguồn: https://www.javatpoint.com/bootstrap-4)
+Javascript
+Javascript chính là một ngôn ngữ lập trình web rất phổ biến ngày nay. Javascript được tích hợp đồng thời nhúng vào HTML để hỗ trợ cho website trở nên sống động hơn. Chúng cũng đóng vai trò tương tự như một phần của website, cho phép Client-side Script từ người dùng tương tự máy chủ (Nodejs) để tạo ra những website động.
+
+Hình 1. SEQ Hình_1. \* ARABIC 4 Logo Javascript.
+(Nguồn: https://www.w3schools.com/whatis/whatis_js.asp)
+Jquery
+JQuery là thư viện được viết từ Javascript dễ dàng, nhanh và giàu tính năng hơn. Đến nay Jquery đã phát triển đến phiên bản JQuery 3.6.0 xuất bản vào ngày 2 tháng 3 năm 2021. Với JQuery khi code có thể làm được nhiều việc hơn mà lại tốn ít công sức hơn. JQuery được tích hợp nhiều module khác nhau.
+
+Hình 1. SEQ Hình_1. \* ARABIC 5 Logo Jquery
+(Nguồn: https://www.chicagocomputerclasses.com/jquery-training/)
+PHP
+PHP (Hypertext Preprocessor) là một ngôn ngữ lập trình kịch bản hay một loại mã lệnh chủ yếu được dùng để phát triển các ứng dụng viết cho máy chủ, mã nguồn mở, dùng cho mục đích tổng quát. PHP rất thích hợp với web và có thể dễ dàng nhúng vào trang HTML.
+
+Hình 1. SEQ Hình_1. \* ARABIC 6 Logo PHP.
+(Nguồn: https://en.wikipedia.org/wiki/PHP)
+Laravel
+Laravel là một PHP framework, có mã nguồn mở và miễn phí, được xây dựng nhằm hỗ trợ phát triển các phần mềm, ứng dụng, theo kiến trúc MVC.
+MVC (Model-View-Controller) là mô hình phân bố source code thành 3 phần. Mỗi thành phần có một nhiệm vụ riêng biệt và độc lập với các thành phần khác. 
+
+Hình 1. SEQ Hình_1. \* ARABIC 7 Logo Laravel
+(Nguồn: https://github.com/laravel/framework)
+SQL Server
+Microsoft Sql Server (MS Sql Server) là một hệ quản trị cơ sở dữ liệu quan hệ do hãng Microsoft phát triển sử dụng ngôn ngữ truy vấn Transact-SQL (T-SQL) để trao đổi dữ liệu giữa máy khách Client và máy chủ Server. Đến nay MS Sql Server đã phát triển đến phiên bản Microsoft Sql Server 2019 phát hành ngày 4 tháng 11 năm 2019.
+
+Hình 1. SEQ Hình_1. \* ARABIC 8 Logo SQL Server.
+(Nguồn: https://www.sqlservertutorial.net/)
+Visual Studio Code
+Visual Studio Code chính là ứng dụng cho phép biên tập, soạn thảo các đoạn code để hỗ trợ trong quá trình thực hiện xây dựng, thiết kế website một cách nhanh chóng. Visual Studio Code hay còn được viết tắt là VS Code. Trình soạn thảo này vận hành mượt mà trên các nền tảng như Windows, macOS, Linux. Hơn thế nữa, VS Code còn cho khả năng tương thích với những thiết bị HYPERLINK "https://fptshop.com.vn/may-tinh-xach-tay"máy tính có cấu hình tầm trung vẫn có thể sử dụng dễ dàng.
+Visual Studio Code hỗ trợ đa dạng các chức năng Debug, đi kèm với Git, có Syntax Highlighting. Đặc biệt là tự hoàn thành mã thông minh, Snippets, và khả năng cải tiến mã nguồn. Nhờ tính năng tùy chỉnh, Visual Studio Code cũng cho phép các lập trình viên thay đổi Theme, phím tắt, và đa dạng các tùy chọn khác. Mặc dù trình soạn thảo Code này tương đối nhẹ, nhưng lại bao gồm các tính năng mạnh mẽ.
+
+Hình 1. SEQ Hình_1. \* ARABIC 9 Logo Visual Studio Code.
+(Nguồn: https://code.visualstudio.com/)
+Laragon
+Là một chương trình cung cấp môi trường WAMP cực kỳ mạnh mẽ và hoàn toàn miễn phí.
+Laragon dùng để tạo web-sever, môi trường phát triển web trên Windows. Đặc biệt Laragon được xây dựng theo dạng module, điều đó có thể tùy chỉnh môi trường phát triển thích hợp với nhu cầu cá nhân hoặc từng dự án riêng biệt. Bảng Laragon Full đã có tích hợp sẵn Apache, Nginx, MySQL, PHP, Redis, Memcached, Node.js, npm, yarn, git.
+
+Hình 1. SEQ Hình_1. \* ARABIC 10 Logo Laragon.
+(Nguồn: https://appsero.com/user-guide/laragon-best-localhost-server-for-wordpress/)
+Chương 2. PHƯƠNG PHÁP THỰC HIỆN
+   Phân tích hệ thống
+Quy trình nghiệp vụ
+Bước 1: Khách hàng đặt hàng.
+Khách hàng liên hệ với doanh nghiệp, để gửi phiếu yêu cầu đặt hàng. 
+Nhân viên tiếp nhận phiếu yêu cầu đặt hàng và xin thông tin nhân viên khách hàng.
+Bước 2: Nhân viên cập nhật yêu cầu báo giá của khách hàng vào hệ thống.
+Thông tin khách hàng: Customer id, customer type, tax code, website, ward, district, province, country, mobiphone, address, email, customer logo.
+Thông tin nhân viên khách hàng: Family name, first name, company/customer, department, email, telephone, ward, district, province, country, staff address, note.
+Thông tin yêu cầu báo giá của khách hàng: Customer id, inquiry no (số thông tin yêu cầu), customer staff, machine, machine type, machine number, sale person, note và chi tiết yêu cầu.
+Model (model name, model seri, description model).
+Item (item no, item name, item description, unit, quantity order, code number, item seri, item image).
+Bước 3: Nhân viên gửi yêu cầu báo giá cho nhà cung cấp.
+Thông tin nhà cung cấp: Supplier name, supplier type, telephone, email, website, district, province, country, address, bank account name, bank name, bank address, bank code, bank branch code, swift code.
+Thông tin nhân viên nhà cung cấp: Family name, first name, supplier, department, email, telephone, ward, district, province, country, staff address, note.
+Thông tin yêu cầu gửi đến nhà cung cấp gồm: Supplier id, inquiry no (số thông tin yêu cầu nhà cung cấp), supplier staff, machine, machine type, machine number, quality, delivery term, delivery time, payment term, warranty, validity, note và chi tiết yêu cầu.
+Model (model name, model seri, description model) model name, model seri, description model.
+Item (item no, item name, item description, unit, quantity order, code number, item seri, item image).
+Bước 4: Nhà cung cấp gửi báo giá.
+Cập nhật giá cho yêu cầu: Unit price USD.
+Bước 5: Nhân viên gửi báo giá cho khách hàng và tiến hành thỏa thuận. 
+Làm bảng costsheet dựa theo báo giá của nhà cung cấp.
+Tạo báo giá trực tiếp cho khách hàng trực tiếp từ hệ thống.
+Giám đốc chấp thuận bảng báo giá đàm phán trước khi gửi báo giá cho khách hàng.
+Nếu thỏa thuận thành công thì qua bước 6.
+Bước 6: Khách hàng gửi đơn đặt hàng chính thức, đặt cọc theo thỏa thuận.
+Nhân viên tiếp nhận đơn đặt hàng, tạo lập hợp đồng, nhận phí cọc như thỏa thuận trong hợp đồng.
+Nhân viên cập nhật đơn hàng theo đơn hàng tiếp nhận.
+Bước 7: Nhân viên gửi đơn đặt hàng cho nhà cung cấp.
+Nhân viên tạo đơn đặt hàng từ hệ thống gửi cho nhà cung cấp.
+Lập hợp đồng và thanh toán phí cọc cho nhà cung cấp.
+Mẫu hóa đơn:
+
+Hình 2. SEQ Hình_2. \* ARABIC 1 Mẫu đơn đặt hàng.
+Bước 8: Nhân viên theo dõi tình trạng vận chuyển của đơn hàng, chi phí thực tế liên quan đến logistic của lô hàng. Thanh toán và giao hàng cho khách.
+
+
+Thông tin yêu cầu
+Xây dựng một hệ thống website gồm hai phần
+Phần dành cho khách hàng.
+Khách hàng xem thông tin của doanh nghiệp, sản phẩm đã bán, nhà cung cấp.
+Tìm kiếm sản phẩm.
+Phần dành cho doanh nghiệp quản trị.
+Giao diện thân thiện với người dùng.
+Xây dựng bố cục, giao diện đảm bảo được độ thẩm mỹ.
+Chuyển dữ liệu từ quy trình này sang quy trình khác một cách tối ưu, tránh việc nhập lại dữ liệu đã có.
+Tính toán tự động để đưa ra báo giá hợp lý từ dữ liệu người dùng nhập vào.
+Quản lý hệ thống gồm các chức năng sau:
+Quản lý người dùng truy cập vào hệ thống gồm: Admin, giám đốc, nhân viên.
+Quản lý thông tin khách hàng.
+Quản lý thông tin yêu cầu của khách hàng.
+Tra cứu thông tin khách khàng tìm: các lần yêu cầu, chi tiết các lần yêu cầu, báo giá của mỗi lần yêu cầu, các lần đặt đơn hàng, chi tiết mỗi đơn hàng.
+Quản lý thông tin nhà cung cấp.
+Tra cứu thông tin số lần mua hàng, doanh thu Polaris mua từ NCC.
+Cập nhật thông tin yêu cầu báo giá của khách hàng.
+Cập nhật thông tin yêu cầu báo giá gửi NCC.
+Cập nhật thông tin báo giá đến từ NCC.
+Quản lý chi tiết yêu cầu báo giá của khách hàng.
+Làm bảng costsheet dựa theo báo giá của NCC.
+Quản lý đơn đặt hàng của khách hàng.
+Quản lý tình trạng quá trình bán hàng: khách hàng gửi yêu cầu, đang đàm phán giá, đã đặt hàng, đã tạm ứng.
+Cho phép giám đốc approve bảng báo giá đàm phán trước khi gửi báo giá cho khách hàng.
+Quản lý đơn đặt hàng với NCC.
+Truy cập hệ thống để làm báo cáo thuế. Báo cáo yêu cầu bán hàng ở các trạng thái.
+Sơ đồ chức năng của hệ thống
+Với yêu cầu nghiệp vụ và thông tin đặt ra đối với hệ thống ta xây dựng được sơ đồ chức năng của hệ thống.
+
+Sơ đồ chức năng hệ thống dành cho Admin.
+ 
+Sơ đồ 2. SEQ Sơ_đồ_2. \* ARABIC 1 Sơ đồ chức năng của Admin.
+Sơ đồ chức năng hệ thống dành cho nhân viên.
+
+Sơ đồ 2. SEQ Sơ_đồ_2. \* ARABIC 2 Sơ đồ chức năng nhân viên.
+Sơ đồ chức năng hệ thống dành cho giám đốc.
+
+Sơ đồ 2. SEQ Sơ_đồ_2. \* ARABIC 3 Sơ đồ chức năng giám đốc.
+Các biểu đồ thiết kế hệ thống
+Lượt đồ Use case 
+
+Lược đồ 2. SEQ Lược_đồ_2. \* ARABIC 1 Lược đồ use case. 
+Đặc tả use case đăng nhập vào hệ thống.
+Mục đích: Đảm bảo xác thực thông tin người sử dụng và an toàn hệ thống.
+Tác nhân, mô tả chung:
+Tác nhân: Admin, nhân viên, giám đốc.
+Mô tả chung: khi tác nhân muốn thao tác với hệ thống để thực hiện chức năng thì cần phải đăng nhập vào hệ thống.
+Luồng sự kiện chính:
+Hành động của tác nhân
+Phản ứng của hệ thống
+
+1. Chọn chức năng đăng nhập.
+-
+3. Nhập thông tin đăng nhập.
+4. Gửi thông tin đăng nhập đến hệ thống.
+-
+
+-
+2. Hiển thị Form đăng nhập.
+-
+-
+
+5. Kiểm tra thông tin đăng nhập, nếu đúng thì cho phép truy cập, sai thì hiển thị thông báo sai thông tin đăng nhập.
+
+Bảng 2. SEQ Bảng_2. \* ARABIC 1 Luồng sự kiện chính use case đăng nhập.
+Luồng thay thế: Nếu người dùng nhập sai thông tin thì nhập lại nhưng số lần lặp lại có giới hạn trong khoảng nhất định.
+Các yêu cầu cụ thể: Username và Password khớp với thông tin đăng ký.
+Điều kiện trước: Người dùng đã đăng ký trong hệ thống.
+Điều kiện sau: Thông báo đăng nhập thành công hoặc thất bại.
+Các điểm mở rộng: Không có.
+Đặc tả use case đăng xuất vào hệ thống.
+Mục đích: Người dùng đăng xuất ra khỏi hệ thống để bảo mật.
+Tác nhân, mô tả chung:
+Tác nhân: Admin, nhân viên, giám đốc.
+Mô tả chung: Tác nhân đăng xuất khi không sử dụng hoặc đăng xuất ra để đăng nhập tài khoản khác.
+Luồng sự kiện chính:
+Hành động của tác nhân
+Phản ứng của hệ thống
+
+1. Chọn chức năng đăng xuất.
+-
+
+3. Xác nhận đăng xuất.
+-
+
+-
+2. Hệ thống hiển thị thông báo xác nhân đăng xuất.
+-
+4. Nếu người dùng xác nhận thì hiển thị Form đăng nhập, nếu người dùng không xác nhận thì hệ thống giữ nguyên trạng thái.
+
+Bảng 2. SEQ Bảng_2. \* ARABIC 2 Luồng sự kiện chính của use case đăng xuất.
+Luồng thay thế: Không.
+Các yêu cầu cụ thể: Không.
+Điều kiện trước: Người dùng đã đăng nhập.
+Điều kiện sau: Thông báo đăng xuất thành công.
+Các điểm mở rộng: Không có.
+Đặc tả use case them thông tin yêu cầu khách hàng.
+Mục đích: thêm yêu cầu khách hàng vào hệ thống.
+Tác nhân, mô tả chung.
+Tác nhân: Admin, nhân viên.
+Mô tả chung: Tác nhân dựa vào phiếu yêu cầu báo giá của khách hàng để thêm các thông tin có trong yêu cầu nhu model, sản phẩm trong model, số lượng, …
+Luồng sự kiện chính:
+Hành động của tác nhân
+Phản ứng của hệ thống
+
+1.Vào trang quản yêu cầu khách hàng.
+2. Nhấn button thêm yêu cầu khách hàng.
+-
+4. Nhập thông tin yêu cầu.
+5. Gửi thông tin yêu cầu cho hệ thống.
+-
+-
+-
+
+3. Hiển thị trang thêm yêu cầu.
+-
+-
+6. Tiếp nhận yêu cầu, kiểm tra thông tin. Nếu thông tin hợp lý, hệ thống lưu lại và thông báo thành công. Nếu thông tin không hợp lý hệ thống trả về trang thêm yêu cầu.
+
+
+Bảng 2. SEQ Bảng_2. \* ARABIC 3 Luồng sự kiện chính của use case thêm thông tin yêu cầu khách hàng.
+Luồng thay thế: Không.
+Các yêu cầu cụ thể: Không.
+Điều kiện trước: Không.
+Điều kiện sau: Thông báo thêm thành công.
+Các điểm mở rộng: Không.
+Đặc tả use case chuyển thông tin sang nhà cung cấp
+Mục đích: chuyển yêu cầu khách hàng sang nhà nhà cung cấp để xuất ra file và gửi nhà cung cấp xin báo giá.
+Tác nhân, mô tả chung:
+Tác nhân: Admin, nhân viên
+Mô tả chung: Tác nhân muốn thao tác với hệ thống nhằm chuyển thông tin yêu cầu khách hàng sang thông tin yêu cầu nhà cung cấp.
+Luồng sự kiện chính:
+Hành động của tác nhân
+Phản ứng của hệ thống
+
+1. Vào trang yêu cầu khách hàng.
+2. Click button “Sent to supplier”.
+-
+4. Điền thông tin cần thiết vào Form.
+5. Gửi thông tin cho hệ thống.
+-
+-
+-
+3. Hiển thị Form “Sent to supplier”.
+-
+-
+6. Kiểm tra thông tin, nếu thông tin hợp lý hệ thống lưu lại.
+Nếu thông tin không hợp lý hệ thống thông báo.
+
+Bảng 2. SEQ Bảng_2. \* ARABIC 4 Luồng sự kiện chính của use case chuyển thông tin yêu cầu khách hàng sang nhà cung cấp.
+Luồng thay thế: Sau khi nhập thông tin click button “Cancel” để quay về trang quản yêu cầu khách hàng.
+Các yêu cầu cụ thể: Không.
+Điều kiện trước: Không.
+Điều kiện sau: Thông báo thêm thành công.
+Các điểm mở rộng: Trạng thái bán hàng của yêu cầu khách hàng này là: “(1) Send supplier for quotation”.
+Đặc tả use case cập nhật giá từ nhà cung cấp.
+Mục đích: Cập nhật giá nhà cung cấp phản hồi.
+Tác nhân, mô tả chung: Tác nhân: Admin, nhân viên.
+Mô tả chung: Tác nhân muốn thao tác với hệ thống nhằm cập nhật giá sản phẩm mà trước đó xin báo giá tại nhà cung cấp.
+Luồng sự kiện chính:
+Hành động của tác nhân
+Phản ứng của hệ thống
+
+1. Vào trang yêu cầu thông tin nhà cung cấp.
+2. Click chọn button “Update”.
+-
+
+4. Nhập thông tin cần cập nhật.
+5. Gửi thông tin cho hệ thống.
+-
+
+-
+
+-
+3.  Hiện trang “Update price form supplier”.
+-
+-
+6. Kiểm tra thông tin, nếu thông tin hợp lý hệ thống lưu lại. Nếu thông tin không hợp lý hệ thống thông báo.
+
+Bảng 2. SEQ Bảng_2. \* ARABIC 5 Luồng sự kiện chính của use case cập nhật giá từ nhà cung cấp.
+Luồng thay thế: Không.
+Các yêu cầu cụ thể: Sau khi nhập thông tin click button “Cancel” để quay về trang quản yêu cầu khách hàng.
+Điều kiện trước: Trạng thái bán hàng của yêu cầu khách hàng này là: “(1) Send supplier for quotation”.
+Điều kiện sau: Thông báo thêm thành công.
+Các điểm mở rộng: Trạng thái bán hàng của yêu cầu khách hàng này là: “(2) Updated quotation from supplier”.
+Đặc tả use case tạo báo giá cho khách hàng.
+Mục đích: Tạo báo giá.
+Tác nhân, mô tả chung:
+Tác nhân: Admin, nhân viên.
+Mô tả chung: Tác nhân muốn tháo tác với hệ thống nhằm tạo báo giá.
+Luồng sự kiện chính:
+Hành động của tác nhân
+Phản ứng của hệ thống
+
+1. Vào trang yêu cầu khách hàng.
+2. Click button “Conpare Price”.
+-
+4. Click chọn các model của các nhà cung cấp cần để tạo báo giá.
+5. Gửi thông tin cho hệ thống.
+-
+
+7. Thêm thông tin cần thiết vào Form.
+8. Gửi thông tin cho hệ thống.
+-
+-
+-
+3. Hiển thị Form “Compare Price”.
+-
+
+-
+6. Hiển thị Form “Create A Quote Sheet”.
+-
+-
+9. Kiểm tra thông tin, nếu thông tin hợp lý hệ thống lưu lại. Nếu thông tin không hợp lý hệ thống thông báo.
+
+Bảng 2. SEQ Bảng_2. \* ARABIC 6 Luồng sự kiện chính use case tạo báo giá cho khách hàng.
+Luồng thay thế: Không.
+Các yêu cầu cụ thể: Không.
+Điều kiện trước: Trạng thái bán hàng của yêu cầu khách hàng này là: “(2) Updated quotation from supplier”.
+Điều kiện sau: Hiển thị thông báo thêm thành công.
+Các điểm mở rộng: Trạng thái bán hàng của yêu cầu khách hàng này là: “(3) Quotation for customer”.
+Đặc tả use case giám đốc chấp thuận báo giá.
+Mục đích: Giám đốc phê duyệt báo giá trước khi cho phép xuất file ra.
+Tác nhân, mô tả chung:
+Tác nhân: Giám đốc.
+Mô tả chung: Tác nhân muốn thao tác với hệ thống để kiểm tra và chấp nhận báo giá.
+Luồng sự kiện chính:
+Hành động của tác nhân
+Phản ứng của hệ thống
+
+1.Vào trang Quotation.
+2.Click button “Detail”.
+-
+4. Check Date Approve.
+-
+-
+-
+3.Hiển thị Form Quotation Detail.
+-
+5. Cập nhật thông tin.
+
+Bảng 2. SEQ Bảng_2. \* ARABIC 7 Luồng sự kiện chính của use case chấp thuận giá.
+Luồng thay thế: Không.
+Các yêu cầu cụ thể: Không.
+Điều kiện trước: Không.
+Điều kiện sau: Không.
+Các điểm mở rộng: Không có.
+Đặc tả use case xuất báo giá cho khách hàng.
+Mục đích: Xuất báo giá để gửi cho khách hàng.
+Tác nhân, mô tả chung:
+Tác nhân: Admin, nhân viên.
+Mô tả chung: Tác nhân xuất báo giá để gửi cho khách hàng.
+Luồng sự kiện chính:
+Hành động của tác nhân
+Phản ứng của hệ thống
+
+1. Vào trang yêu cầu khách hàng.
+2. Click button “Quotation”.
+-
+
+
+4. Click chọn button “Export Quotation”.
+-
+-
+-
+3. Hiển thị trang Quotation với các bảng báo giá tương ứng của yêu cầu khách hàng.
+-
+
+5. Xuất File báo giá tương ứng.
+
+Bảng 2. SEQ Bảng_2. \* ARABIC 8 Luồng sự kiện chính của use case xuất báo giá cho khách hàng.
+Luồng thay thế:
+Bước 1: Vào trang quản lý Quotation.
+Bước 2. Tìm kiếm báo giá với từ khóa là: Tên khách hàng, quotation no, inquiry no.
+Các yêu cầu cụ thể: Không.
+Điều kiện trước: Giám đốc đã chấp thuận bảng báo giá.
+Điều kiện sau: Không.
+Các điểm mở rộng: Không có.
+Đặc tả use case đặt hàng từ nhà cung cấp.
+Mục đích: Đặt hàng từ nhà cung cấp theo bảng báo giá mà khách hàng đã đồng ý đặt cọc.
+Tác nhân, mô tả chung:
+Tác nhân: Admin, nhân viên.
+ Mô tả chung: Tác nhân muốn thao tác với hệ thống để tạo đơn đặt hàng đến nhà cung cấp.
+Luồng sự kiện chính:
+
+Hành động của tác nhân
+Phản ứng của hệ thống
+
+1. Vào trang Quotation.
+2. Click button “Create PO”.
+-
+4. Nhập thông tin.
+5. Gửi thông tin hệ thống.
+-
+-
+-
+3. Hiển thị Form tạo đơn hàng.
+-
+-
+6. Kiểm tra thông tin, nếu thông tin hợp lý hệ thống lưu lại. Nếu thông tin không hợp lý hệ thống thông báo.
+
+
+Bảng 2. SEQ Bảng_2. \* ARABIC 9 Luồng sự kiện chính của use case đặt hàng từ nhà cung cấp.
+Luồng thay thế: Không.
+Các yêu cầu cụ thể: Không.
+Điều kiện trước: Trạng thái bán hàng của yêu cầu khách hàng này là: “(4) Customer agrees to make a deposit”.
+Điều kiện sau: Thông báo thêm thành công.
+Các điểm mở rộng: Không có.
+Đặc tả use case cập nhật trạng thái của quy trình bán hàng.
+Mục đích:  Thay đổi trạng thái bán hàng cho phù hợp với thực tế.
+Tác nhân, mô tả chung:
+Tác nhân: Admin, nhân viên.
+Mô tả chung: Tác nhân muốn thao tác với hệ thống để cập nhật trạng thái bán hàng.
+Luồng sự kiện chính:
+Hành động của tác nhân
+Phản ứng của hệ thống
+
+1. Vào trang thông tin yêu cầu khách hàng.
+2. Click button “Detail”.
+-
+4. Click button “Update Status”.
+-
+6. Click chọn trạng thái.
+7. Gửi dữ liệu hệ thống.
+-
+-
+
+-
+3. Hiển thị Form Detail.
+- 
+5. Hiển thị Update Status.
+-
+-
+8. Hệ thông lưu lại thông tin.
+
+Bảng 2. SEQ Bảng_2. \* ARABIC 10 Luồng sự kiện chính của use case cập nhật trạng thái quy trình bán hàng.
+Luồng thay thế: Không.
+Các yêu cầu cụ thể: Không.
+Điều kiện trước: Không.
+Điều kiện sau: Không.
+Các điểm mở rộng: Không có.
+Đặc tả usecase cập nhật hiển thị nội dung
+Mục đích:  Cho phép ẩn hoặc hiện hình sản phẩm đã bán hay logo nhà cung cấp tại trang dành cho khách hàng.
+Tác nhân, mô tả chung:
+Tác nhân: Admin, nhân viên.
+Mô tả chung: Thay đổi trạng thái.	
+Luồng sự kiện chính:
+Hành động của tác nhân
+Phản ứng của hệ thống
+
+1. Vào trang thông tin yêu cầu khách hàng.
+2. Click button “Detail”.
+-
+4. Click button “Update Status”.
+-
+6. Click chọn trạng thái.
+7. Gửi dữ liệu hệ thống.
+-
+-
+
+-
+3. Hiển thị Form Detail.
+- 
+5. Hiển thị Update Status.
+-
+-
+8. Hệ thông lưu lại thông tin.
+
+Bảng 2. SEQ Bảng_2. \* ARABIC 11 Luồng sự kiện chính của use case cập nhật hiển thị nội dung.
+Luồng thay thế: Không.
+Các yêu cầu cụ thể: Không.
+Điều kiện trước: Không.
+Điều kiện sau: Không.
+Các điểm mở rộng: Không có.
+Lược đồ Activity 
+Lược đồ chức năng đăng nhập
+
+Lược đồ 2. SEQ Lược_đồ_2. \* ARABIC 2 Lược đồ chức năng đăng nhập.
+ 
+
+Lược đồ chức năng reset password
+
+Lược đồ 2. SEQ Lược_đồ_2. \* ARABIC 3 Lược đồ chức năng reset password.
+Lược đồ tìm kiếm
+
+Lược đồ 2. SEQ Lược_đồ_2. \* ARABIC 4 Lược đồ tìm kiếm.
+Lược đồ quản lý thông tin yêu cầu khách hàng
+
+Lược đồ 2. SEQ Lược_đồ_2. \* ARABIC 5 Lược đồ thông tin yêu cầu khách hàng.
+Lược đồ quản lý thông tin yêu cầu nhà cung cấp
+
+Lược đồ 2. SEQ Lược_đồ_2. \* ARABIC 6 Lược đồ thông tin yêu cầu nhà cung cấp.
+Lược đồ quản lý thông tin báo giá
+
+Lược đồ 2. SEQ Lược_đồ_2. \* ARABIC 7 Lược đồ quản lý thông tin báo giá.
+Lược đồ quản lý thông tin hóa đơn
+
+Lược đồ 2. SEQ Lược_đồ_2. \* ARABIC 8 Lược đồ quản lý thông tin hóa đơn.
+Lược đồ quản lý thông tin khách hàng
+
+Lược đồ 2. SEQ Lược_đồ_2. \* ARABIC 9 Lược đồ quản lý thông tin khách hàng.
+Lược đồ quản lý thông tin nhân viên khách hàng
+
+Lược đồ 2. SEQ Lược_đồ_2. \* ARABIC 10 Lược đồ quản lý thông tin nhân viên khách hàng.
+Lược đồ quản lý thông tin nhà cung cấp
+
+Lược đồ 2. SEQ Lược_đồ_2. \* ARABIC 11 Lược đồ quản lý thông tin nhà cung cấp.
+Lược đồ quản lý thông tin nhân viên nhà cung cấp
+
+Lược đồ 2. SEQ Lược_đồ_2. \* ARABIC 12 Lược đồ quản lý thông tin nhân viên nhà cung cấp.
+Lược đồ quản lý thông tin nhân viên
+
+Lược đồ 2. SEQ Lược_đồ_2. \* ARABIC 13 Lược đồ quản lý thông tin nhân viên.
+Biểu đồ thành phần
+Biểu đồ thành phần hệ thống
+
+Biểu đồ 2. SEQ Biểu_đồ_2. \* ARABIC 1 Biểu đồ thành phần tổng quan hệ thống.
+Biểu đồ thành phần quản trị viên
+
+Biểu đồ 2. SEQ Biểu_đồ_2. \* ARABIC 2 Biểu đồ thành phần quản trị viên.
+
+Biểu đồ thành phần người dùng
+
+Biểu đồ 2. SEQ Biểu_đồ_2. \* ARABIC 3 Biểu đồ thành phần người dùng
+Biểu đồ triển khai 
+
+Biểu đồ 2. SEQ Biểu_đồ_2. \* ARABIC 4 Biểu đổ triển khai.
+Cơ sở dữ liệu
+
+Hình 2. SEQ Hình_2. \* ARABIC 2 Cơ sở dữ liệu.
+Tóm tắt ý nghĩa các bảng dữ liệu:
+Table Company
+Tên cột
+Kiểu dữ liệu
+Ràng buộc
+Gía trị tối đa
+Mô tả
+
+Company_ID
+int
+Primary key, IDENTITY (1,1), Not Null
+
+Mã công ty
+
+Company_Name
+nvarchar
+Null
+300
+Tên công ty
+
+Company_Tel
+nvarchar
+Null
+30
+Số điện thoại công ty
+
+Company_Address
+nvarchar
+Null
+100
+Địa chỉ công ty
+
+Ward
+nvarchar
+Null
+100
+Khu vực
+
+District
+nvarchar
+Null
+100
+Quận, Huyện
+
+Province
+nvarchar
+Null
+100
+Tỉnh
+
+Country
+nvarchar
+Null
+100
+Quốc gia
+
+Website
+nvarchar
+Null
+100
+Website
+
+Bank_Account_Number_USD
+nvarchar
+Null
+100
+Số tài khoản ngân hàng
+
+Bank_Branch_Name
+nvarchar
+Null
+100
+Tên chi nhánh ngân hàng
+
+Tax_Code
+nvarchar
+Null
+30
+Mã số thuế
+
+Date_Update
+date
+Null
+
+Ngày cập nhật
+
+Company_Email
+nvarchar
+Null
+100
+Email công ty
+
+Bank_Account_Number_VN
+nvarchar
+Null
+100
+Số tài khoản ngân hàng tại Việt Nam
+
+Swift_Code
+nvarchar
+Null
+100
+Mã Swift
+
+Short_Name
+nvarchar
+Null
+100
+Tên viết tắt
+
+Hình 2. SEQ Hình_2. \* ARABIC 3 Tóm tắt ý nghĩa dữ liệu bảng Company.
+Table Staff
+Tên cột
+Kiểu dữ liệu
+Ràng buộc
+Gía trị tối đa
+Mô tả
+
+Staff_ID
+int
+Primary key, IDENTITY (1,1), 
+Not Null
+
+Mã nhân viên
+
+Family_Name
+nvarchar
+Null
+50
+Tên
+
+First_Name
+nvarchar
+Null
+50
+Họ
+
+Department
+nvarchar
+Null
+100
+Phòng ban
+
+Title
+nvarchar
+Null
+100
+Title
+
+BirthDay
+date
+Null
+
+Ngày sinh
+
+Place_of_Birth
+nvarchar
+Null
+100
+Nơi sinh
+
+Email
+nvarchar
+Null
+100
+Email
+
+Mobiphone
+nvarchar
+Null
+20
+Số điện thoại
+
+Staff_Address
+nvarchar
+Null
+100
+Địa chỉ nhân viên
+
+Ward
+nvarchar
+Null
+100
+Khu vực
+
+District
+nvarchar
+Null
+100
+Quận, huyện
+
+Province
+nvarchar
+Null
+100
+Tỉnh thành
+
+Country
+nvarchar
+Null
+100
+Quốc gia
+
+Date_Update
+date
+Null
+
+Ngày cập nhật
+
+FK_Staff_ID_Update
+int
+Foreign key, Null
+
+Mã nhân viên cập nhật
+
+FK_Company_ID
+int
+Foreign key, Null
+
+Mã công ty
+
+Hình 2. SEQ Hình_2. \* ARABIC 4 Tóm tắt ý nghĩa dữ liệu bảng Staff.
+Table Customer	
+Tên cột
+Kiểu dữ liệu
+Ràng buộc
+Gía trị tối đa
+Mô tả
+
+Customer_ID
+int
+Primary key, IDENTITY (1,1), 
+Not Null
+300
+Mã khách hàng
+
+Customer_Name
+nvarchar
+Null
+30
+Tên khách hàng
+
+Customer_Tel
+nvarchar
+Null
+100
+Số điện thoại khách hàng
+
+Customer_Type
+nvarchar
+Null
+100
+Loại khách hàng
+
+Customer_Address
+nvarchar
+Null
+100
+Địa chỉ khách hàng
+
+Ward
+nvarchar
+Null
+100
+Khu vực
+
+District
+nvarchar
+Null
+100
+Quận, huyện
+
+Province
+nvarchar
+Null
+100
+Tỉnh thành
+
+Country
+nvarchar
+Null
+100
+Quốc gia
+
+Website
+nvarchar
+Null
+100
+Website
+
+Date_Update
+date
+Null
+
+Ngày cập nhật
+
+FK_Staff_ID_Update
+Int
+Foreign key, Null
+
+Mã nhân viên cập nhật
+
+Customer_Email
+nvarchar
+Null
+100
+Email khách hàng
+
+Tax_Code
+varchar
+Null
+50
+Mã số thuế
+
+Link_Logo
+varchar
+Null
+300
+Đường dẫn hình
+
+Status
+bigint
+Null
+
+Trạng thái
+
+Hình 2. SEQ Hình_2. \* ARABIC 5 Tóm tắt ý nghĩa dữ liệu bảng Customer.
+
+Table Customer_Staff
+Tên cột
+Kiểu dữ liệu
+Ràng buộc
+Giá trị tối đa
+Mô tả
+
+Staff_ID
+int
+Primary key, IDENTITY (1,1), Not Null
+
+Mã nhân viên
+
+FK_Customer_ID
+int
+Foreign key, Null
+
+Mã khách hàng
+
+Family_Name
+nvarchar
+Null
+50
+Tên nhân viên
+
+First_Name
+nvarchar
+Null
+50
+Họ nhân viên
+
+Department
+nvarchar
+Null
+100
+Phòng ban
+
+Title
+nvarchar
+Null
+100
+Title
+
+BirthDay
+date
+Null
+
+Ngày sinh
+
+Place_of_Birth
+nvarchar
+Null
+100
+Nơi sinh
+
+Email
+varchar
+Null
+100
+Email
+
+Mobiphone
+varchar
+Null
+20
+mobiphone
+
+Tel
+varchar
+Null
+20
+Số điện thoại
+
+Staff_Address
+nvarchar
+Null
+100
+Địa chỉ nhân viên
+
+Ward
+nvarchar
+Null
+100
+Khu vực
+
+District
+nvarchar
+Null
+100
+Quận, huyện
+
+Province
+nvarchar
+Null
+100
+Tỉnh thành
+
+Note
+nvarchar
+Null
+500
+Ghi chú
+
+Date_Update
+date
+Null
+
+Ngày cập nhật
+
+Hình 2. SEQ Hình_2. \* ARABIC 6 Tóm tắt ý nghĩa dữ liệu bảng Customer_Staff.
+Table Supplier
+Tên cột
+Kiểu dữ liệu
+Ràng buộc
+Giá trị tối đa
+Mô tả
+
+Supplier_ID
+int
+Primary key, IDENTITY (1,1), 
+Not Null
+300
+Mã nhà cung cấp
+
+Supplier_Name
+nvarchar
+Null
+100
+Tên nhà cung cấp
+
+Supplier_Type
+nvarchar
+Null
+30
+Loại nhà cung cấp
+
+Supplier_Tel
+varchar
+Null
+100
+Số điện thoại nhà cung cấp
+
+Supplier_Address
+nvarchar
+Null
+100
+Địa chỉ nhà cung cấp
+
+Ward
+nvarchar
+Null
+100
+Khu vực
+
+District
+nvarchar
+Null
+100
+Quận, huyện
+
+Province
+nvarchar
+Null
+100
+Tỉnh thành
+
+Country
+nvarchar
+Null
+100
+Quốc gia
+
+Website
+nvarchar
+Null
+100
+Website
+
+Date_Update
+date
+Null
+
+Ngày cập nhật
+
+FK_Staff_ID_Update
+int
+Foreign key, Null
+
+Mã nhân viên cập nhật
+
+Supplier_Email
+nvarchar
+Null
+100
+Email nhà cung cấp
+
+Bank_Account_Name
+nvarchar
+Null
+100
+Tên tài khoản ngân hàng
+
+Bank_USD_Account_No
+nvarchar
+Null
+100
+Số tài khoảng ngân hàng
+
+Bank_Name
+nvarchar
+Null
+100
+Tên ngân hàng
+
+Bank_Address
+nvarchar
+Null
+200
+Địa chỉ ngân hàng
+
+Bank_Code
+nvarchar
+Null
+50
+Mã ngân hàng
+
+Bank_Branch_Code
+nvarchar
+Null
+50
+Mã chi nhánh ngân hàng
+
+Swift_Code
+nvarchar
+Null
+50
+Mã Swift
+
+Hình 2. SEQ Hình_2. \* ARABIC 7 Tóm tắt ý nghĩa dữ liệu bảng Supplier
+Table Supplier_Staff
+Tên cột
+Kiểu dữ liệu
+Ràng buộc
+Giá trị tối thiểu
+Mô tả
+
+Staff_ID
+int
+Primary key, IDENTITY(1,1), Not Null
+
+Mã nhân viên
+
+FK_Supplier_ID
+int
+Foreign key, Null
+
+Mã nhà cung cấp
+
+Family_Name
+nvarchar
+Null
+50
+Tên nhân viên
+
+First_Name
+nvarchar
+Null
+50
+Họ nhân viên
+
+Department
+nvarchar
+Null
+100
+Phòng ban
+
+Title
+nvarchar
+Null
+100
+Title
+
+BirthDay
+Date
+Null
+
+Ngày sinh
+
+Place_of_Birth
+nvarchar
+Null
+100
+Nơi sinh
+
+Email
+varchar
+Null
+100
+Email
+
+Mobiphone
+varchar
+Null
+20
+Mobiphone
+
+Tel
+varchar
+Null
+20
+Số điện thoại
+
+Staff_Address
+nvarchar
+Null
+100
+Địa chỉ nhân viên
+
+Ward
+nvarchar
+Null
+100
+Khu vực
+
+District
+nvarchar
+Null
+100
+Quận huyện
+
+Province
+nvarchar
+Null
+100
+Tỉnh thành
+
+Note
+nvarchar
+Null
+500
+Ghi chú
+
+Date_Update
+date
+Null
+
+Ngày cập nhật
+
+Hình 2. SEQ Hình_2. \* ARABIC 8 Tóm tắt ý nghĩa dữ liệu bảng Supplier_Staff.
+Table Cust_Prv
+Tên cột
+Kiểu dữ liệu
+Ràng buộc
+Giá trị tối đa
+Mô tả
+
+Cust_Prv_ID
+int
+Primary key, IDENTITY (1,1), 
+Not Null
+
+Mã yêu cầu khách hàng
+
+FK_Customer_ID
+int
+Null
+
+Mã khách hàng
+
+Cust_Prv_No
+nvarchar
+Null
+100
+Số No yêu cầu của khách hàng
+
+FK_Supplier_ID
+int
+Foreign key, Null
+
+Mã nhà cung cấp
+
+Machine
+nvarchar
+Null
+100
+Tên thiết bị
+
+Machine_Type
+nvarchar
+Null
+100
+Loại thiết bị
+
+Machine_Number
+nvarchar
+Null
+100
+Số thiết bị
+
+Note
+nvarchar
+Null
+500
+Ghi chú
+
+FK_Staff_ID_Update
+int
+Foreign key, Null
+
+Mã nhân viên cập nhật
+
+Date_Update
+date
+Null
+
+Ngày cập nhật
+
+FK_Customer_Staff_ID
+int
+Foreign key, Null
+
+Mã nhân viên của khách hàng
+
+FK_Sale_Person_ID
+int
+Foreign key, Null
+
+Mã người sale
+
+Date_Created
+date
+Null
+
+Ngày tạo
+
+Hình 2. SEQ Hình_2. \* ARABIC 9 Tóm tắt ý nghĩa dữ liệu bảng Cust_Prv.
+Table Cust_Model
+Tên cột
+Kiểu dữ liệu
+Ràng buộc
+Giá trị tối đa
+Mô tả
+
+Cust_Model_ID
+int
+Primary key, IDENTITY (1,1), 
+Not Null
+
+Mã Model
+
+FK_Cust_Prv_ID
+int
+Foreign key, Null
+
+Mã yêu cầu của khách hàng
+
+Cust_Model
+nvarchar
+Null
+100
+Tên Model
+
+Description_Model
+nvarchar
+Null
+500
+Mô tả Model
+
+FK_Supplier_ID
+int
+Foreign key, Null
+
+Mã nhà cung cấp
+
+Note
+nvarchar
+Null
+100
+Ghi chú
+
+FK_Staff_ID_Update
+int
+Foreign key, Null
+
+Mã nhân viên cập nhật
+
+Date_Update
+date
+Null
+
+Ngày cập nhật
+
+Seri
+nvarchar
+Null
+100
+Seri
+
+Hình 2. SEQ Hình_2. \* ARABIC 10 Tóm tắt ý nghĩa dữ liệu bảng Cust_Model.
+Table Cust_Item
+Tên cột
+Kiểu dữ liệu
+Ràng buộc
+Giá trị tối đa
+Mô tả
+
+Cust_Item_ID
+bigint
+Primary key, IDENTITY (1,1), 
+Not Null
+
+Mã sản phẩm
+
+FK_Cust_Model_ID
+int
+Foreign key, Not Null
+
+Mã Model
+
+Cust_Item
+nvarchar
+Null
+100
+Tên sản phẩm
+
+Seri
+nvarchar
+Null
+100
+Seri
+
+Code_Number
+nvarchar
+Null
+100
+Mã số
+
+Description_Item
+nvarchar
+Null
+500
+Mô tả sản phẩm
+
+Unit
+nvarchar
+Null
+10
+Đơn vị
+
+Quantity_Order
+int
+Null
+
+Số lượng đặt hàng
+
+Note
+nvarchar
+Null
+100
+Ghi chú
+
+FK_Staff_ID_Update
+int
+Foreign key, Null
+
+Mã nhân viên cập nhật
+
+Date_Update
+date
+Null
+
+Ngày cập nhật
+
+No
+int
+Null
+
+Số No
+
+Link_Image
+varchar
+Null
+1000
+Đường dẫn ảnh
+
+Hình 2. SEQ Hình_2. \* ARABIC 11 Tóm tắt ý nghĩa dữ liệu bảng Cust_Item.
+Table Status_Detail
+Tên cột
+Kiểu dữ liệu
+Ràng buộc
+Giá trị tối đa
+Mô tả
+
+Status_Order_ID
+int
+Primary key, IDENTITY (1,1), 
+Not Null
+
+Mã trạng thái đặt hàng
+
+FK_Cust_Prv_ID
+int
+Foreign key, Not Null
+
+Mã yêu cầu khách đặt hàng
+
+FK_Status_List_ID
+int
+Foreign key, Not Null
+
+Mã danh sách trạng thái
+
+Date_Status
+date
+Null
+
+Ngày ghi trạng thái
+
+Note
+varchar
+Null
+500
+Ghi chú
+
+FK_Staff_ID_Update
+int
+Foreign key, Null
+
+Mã nhân viên cập nhật
+
+Date_Update
+date
+Null
+
+Ngày cập nhật
+
+Hình 2. SEQ Hình_2. \* ARABIC 12 Tóm tắt ý nghĩa dữ liệu bảng Status_Detail.
+Table Status_List
+Tên cột
+Kiểu dữ liệu
+Ràng buộc
+Giá trị tối đa
+Mô tả
+
+Status_List_ID
+int
+Primary key, IDENTITY (1,1), 
+Not Null
+
+Mã trạng thái danh sách
+
+Status_ENG
+nvarchar
+Null
+500
+Trạng thái
+
+Ordinal_number
+nvarchar
+Null
+500
+Số thứ tự
+
+Hình 2. SEQ Hình_2. \* ARABIC 13 Tóm tắt ý nghĩa dữ liệu bảng Status_List.
+Table Suppl_Prv
+Tên cột
+Kiểu dữ liệu
+Ràng buộc
+Giá trị tối đa
+Mô tả
+
+Suppl_Prv_ID
+int
+Primary key, IDENTITY (1,1), 
+Not Null
+
+Mã yêu cầu đến nhà cung cấp
+
+FK_Cust_Prv_ID
+int
+Foreign key, Null
+
+Mã yêu cầu từ khách hàng
+
+FK_Supplier_ID
+int
+Foreign key, Null
+
+Mã nhà cung cấp
+
+MACHINE
+nvarchar
+Null
+100
+Tên thiết bị
+
+MACHINE_TYPE
+nvarchar
+Null
+100
+Loại thiết bị
+
+MACHINE_NUMBER
+nvarchar
+Null
+100
+Số thiết bị
+
+Quality
+nvarchar
+Null
+100
+Chất lượng
+
+Warranty
+nvarchar
+Null
+200
+Bảo hành
+
+Delivery_Term
+nvarchar
+Null
+200
+Vận chuyển
+
+Delivery_Time
+nvarchar
+Null
+200
+Thời gian vận chuyển
+
+Payment_Term
+nvarchar
+Null
+200
+Chính sách thanh toán
+
+Validity
+nvarchar
+Null
+200
+Hiệu lực
+
+Note
+nvarchar
+Null
+500
+Ghi chú
+
+FK_Staff_ID_Update
+int
+Foreign key, Null
+
+Mã nhân viên cập nhập
+
+Date_Update
+date
+Null
+
+Ngày cập nhật
+
+FK_Supplier_Staff_ID
+int
+Foreign key, Null
+
+Mã nhân viên nhà cung cấp
+
+Suppl_Prv_Inquiry_No
+nvarchar
+Null
+100
+Mã yêu cầu đến nhà cung cấp
+
+Date_Created
+date
+Null
+
+Ngày tạo
+
+Hình 2. SEQ Hình_2. \* ARABIC 14 Tóm tắt ý nghĩa dữ liệu bảng Suppl_Prv.
+Table Suppl_Model
+Tên cột
+Kiểu dữ liệu
+Ràng buộc
+Giá trị tối đa
+Mô tả
+
+Suppl_Model_ID
+int
+Primary key, IDENTITY (1,1), Not Null
+
+Mã model đến nhà cung cấp
+
+FK_Suppl_Prv_ID
+int
+Foreign key, Null
+
+Mã yêu cầu đến nhà cung cấp
+
+Suppl_Model
+nvarchar
+Null
+100
+Tên model
+
+Description_Model
+nvarchar
+Null
+500
+Mô tả model
+
+Note
+nvarchar
+Null
+100
+Ghi chú
+
+FK_Staff_ID_Update
+int
+Foreign key, Null
+
+Mã nhân viên cập nhật
+
+Date_Update
+date
+Null
+
+Ngày cập nhật
+
+Seri
+nvarchar
+Null
+
+Seri
+
+Hình 2. SEQ Hình_2. \* ARABIC 15 Tóm tắt ý nghĩa dữ liệu bảng Suppl_Model.
+Table Suppl_Item
+Tên cột
+Kiểu dữ liệu
+Ràng buộc
+Giá trị tối đa
+Mô tả
+
+Suppl_Item_ID
+int
+Primary key, IDENTITY (1,1), Not Null
+
+Mã sản phẩm gửi đến nhà cung cấp
+
+FK_Suppl_Model_ID
+int
+Foreign key, Not Null
+
+Mã model gửi đến nhà cung cấp
+
+Suppl_Item
+nvarchar
+Null
+100
+Tên sản phẩm
+
+Seri
+nvarchar
+Null
+100
+Seri
+
+Code_Number
+nvarchar
+Null
+100
+Mã số
+
+Description_Item
+nvarchar
+Null
+500
+Mô tả sản phẩm
+
+Location_number
+nvarchar
+Null
+100
+Mã vị trí
+
+Unit
+nvarchar
+Null
+100
+Đơn vị
+
+Quantity_Order
+int
+Null
+
+Số lượng đặt hàng
+
+Unit_Price_USD
+real
+Null
+
+Giá trên đơn vị
+
+Note
+nvarchar
+Null
+300
+Ghi chú
+
+FK_Staff_ID_Update
+int
+Foreign key, Null
+
+Mã nhân viên cập nhật
+
+Date_Update
+date
+Null
+
+Ngày cập nhật
+
+Link_Image
+nvarchar
+Null
+1000
+Đường dẫn hình ảnh
+
+No
+int
+Null
+
+No
+
+Status
+bigint
+Null
+
+Trạng thái
+
+Hình 2. SEQ Hình_2. \* ARABIC 16 Tóm tắt ý nghĩa dữ liệu bảng Suppl_Item.
+Table Cust_Quotaion
+Tên cột
+Kiểu dữ liệu
+Ràng buộc
+Giá trị tối đa
+Mô tả
+
+Cust_Quotation_ID
+int
+Primary key, IDENTITY (1,1), 
+Not Null
+
+Mã báo giá
+
+FK_Cust_Prv_ID
+int
+Foreign key, Not Null
+
+Mã yêu cầu từ khách hàng
+
+Note
+nvarchar
+Null
+300
+Ghi chú
+
+Version_Quotation
+nvarchar
+Null
+50
+Biên bản báo giá
+
+Price_VAT
+real
+Null
+
+Thuế VAT
+
+Input_Price_USD
+real
+Null
+
+Giá sản phẩm
+
+Transport_Price_USD
+real
+Null
+
+Phí vận chuyển
+
+Transport_Weight
+real
+Null
+
+Trọng lượng vận chuyển
+
+Total_Cost_Unit_USD
+real
+Null
+
+Tổng chi phí trên đơn vị
+
+Total_Cost_USD
+real
+Null
+
+Tổng chi phí
+
+Sell_Per_Cost
+real
+Null
+
+Chi phí người sale
+
+Sell_Total_USD
+real
+Null
+
+Chi phí bán tổng cộng
+
+Margin_Total_USD
+real
+Null
+
+Lợi nhuận
+
+Commission
+real
+Null
+
+Hoa hồng
+
+Tax_com
+real
+Null
+
+Thuế thu nhập doanh nghiệp
+
+Profit_polaris
+real
+Null
+
+Lợi nhuận Polaris
+
+FK_Staff_ID_Update
+int
+Foreign key, Null
+
+Mã nhân viên cập nhật
+
+Date_Update
+date
+Null
+
+Ngày cập nhật
+
+FK_Company_ID
+int
+Foreign key, Null
+
+Mã công ty
+
+FK_Sale_Person_ID
+int
+Foreign key, Null
+
+Mã nhân viên sale
+
+Date_Created
+date
+Null
+
+Ngày tạo
+
+Quotation_No
+varchar
+Null
+50
+Báo giá số No
+
+Discount
+real
+Null
+
+Giả giá
+
+Term_Quality
+nvarchar
+Null
+
+Chất lượng
+
+Term_Warranty
+nvarchar
+Null
+
+Bảo hành
+
+Term_Delivery
+nvarchar
+Null
+
+Vận chuyển
+
+Term_Delivery_Time
+nvarchar
+Null
+
+Thời gian vận chuyển
+
+Term_Payment
+nvarchar
+Null
+
+Thanh toán
+
+Term_Validity
+nvarchar
+Null
+
+Hiệu lực
+
+Hình 2. SEQ Hình_2. \* ARABIC 17 Tóm tắt ý nghĩa dữ liệu bảng Cust_Quotation.
+Table Cust_Quotation_Detail
+Tên cột
+Kiểu dữ liệu
+Ràng buộc
+Giá trị tối đa
+Mô tả
+
+Cust_Quotation_Detail_ID
+int
+Primary key, IDENTITY (1,1), Not Null
+
+Mã báo giá chi tiế
+
+FK_Cust_Quotation_ID
+int
+Foreign key, Not Null
+
+Mã báo giá
+
+FK_Suppl_Item_ID
+int
+Foreign key, Not Null
+
+Mã sản phẩm
+
+Supplier_Name
+nvarchar
+Null
+200
+Tên nhà cung cấp
+
+Suppl_Item
+nvarchar
+Null
+100
+Tên sản phẩm
+
+Seri
+nvarchar
+Null
+100
+Seri
+
+Code_Number
+nvarchar
+Null
+100
+Mã số
+
+Description_Item
+nvarchar
+Null
+500
+Mô tả sản phẩm
+
+Location_number
+nvarchar
+Null
+200
+Mã khu vực
+
+Unit
+nvarchar
+Null
+10
+Đơn vị
+
+Quantity_Order
+int
+Null
+
+Số lượng đặt hàng
+
+Input_Price_USD
+real
+Null
+
+Giá nhập
+
+Transport_Price_USD
+real
+Null
+
+Phí vận chuyển
+
+Total_Cost_Unit_USD
+real
+Null
+
+Tổng chi phí đơn vị
+
+Total_Cost_USD
+real
+Null
+
+Tổng chi phí
+
+Selling_Unit_USD
+real
+Null
+
+Chi phí bán tổng cộng đơn vị
+
+Sell_Total_USD
+real
+Null
+
+Chi phí bán tổng cộng
+
+Margin_USD
+real
+Null
+
+Lợi nhuận
+
+Note
+nvarchar
+Null
+
+Ghi chú
+
+FK_Staff_ID_Update
+int
+Foreign key, Null
+
+Mã nhân viên cập nhật
+
+Date_Approve
+date
+Null
+
+Ngày chấp thuận
+
+Date_Update
+date
+Null
+
+Ngày cập nhật
+
+Packing_Fee_USD
+real
+Null
+
+Phí đóng gói
+
+Import_Tax_USD
+real
+Null
+
+Thuế VAT
+
+Delivery_Bank_Fee_USD
+real
+Null
+
+Phí ngân hàng
+
+No
+int
+Null
+
+No
+
+Weight
+real
+Null
+
+Cân nặng
+
+Dimension
+nvarchar
+Null
+
+Hoa hồng nhân viên khách hàng
+
+Hình 2. SEQ Hình_2. \* ARABIC 18 Tóm tắt ý nghĩa dữ liệu bảng Cust_Quotation_Detail.
+Table Cust_PO
+Tên cột
+Kiểu dữ liệu
+Ràng buộc
+Giá trị tối đa
+Mô tả
+
+Cust_PO_ID
+int
+Primary key, IDENTITY (1,1), Not Null
+
+Mã hóa đơn
+
+FK_Cust_Quotation_ID
+int
+Foreign key, Null
+
+Mã báo giá
+
+Cust_PO_No
+nvarchar
+Null
+20
+Số hóa đơn
+
+Order_date
+date
+Null
+
+Ngày đặt hàng
+
+VAT
+real
+Null
+
+Thuế VAT
+
+Sell_Total_USD
+real
+Null
+
+Tổng tiền
+
+Quality
+nvarchar
+Null
+200
+Chất lượng
+
+Warranty
+nvarchar
+Null
+200
+Bảo hành
+
+Delivery_Term
+nvarchar
+Null
+200
+Vận chuyển
+
+Payment_Term
+nvarchar
+Null
+200
+Thanh toán
+
+Validity
+nvarchar
+Null
+200
+Hiệu lực
+
+Customer_Contact_Person
+nvarchar
+Null
+200
+Người liên hệ khách hàng
+
+Order_Handler_Email_Address
+nvarchar
+Null
+200
+Địa chỉ email người xử lý đơn hàng
+
+FK_Staff_ID_Update
+int
+Foreign key, Null
+
+Nhân viên cập nhật
+
+Date_Update
+date
+Null
+
+Ngày cập nhật
+
+Date_Created
+date
+Null
+
+Ngày tạo
+
+Delivery_Time
+nvarchar
+Null
+200
+Thời gian giao hàng
+
+Payment_Term_PO
+nvarchar
+Null
+200
+Thời hạn thanh toán hóa đơn
+
+Packing_Detail
+nvarchar
+Null
+100
+Chi tiết đóng gói
+
+Supplier_Contact_Person
+int
+Null
+
+Người liên hệ nhà cung cấp 
+
+Hình 2. SEQ Hình_2. \* ARABIC 19 Tóm tắt ý nghĩa dữ liệu bảng Cust_PO.
+Table Cust_PO_Model
+Tên cột
+Kiểu dữ liệu
+Ràng buộc
+Giá trị tối đa
+Mô tả
+
+Cust_PO_Model_ID
+int
+Primary key, IDENTITY (1,1), Not Null
+
+Mã model
+
+FK_Cust_PO_ID
+int
+Foreign key, Not Null
+
+Mã hóa đơn
+
+Cust_Model
+nvarchar
+Null
+100
+Tên model
+
+Description_Model
+nvarchar
+Null
+500
+Mô tả model
+
+FK_Supplier_ID
+int
+Foreign key, Null
+
+Mã nhà cung cấp
+
+Note
+nvarchar
+Null
+100
+Ghi chú
+
+FK_Staff_ID_Update
+int
+Foreign key, Null
+
+Mã nhân viên cập nhật
+
+Date_Update
+date
+Null
+
+Ngày cập nhật
+
+Hình 2. SEQ Hình_2. \* ARABIC 20 Tóm tắt ý nghĩa dữ liệu bảng CusT_PO_Model.
+Table Cust_PO_Item
+Tên cột
+Kiểu dữ liệu
+Ràng buộc
+Giá trị tối đa
+Mô tả
+
+Cust_PO_Item_ID
+int
+Primary key, IDENTITY (1,1), Not Null
+
+Mã sản phẩm
+
+FK_Cust_Model_ID
+int
+Foreign key, Not Null
+
+Mã model
+
+Cust_Item
+nvarchar
+Null
+100
+Tên sản phẩm
+
+Seri
+nvarchar
+Null
+100
+Seri
+
+Code_Number
+nvarchar
+Null
+100
+Mã số
+
+Description_Item
+nvarchar
+Null
+500
+Mô tả sản phẩm
+
+Unit
+nvarchar
+Null
+10
+Đơn vị
+
+Quantity_Order
+int
+Null
+
+Số lượng đặt hàng
+
+Selling_Unit_USD
+real
+Null
+
+Tổng chi phí bán hàng đơn vị
+
+Sell_Total_USD
+real
+Null
+
+Tổng chi phí bán hàng
+
+Note
+nvarchar
+Null
+100
+Ghi chú
+
+FK_Staff_ID_Update
+int
+Foreign key, Null
+
+Mã nhân viên cập nhật
+
+Date_Update
+date
+Null
+
+Ngày cập nhật
+
+Hình 2. SEQ Hình_2. \* ARABIC 21 Tóm tắt ý nghĩa dữ liệu bảng Cust_PO_Item.
+Table UserGroup
+Tên cột
+Kiểu dữ liệu
+Ràng buộc
+Giá trị tối đa
+Mô tả
+
+Group_ID
+varchar
+Primary key, Not Null
+100
+Mã nhóm
+
+Group_Name
+nvarchar
+Null
+100
+Tên nhóm
+
+Note
+Text
+Null
+
+Ghi chú
+
+Created_At
+datetime
+Null
+
+Ngày tạo
+
+Updated_At
+datetime
+Null
+
+Ngày cập nhật
+
+Hình 2. SEQ Hình_2. \* ARABIC 22 Tóm tắt ý nghĩa dữ liệu bảng User_Group.
+Table User
+Tên cột
+Kiểu dữ liệu
+Ràng buộc
+Giá trị tối đa
+Mô tả
+
+Id
+int
+Primary key, IDENTITY (1,1) Not Null
+
+Mã
+
+name
+nvarchar
+Not Null
+255
+Tên
+
+username
+nvarchar
+Not Null
+255
+Tên tài khoản
+
+email
+nvarchar
+Not Null
+255
+Email
+
+password
+nvarchar
+Not Null
+255
+Mật khẩu
+
+FK_Group_ID
+varchar
+Not Null
+100
+Mã nhóm
+
+create_at
+datetime
+Null
+
+Ngày tạo
+
+update_at
+datetime
+Null
+
+Ngày cập nhật
+
+FK_Staff_ID
+int
+Foreign key, Null
+
+Mã nhân viên
+
+Hình 2. SEQ Hình_2. \* ARABIC 23 Tóm tắt ý nghĩa dữ liệu bảng User.
+Chương 3. CÀI ĐẶT THỰC NGHIỆM VÀ KẾT QUẢ
+Một số giao diện website
+3.1.1 Phần quản trị
+Giao diện đăng nhập
+
+Hình 3. SEQ Hình_3. \* ARABIC 1 Giao diện đăng nhập từ phía quản trị.
+Giao diện quản lý thông tin yêu cầu khách hàng
+Giao diện danh sách thông tin yêu cầu khách hàng.
+
+Hình 3. SEQ Hình_3. \* ARABIC 2 Giao diện danh sách thông tin yêu cầu khách hàng.
+Giao diện chi tiết các nhà cung cấp đã gửi thông tin yêu cầu.
+
+Hình 3. SEQ Hình_3. \* ARABIC 3 Giao diện chi tiết các nhà cung cấp đã gửi thông tin yêu cầu.
+Giao diện chi tiết thông tin yêu cầu khách hàng.
+
+Hình 3. SEQ Hình_3. \* ARABIC 4 Giao diện chi tiết thông tin yêu cầu khách hàng.
+Giao diện cập nhật trạng thái quy trình bán hàng.
+
+Hình 3. SEQ Hình_3. \* ARABIC 5 Giao diện cập nhật trạng thái quy trình bán hàng.
+Giao diện thông báo xóa thông tin yêu cầu.
+
+Hình 3. SEQ Hình_3. \* ARABIC 6 Giao diện thông báo xóa thông tin yêu cầu.
+Giao diện thêm thông tin yêu cầu khách hàng.
+
+Hình 3. SEQ Hình_3. \* ARABIC 7 Giao diện thêm thông tin yêu cầu khách hàng.
+Giao diện đẩy yêu cầu khách hàng sang nhà cung cấp.
+
+Hình 3. SEQ Hình_3. \* ARABIC 8 Giao diện đẩy yêu cầu khách hàng sang nhà cung cấp.
+Giao diện so sánh giá các model của các nhà cung cấp.
+
+Hình 3. SEQ Hình_3. \* ARABIC 9 Giao diện so sánh giá các model của các nhà cung cấp.
+Giao diện tạo thông tin báo giá.
+
+Hình 3. SEQ Hình_3. \* ARABIC 10 Giao diện tạo thông tin báo giá.
+Giao diện quản lý thông tin yêu cầu nhà cung cấp
+Giao diện danh sách thông tin yêu cầu nhà cung cấp.
+
+Hình 3. SEQ Hình_3. \* ARABIC 11 Giao diện danh sách thông tin yêu cầu nhà cung cấp.
+Giao diện chi tiết thông tin yêu cầu nhà cung cấp.
+
+Hình 3. SEQ Hình_3. \* ARABIC 12 Giao diện chi tiết thông tin yêu cầu nhà cung cấp.
+Giao diện cập nhật giá trong yêu cầu nhà cung cấp.
+
+Hình 3. SEQ Hình_3. \* ARABIC 13 Giao diện cập nhật giá trong yêu cầu nhà cung cấp.
+Giao diện quản lý thông tin báo giá
+Giao diện danh sách các thông tin báo giá.
+
+Hình 3. SEQ Hình_3. \* ARABIC 14 Giao diện danh sách các thông tin báo giá.
+Giao diện thông tin báo giá chi tiết.
+
+Hình 3. SEQ Hình_3. \* ARABIC 15 Giao diện thông tin báo giá chi tiết.
+Giao diện thông tin báo giá chi tiết (bổ sung).
+
+Hình 3. SEQ Hình_3. \* ARABIC 16 Giao diện thông tin báo giá chi tiết (bổ sung).
+Giao diện chi tiết thông tin Tern của báo giá.
+
+Hình 3. SEQ Hình_3. \* ARABIC 17 Giao diện chi tiết thông tin Tern của báo giá.
+Giao diện quản lý thông tin khách hàng
+Giao diện danh sách thông tin khách hàng.
+
+Hình 3. SEQ Hình_3. \* ARABIC 18 Giao diện danh sách thông tin khách hàng.
+Giao diện thêm thông tin khách hàng.
+
+Hình 3. SEQ Hình_3. \* ARABIC 19 Giao diện thêm thông tin khách hàng.
+Giao diện chỉnh sửa thông tin khách hàng.
+
+Hình 3. SEQ Hình_3. \* ARABIC 20 Giao diện chỉnh sửa thông tin khách hàng.
+Giao diện quản lý thông tin nhân viên khách hàng
+Giao diện danh sách thông tin nhân viên khách hàng.
+
+Hình 3. SEQ Hình_3. \* ARABIC 21 Giao diện danh sách thông tin nhân viên khách hàng.
+Giao diện thêm thông tin nhân viên khách hàng.
+
+Hình 3. SEQ Hình_3. \* ARABIC 22 Giao diện thêm thông tin nhân viên khách hàng.
+Giao diện chỉnh sửa thêm thông nhân viên khách hàng.
+
+Hình 3. SEQ Hình_3. \* ARABIC 23 Giao diện chỉnh sửa thêm thông nhân viên khách hàng.
+Giao diện quản lý thông tin nhà cung cấp
+Giao diện danh sách thông tin nhà cung cấp.
+
+Hình 3. SEQ Hình_3. \* ARABIC 24 Giao diện danh sách thông tin nhà cung cấp.
+Giao diện chỉnh sửa thông tin nhà cung cấp.
+
+Hình 3. SEQ Hình_3. \* ARABIC 25 Giao diện chỉnh sửa thông tin nhà cung cấp.
+Giao diện quản lý thông tin nhân viên nhà cung cấp
+Giao diện danh sách thông tin nhà nhân viên nhà cung cấp.
+
+Hình 3. SEQ Hình_3. \* ARABIC 26 Giao diện danh sách thông tin nhà nhân viên nhà cung cấp.
+Giao diện thêm mới thông tin nhân viên nhà cung cấp.
+
+Hình 3. SEQ Hình_3. \* ARABIC 27 Giao diện thêm mới thông tin nhân viên nhà cung cấp.
+Giao diện chỉnh sửa thông tin nhân viên nhà cung cấp.
+
+Hình 3. SEQ Hình_3. \* ARABIC 28 Giao diện chỉnh sửa thông tin nhân viên nhà cung cấp.
+Giao diện quản lý nhân viên
+Giao diện danh sách thông tin nhân viên.
+
+Hình 3. SEQ Hình_3. \* ARABIC 29 Giao diện danh sách thông tin nhân viên.
+Giao diện thêm mới thông tin nhân viên.
+
+Hình 3. SEQ Hình_3. \* ARABIC 30 Giao diện thêm mới thông tin nhân viên.
+Giao diện chỉnh sửa thông tin nhân viên.
+
+Hình 3. SEQ Hình_3. \* ARABIC 31 Giao diện chỉnh sửa thông tin nhân viên.
+Giao diện Reset Password
+Giao diện nhập email để khôi phục mật khẩu.
+
+Hình 3. SEQ Hình_3. \* ARABIC 32 Giao diện nhập email để khôi phục mật khẩu.
+Giao diện khôi phục tài khoản.
+
+Hình 3. SEQ Hình_3. \* ARABIC 33 Giao diện khôi phục tài khoản.
+3.1.2 File excel xuất ra từ quản trị
+File yêu cầu báo giá để gửi nhà cung cấp.
+
+Hình 3. SEQ Hình_3. \* ARABIC 34 File yêu cầu báo giá để gửi nhà cung cấp.
+-69852768600File báo giá dành cho Polaris.
+Hình 3. SEQ Hình_3. \* ARABIC 35 File báo giá dành cho Polaris.
+File báo giá dành cho Polaris (bổ sung).
+
+Hình 3. SEQ Hình_3. \* ARABIC 36 File báo giá dành cho Polaris (bổ sung).
+File báo giá xuất cho khách hàng.
+
+Hình 3. SEQ Hình_3. \* ARABIC 37 File báo giá xuất cho khách hàng.
+3.1.3 Phần người dùng
+Giao diện người dùng ở thiết bị màn hình lớn
+Giao diện phần Header.
+
+Hình 3. SEQ Hình_3. \* ARABIC 38 Giao diện phần Header.
+Giao diện về phần thông tin doanh nghiệp.
+
+Hình 3. SEQ Hình_3. \* ARABIC 39 Giao diện về phần thông tin doanh nghiệp.
+Giao diện về phần thông tin dịch vụ.
+
+Hình 3. SEQ Hình_3. \* ARABIC 40 Giao diện về phần thông tin dịch vụ.
+Giao diện về phần thông tin sản phẩm.
+
+Hình 3. SEQ Hình_3. \* ARABIC 41 Giao diện về phần thông tin sản phẩm.
+Giao diện về phần thông tin nhà cung cấp và khách hàng.
+
+Hình 3. SEQ Hình_3. \* ARABIC 42 Giao diện về phần thông tin nhà cung cấp và khách hàng.
+Giao diện phần Footer.
+
+Hình 3. SEQ Hình_3. \* ARABIC 43 Giao diện phần Footer.
+Giao diện người dùng ở thiết bị màn hình nhỏ
+Giao diện phần Header và thông tin doanh nghiệp.
+
+Hình 3. SEQ Hình_3. \* ARABIC 44 Giao diện phần Header và thông tin doanh nghiệp.
+Giao diện phần dich vụ doanh nghiệp.
+
+Hình 3. SEQ Hình_3. \* ARABIC 45 Giao diện phần dich vụ doanh nghiệp.
+Giao diện phần sản phẩm đã bán của doanh nghiệp.
+
+Hình 3. SEQ Hình_3. \* ARABIC 46 Giao diện phần sản phẩm đã bán của doanh nghiệp.
+Giao diện về phần nhà cung cấp cho doanh nghiệp.
+
+Hình 3. SEQ Hình_3. \* ARABIC 47 Giao diện về phần nhà cung cấp cho doanh nghiệp.
+Giao diện về Footer.
+
+Hình 3. SEQ Hình_3. \* ARABIC 48 Giao diện về Footer.
+Chương 4: KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN
+Kết luận
+Kết luận đạt được
+Đã xây dựng hoàn thiện được ứng dụng với đầy đủ các tính năng cơ bản phục vụ cho việc quản lý thương mại mô hình B2B.
+Đáp ứng được các yêu cầu cơ bản của một Website.
+Website có giao diện thân thiện với người dùng, dễ dàng sử dụng.
+Website có các công nghệ được tích hợp như, Google Map, FanPage facebook, Email hỗ trợ quên tài khoản mật khẩu.
+Website hỗ trợ các tính toán báo giá nhanh và chính xác giúp tiết kiệm thời gian và sức lực của người dùng.
+Website được thiết kế chú trọng cho nhà quản lý, giúp người dùng quản lý Website dễ dàng và thuận tiện hơn.
+Vận dụng được kiến thức đã học để hoàn thành luận văn.
+Lý thuyết, kỹ năng và kinh nghiệm
+Biết cách áp dụng một vài công nghệ vào Website và sử dụng thuần thục phần mềm Visual Studio Code.
+Biết cách xây dựng được một Website và áp dụng phương pháp để xây dựng những Website tương tự với các chức năng khác nhau.
+Có thêm kiến thức về ngôn ngữ lập trình PHP Laravel.
+Biết thêm được cách truy vấn dữ liệu: Eloquent Laravel, Repeater, Laravel Authentication để giảm thiểu thời code.
+Khuyết điểm
+Tốc độ xử lý của một số chức năng còn hơi chậm.
+Các chức năng chưa đa dạng.
+Chưa triển khai được trang web lên môi trường thực tế mà chỉ ở máy tính cá nhân.
+Cơ sở dữ liệu, Code chưa được tối ưu.
+Độ bảo mật của trang Web vẫn chưa được cao.
+Kinh nghiêm đúc kết
+Cần nâng cao khả năng tự học các kiến thức mới.
+Cần nâng cao thêm khả năng suy luận, tư duy logic, …
+Cải thiện hơn nữa về kiến thức chuyên môn. 
+Định hướng phát triển
+Phát triển đề tài
+Thêm chức năng phân quyền.
+Kết hợp API giao nhận để quản lý quy trình chuyển hàng dễ dàng.
+Cải thiện giao diện người dùng.
+Đưa website lên môi trường Internet.
+Nghiên cứu tối ưu hóa cơ sở dữ liệu.
+Kết hợp Mail Server vào hệ thống.
+Phát triển bản thân
+Cần nâng cao khả năng tự học các kiến thức mới.
+Cần nâng cao thêm khả năng suy luận, tư duy logic, …
+Cải thiện hơn nữa về kiến thức chuyên môn.
+
+PHỤ LỤC
+DANH MỤC TÀI LIỆU THAM KHẢO
+[ 1 ] https://dev.to/othmane_nemli/laravel-wherehas-and-with-550o
+[ 2 ] https://github.com/laravel/ui
+[ 3 ] https://github.com/puikinsh/CoolAdmin
+[ 4 ] https://github.com/TypeRocket/laravel/blob/master/src/Fields/Repeater.php
+[ 5 ] https://laravel.com/
+[ 6 ] https://select2.org/
+[ 7 ] https://stackoverflow.com/
+[ 8 ] https://vi.wikipedia.org/
+[ 9 ] https://www.w3schools.com/
+
+
+

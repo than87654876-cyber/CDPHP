@@ -20,9 +20,14 @@
             <p class="text-xs text-slate-500 font-medium mt-1">Quản lý thông tin, hình ảnh, giá bán và trạng thái món ăn</p>
         </div>
 
-        <a href="{{ route('monandon_them', ['category_id' => $categoryId]) }}" class="px-5 py-3 rounded-2xl bg-[#ee4d2d] hover:bg-red-600 text-white text-xs font-extrabold shadow-lg shadow-rose-500/20 transition-all flex items-center justify-center gap-2">
-            <i class="fas fa-plus"></i> Thêm món ăn mới
-        </a>
+        <div class="flex items-center gap-3">
+            <a href="{{ route('baocao_xuat_dishes') }}" class="px-4 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
+                <i class="fas fa-file-excel"></i> Xuất Excel món ăn
+            </a>
+            <a href="{{ route('monandon_them', ['category_id' => $categoryId]) }}" class="px-5 py-3 rounded-2xl bg-[#ee4d2d] hover:bg-red-600 text-white text-xs font-extrabold shadow-lg shadow-rose-500/20 transition-all flex items-center justify-center gap-2">
+                <i class="fas fa-plus"></i> Thêm món ăn mới
+            </a>
+        </div>
     </div>
 
     <!-- Alerts -->

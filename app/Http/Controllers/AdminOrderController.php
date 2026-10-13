@@ -8,6 +8,12 @@ use App\Models\OrderItem;
 use App\Models\Subscription;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 class AdminOrderController extends Controller
 {
@@ -276,13 +282,89 @@ class AdminOrderController extends Controller
         return redirect()->route('quanly_donhang')->with('success', 'Đã xóa đơn hàng FDL-'.$id.' thành công.');
     }
 
-    // Xuất báo cáo đơn hàng (CSV UTF-8 BOM)
-    public function exportOrdersCsv()
+    // Xuất báo cáo đơn hàng (Hỗ trợ Excel .xlsx và CSV UTF-8 BOM)
+    public function exportOrdersCsv(Request $request)
     {
-        $headers = ['Mã đơn hàng', 'Khách hàng', 'Email', 'Số điện thoại', 'Loại đơn', 'Tổng tiền', 'Hình thức thanh toán', 'Trạng thái thanh toán', 'Trạng thái đơn hàng', 'Ngày đặt'];
         $orders = Order::with('user')->orderBy('created_at', 'desc')->get();
 
-        return $this->exportCsvStream('bao-cao-don-hang.csv', $headers, $orders, function ($order) {
+        $formatDate = function ($value, string $format = 'd/m/Y H:i') {
+            if (empty($value)) return 'N/A';
+            if ($value instanceof \DateTimeInterface) return $value->format($format);
+            try {
+                return \Carbon\Carbon::parse($value)->format($format);
+            } catch (\Throwable) {
+                return (string) $value;
+            }
+        };
+
+        if ($request->query('format') === 'csv') {
+            $headers = ['Mã đơn hàng', 'Khách hàng', 'Email', 'Số điện thoại', 'Loại đơn', 'Tổng tiền', 'Hình thức thanh toán', 'Trạng thái thanh toán', 'Trạng thái đơn hàng', 'Ngày đặt'];
+            return $this->exportCsvStream('bao-cao-don-hang.csv', $headers, $orders, function ($order) use ($formatDate) {
+                $paymentMethodText = match ($order->payment_method) {
+                    'bank_transfer' => 'Chuyển khoản',
+                    'momo' => 'Ví MoMo',
+                    default => 'Tiền mặt (COD)',
+                };
+                $orderTypeText = $order->order_type === 'single' ? 'Món lẻ' : 'Gói dài kỳ';
+
+                return [
+                    'FDL-' . $order->id,
+                    $order->user ? $order->user->fullname : 'Khách vãng lai',
+                    $order->user ? $order->user->email : 'N/A',
+                    $order->user ? $order->user->phone : 'N/A',
+                    $orderTypeText,
+                    $order->final_amount,
+                    $paymentMethodText,
+                    $order->payment_status,
+                    $order->order_status,
+                    $formatDate($order->created_at),
+                ];
+            });
+        }
+
+        // Mặc định xuất file Excel chuyên nghiệp (.xlsx)
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Danh sách đơn hàng');
+
+        $now = now();
+        $title = 'BÁO CÁO DANH SÁCH ĐƠN HÀNG TOÀN HỆ THỐNG';
+        $sheet->setCellValue('A1', $title);
+        $sheet->mergeCells('A1:J1');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14)->getColor()->setRGB('1E293B');
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->setCellValue('A2', 'Thời gian xuất: ' . $now->format('d/m/Y H:i') . ' | Tổng số đơn: ' . $orders->count());
+        $sheet->mergeCells('A2:J2');
+        $sheet->getStyle('A2')->getFont()->setItalic(true)->setSize(10)->getColor()->setRGB('475569');
+        $sheet->getStyle('A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $headers = [
+            'STT',
+            'Mã đơn hàng',
+            'Khách hàng',
+            'Email',
+            'Số điện thoại',
+            'Loại đơn',
+            'Tổng tiền (VNĐ)',
+            'Hình thức thanh toán',
+            'Trạng thái thanh toán',
+            'Ngày đặt',
+        ];
+
+        foreach ($headers as $index => $header) {
+            $sheet->setCellValue(Coordinate::stringFromColumnIndex($index + 1) . '4', $header);
+        }
+
+        $sheet->getStyle('A4:J4')->applyFromArray([
+            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '0284C7']],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+            'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
+        ]);
+
+        $rowNumber = 5;
+        foreach ($orders->values() as $index => $order) {
             $paymentMethodText = match ($order->payment_method) {
                 'bank_transfer' => 'Chuyển khoản',
                 'momo' => 'Ví MoMo',
@@ -290,19 +372,54 @@ class AdminOrderController extends Controller
             };
             $orderTypeText = $order->order_type === 'single' ? 'Món lẻ' : 'Gói dài kỳ';
 
-            return [
+            $values = [
+                $index + 1,
                 'FDL-' . $order->id,
                 $order->user ? $order->user->fullname : 'Khách vãng lai',
                 $order->user ? $order->user->email : 'N/A',
                 $order->user ? $order->user->phone : 'N/A',
                 $orderTypeText,
-                $order->final_amount,
+                (float) $order->final_amount,
                 $paymentMethodText,
-                $order->payment_status,
-                $order->order_status,
-                $order->created_at->format('d/m/Y H:i'),
+                $order->payment_status === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán',
+                $formatDate($order->created_at),
             ];
-        });
+
+            foreach ($values as $colIndex => $value) {
+                $sheet->setCellValue(Coordinate::stringFromColumnIndex($colIndex + 1) . $rowNumber, $value);
+            }
+
+            $rowNumber++;
+        }
+
+        $lastRow = max(5, $rowNumber - 1);
+        $sheet->getStyle('A5:J' . $lastRow)->applyFromArray([
+            'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => 'E2E8F0']]],
+            'alignment' => ['vertical' => Alignment::VERTICAL_CENTER],
+        ]);
+
+        $sheet->getStyle('A5:A' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('B5:B' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('F5:F' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('H5:H' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('I5:I' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('J5:J' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('G5:G' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('G5:G' . $lastRow)->getNumberFormat()->setFormatCode('#,##0 "₫"');
+
+        foreach (range('A', 'J') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $filename = 'BaoCao_DonHang_' . $now->format('Ymd_His') . '.xlsx';
+
+        return response()->streamDownload(function () use ($spreadsheet) {
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+        }, $filename, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
     }
 
     // =========================================================================

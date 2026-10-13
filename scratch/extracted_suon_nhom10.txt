@@ -1,0 +1,81 @@
+BÁO CÁO ĐỒ ÁN TỐT NGHIỆP / DỰ ÁN CÔNG NGHỆ PHẦN MỀM
+ĐỀ TÀI: XÂY DỰNG HỆ THỐNG GIAO ĐỒ ĂN TRỰC TUYẾN TÍCH HỢP TRÍ TUỆ NHÂN TẠO & ĐẶT MÓN THEO NHÓM – FOODDAILY
+Sinh viên thực hiện: Trần Lê Thân | Nền tảng: Laravel 13, PHP 8.3, MySQL, Gemini AI, PayOS
+─────────────────────────────────────────────────────────────
+LỜI MỞ ĐẦU
+• Lý do chọn đề tài: Nhu cầu đặt đồ ăn trực tuyến bùng nổ; giải quyết bất cập gom đơn nhóm tập thể bằng phương pháp thủ công (ghi chép dễ nhầm món, sót tiền); ứng dụng AI tư vấn món ăn thông minh giải quyết tình trạng &apos;hôm nay ăn gì&apos;.
+• Mục đích nghiên cứu: Xây dựng hệ thống giao đồ ăn khép kín từ Khách hàng đến Nhà bếp và Quản trị viên; tích hợp Google Gemini AI và thanh toán tự động VietQR PayOS; xây dựng tính năng Đặt món theo nhóm thời gian thực (Realtime Group Order).
+• Phạm vi và phương pháp nghiên cứu: Phạm vi ứng dụng cho nhà hàng, chuỗi quán ăn giao tận nơi & gói ăn định kỳ; phương pháp tiếp cận Agile/Scrum trên nền tảng Laravel 13 MVC.
+• Bố cục đồ án: Bố cục gồm 4 chương chuẩn theo quy định báo cáo công nghệ phần mềm.
+CHƯƠNG 1: TỔNG QUAN VỀ ĐỀ TÀI VÀ BÀI TOÁN THỰC TẾ
+1.1. Bối cảnh thực tiễn và giới thiệu đề tài
+• Khái quát về mô hình kinh doanh F&B trực tuyến hiện đại và xu hướng chuyển đổi số trong ngành ẩm thực.
+1.2. Phân tích bài toán và những khó khăn thực tế
+• Khó khăn gom đơn nhóm tập thể văn phòng/học sinh tốn thời gian, dễ nhầm món và sót tiền.
+• Tâm lý phân vân của người dùng khi chọn món do thiếu công cụ gợi ý theo ngữ cảnh.
+• Đứt gãy luồng thông tin quầy - bếp gây trễ đơn và nhầm thứ tự ưu tiên làm đồ ăn.
+• Rủi ro và sự chậm trễ khi đối soát chuyển khoản ngân hàng bằng phương pháp thủ công.
+1.3. Mục tiêu và phạm vi của đề tài
+• Xây dựng website đặt món trực tuyến với giao diện thân thiện, hiện đại, tốc độ phản hồi nhanh.
+• Hoàn thiện các module: Thực đơn, Giỏ hàng, Đặt món nhóm, Thanh toán, Vận hành bếp và Quản trị hệ thống.
+• Tích hợp Trí tuệ nhân tạo (Google Gemini AI) hỗ trợ khách hàng ra quyết định chọn món.
+1.4. Đối tượng và phạm vi ứng dụng
+• Khách hàng cá nhân, nhóm khách hàng tập thể; nhân viên phục vụ, thu ngân, đầu bếp và Ban quản trị nhà hàng.
+CHƯƠNG 2: PHƯƠNG PHÁP THỰC HIỆN VÀ THIẾT KẾ HỆ THỐNG
+2.1. Phương pháp nghiên cứu và tiếp cận
+• Khảo sát và phân tích các hệ thống đặt đồ ăn và thương mại điện tử hiện có (ShopeeFood, GrabFood).
+• Phân tích các yêu cầu nghiệp vụ đặc thù của ngành F&B (tính tức thời, đồng bộ đơn hàng với bếp).
+• Tiếp cận quy trình phát triển phần mềm theo mô hình Agile/Scrum.
+• Lập trình và thiết kế hệ thống theo mô hình MVC phân tầng trong Laravel.
+2.2. Công nghệ và công cụ sử dụng (Tech Stack & Tooling)
+• Backend: PHP 8.3, Framework Laravel 13, Eloquent ORM.
+• Frontend: Blade Template Engine, TailwindCSS v4, Vite, JavaScript Modern Fetch API.
+• Database: Hệ quản trị cơ sở dữ liệu MySQL 8.0 (hỗ trợ SQLite môi trường testing).
+• Realtime: Công nghệ đồng bộ dữ liệu thời gian thực (Long-Polling / WebSockets Laravel Reverb).
+• Payment: Cổng thanh toán trực tuyến PayOS VietQR tự động khớp lệnh qua Webhook.
+• Trí tuệ nhân tạo (AI): Google Gemini 1.5 Flash API (Prompt Context Injection).
+• Quản lý Dependency & Môi trường: Composer, npm, Git, Laragon / Postman.
+2.3. Quy trình xây dựng hệ thống (Quy trình 8 bước chuẩn)
+• Bước 1: Khảo sát yêu cầu và phân tích chức năng hệ thống F&B.
+• Bước 2: Thiết kế cơ sở dữ liệu và xây dựng quan hệ thực thể (ERD).
+• Bước 3: Xây dựng hệ thống định tuyến (Routes), Controllers, Models và Service Layer.
+• Bước 4: Thiết kế giao diện người dùng cho Khách hàng và Admin Dashboard.
+• Bước 5: Tích hợp giỏ hàng thông minh, đặt món nhóm và thanh toán VietQR PayOS.
+• Bước 6: Tích hợp Trợ lý ẩm thực AI Gemini, Màn hình Bếp FIFO và Vòng quay may mắn.
+• Bước 7: Kiểm thử hệ thống (Automation Testing với PHPUnit) và tối ưu bảo mật (RBAC, BFCache).
+• Bước 8: Đánh giá hiệu năng, sửa lỗi phát sinh và đóng gói triển khai.
+2.4. Thiết kế Kiến trúc hệ thống & Các Module chính
+• 2.4.1. Kiến trúc phân tầng: Tách biệt rõ ràng Controller → Service Layer → Model → Database.
+• 2.4.2. Các module chức năng cốt lõi: Module Món ăn & Danh mục, Module Giỏ hàng & Thanh toán, Module Đặt món nhóm Realtime, Module Vận hành Bếp & Bàn làm việc, Module Quản lý Kho & Nhà cung cấp, Module Khuyến mãi & Voucher, Module Đăng ký gói ăn định kỳ, Module Đánh giá khách hàng, Module Trợ lý ảo AI, Module Quản trị & RBAC.
+2.5. Phân định vai trò người dùng (Actors) & Sơ đồ Use Case
+• Xác định 4 tác nhân: Khách hàng (Customer), Thu ngân/Phục vụ (Staff), Bếp (Kitchen), Quản trị viên (Super Admin & Admin).
+• Sơ đồ Use Case tổng quát toàn hệ thống và biểu đồ Use Case phân rã: Đặt món nhóm, Màn hình Bếp, Quản lý kho.
+2.6. Biểu đồ Hoạt động (Activity Diagrams) cho các luồng nghiệp vụ chính
+• Luồng Đặt hàng và Thanh toán tự động qua PayOS VietQR.
+• Luồng Đặt đơn theo nhóm Realtime (Tạo phòng → Mời bạn bè → Chọn món → Chốt đơn).
+• Luồng Tiếp nhận đơn và Chế biến tại Màn hình Bếp (Kitchen Display).
+2.7. Thiết kế Mô hình Dữ liệu (Database Schema / ERD)
+• Sơ đồ ERD toàn hệ thống và cấu trúc các bảng dữ liệu lõi: users, dishes, categories, orders, order_items, group_orders, group_order_items, inventory, suppliers, meal_subscriptions, vouchers, reviews.
+CHƯƠNG 3: CÀI ĐẶT, THỰC NGHIỆM VÀ KẾT QUẢ TRIỂN KHAI
+3.1. Môi trường triển khai thực nghiệm
+• Hệ điều hành: Windows / Web Server Laragon; PHP 8.3, Laravel 13, MySQL 8.0, Node.js 24, Vite 8.
+3.2. Kết quả giao diện và chức năng đạt được
+• Phân hệ Khách hàng (Menu, tìm kiếm, giỏ hàng, đặt món nhóm realtime, vòng quay may mắn, tra cứu đơn realtime).
+• Phân hệ Vận hành Bếp & Bàn làm việc (Màn hình bếp FIFO tự động nhận đơn, bàn làm việc thu ngân duyệt đơn 1 chạm, in bill).
+• Phân hệ Quản trị Cấp cao (Dashboard doanh thu, quản lý món ăn, quản lý kho nguyên liệu, phân quyền RBAC, email marketing).
+• Trợ lý ẩm thực Google Gemini AI & Cổng thanh toán VietQR PayOS hoạt động chính xác qua Webhook.
+3.3. Các kịch bản kiểm thử tự động (Automation Testing)
+• Thực thi bộ kiểm thử PHPUnit toàn diện với 41/41 test case đạt 100% Passed (CartTest, OrderTest, GroupOrderTest, PaymentTest, AuthSecurityTest).
+3.4. Đánh giá hiệu quả sau thực nghiệm
+• Ưu điểm: Giao diện chỉn chu, phản hồi dưới 1 giây, realtime mượt mà, bảo mật phân quyền chặt chẽ.
+• Hạn chế: Logic trừ kho chưa tự động theo định lượng món, chưa có app chuyên biệt cho shipper.
+CHƯƠNG 4: KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN
+4.1. Tổng kết đề tài: Hoàn thiện nền tảng F&B trực tuyến khép kín, hoạt động ổn định, ứng dụng công nghệ hiện đại (Google AI, PayOS QR, Realtime Group Order).
+4.2. Đánh giá chung: Sản phẩm đạt 100% mục tiêu ban đầu, cấu trúc mã nguồn phân tầng rõ ràng, dễ bảo trì và mở rộng.
+4.3. Hướng phát triển trong 2 tuần tiếp theo:
+• Tuần 1: Định lượng món tự động trừ kho (Recipe/BOM), chuông báo âm thanh bếp, tích điểm thăng hạng thành viên.
+• Tuần 2: Cổng ứng dụng cho Tài xế (Driver Portal), định vị Live GPS Tracking, thông báo đẩy trạng thái đơn (Web Push / Zalo ZNS).
+4.4. Kết luận cuối cùng: Khẳng định tính khả thi, giá trị thực tế và tiềm năng ứng dụng rộng rãi của hệ thống FOODDAILY.
+PHỤ LỤC & TÀI LIỆU THAM KHẢO
+• Phụ lục: Mã nguồn Middleware chống BFCache, Service Gemini AI, Service Webhook PayOS, Bảng kết quả chạy Automation Testing (PHPUnit Results).
+• Tài liệu tham khảo: Laravel Framework Documentation, Google Gemini API, PayOS VietQR API, Spatie Permission, TailwindCSS.

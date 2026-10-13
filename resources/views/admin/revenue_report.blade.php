@@ -28,14 +28,14 @@
                     <i class="fas fa-chevron-down text-[10px]"></i>
                 </button>
                 <div class="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                    <a class="flex items-center px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-rose-600" href="{{ route('baocao_xuat_orders') }}">
-                        <i class="fas fa-file-invoice mr-2 text-rose-500"></i>Xuất danh sách đơn hàng
+                    <a class="flex items-center px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-sky-600 transition-colors" href="{{ route('baocao_xuat_orders') }}">
+                        <i class="fas fa-file-excel mr-2 text-sky-500"></i>Xuất Excel đơn hàng
                     </a>
-                    <a class="flex items-center px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-emerald-600" href="{{ route('baocao_xuat_customers') }}">
-                        <i class="fas fa-users mr-2 text-emerald-500"></i>Xuất thông tin khách hàng
+                    <a class="flex items-center px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-emerald-600 transition-colors" href="{{ route('baocao_xuat_customers') }}">
+                        <i class="fas fa-file-excel mr-2 text-emerald-500"></i>Xuất Excel khách hàng
                     </a>
-                    <a class="flex items-center px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-amber-600" href="{{ route('baocao_xuat_dishes') }}">
-                        <i class="fas fa-hamburger mr-2 text-amber-500"></i>Xuất báo cáo món chạy
+                    <a class="flex items-center px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-rose-600 transition-colors" href="{{ route('baocao_xuat_dishes') }}">
+                        <i class="fas fa-file-excel mr-2 text-rose-500"></i>Xuất Excel món bán chạy
                     </a>
                 </div>
             </div>

@@ -10,6 +10,9 @@
             <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Danh Sách Đơn Hàng</h1>
             <p class="text-xs text-slate-500 font-medium mt-1">Cập nhật thời gian thực trạng thái chế biến & thanh toán</p>
         </div>
+        <a href="{{ route('baocao_xuat_orders') }}" class="px-5 py-3 rounded-2xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-extrabold shadow-lg shadow-sky-500/20 transition-all flex items-center justify-center gap-2">
+            <i class="fas fa-file-excel"></i> Xuất Excel đơn hàng
+        </a>
     </div>
 
     <!-- Alert Flash Notifications -->

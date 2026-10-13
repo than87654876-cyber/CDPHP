@@ -175,6 +175,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'status' => 'boolean',
+            'birthday' => 'date',
+            'last_login' => 'datetime',
         ];
     }
 
