@@ -2,6 +2,11 @@
 
 @section('title', 'Thanh toán đơn hàng #' . $order->id . ' - FOODDAILY')
 
+@section('styles')
+<link rel="preconnect" href="https://img.vietqr.io" crossorigin>
+<link rel="dns-prefetch" href="https://img.vietqr.io">
+@endsection
+
 @section('content')
 <section class="py-8 min-h-[75vh] flex items-center justify-center bg-transparent">
     <div class="max-w-2xl w-full mx-auto px-4 sm:px-6">

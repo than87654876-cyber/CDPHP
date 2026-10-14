@@ -45,20 +45,36 @@ class AppServiceProvider extends ServiceProvider
             ]);
         });
 
-        // 2. Share sidebar badge counts for admin layout (cached 10s to avoid per-request queries)
+        // 2. Share sidebar badge counts for admin layout (cached 15s with single SQL query)
         \Illuminate\Support\Facades\View::composer('layouts.admin', function ($view) {
-            $badges = \Illuminate\Support\Facades\Cache::remember('admin_sidebar_badges', 10, function () {
+            $badges = \Illuminate\Support\Facades\Cache::remember('admin_sidebar_counts', 15, function () {
                 try {
+                    $orderCounts = \Illuminate\Support\Facades\DB::table('orders')
+                        ->selectRaw("
+                            COUNT(CASE WHEN order_status = 'preparing' THEN 1 END) as pending,
+                            COUNT(CASE WHEN order_status = 'delivering' THEN 1 END) as delivering,
+                            COUNT(CASE WHEN order_status IN ('confirmed', 'preparing') THEN 1 END) as kitchen
+                        ")->first();
+
+                    $lowStock = 0;
+                    if (\Illuminate\Support\Facades\Schema::hasTable('inventory_items')) {
+                        $lowStock = (int) \Illuminate\Support\Facades\DB::table('inventory_items')
+                            ->whereRaw('current_stock <= min_stock')
+                            ->count();
+                    }
+
                     return [
-                        'pendingOrdersCount' => \App\Models\Order::where('order_status', 'preparing')->count(),
-                        'deliveringOrdersCount' => \App\Models\Order::where('order_status', 'delivering')->count(),
-                        'kitchenCount' => \App\Models\Order::whereIn('order_status', ['pending', 'confirmed', 'preparing'])->count(),
+                        'pendingOrdersCount' => (int) ($orderCounts->pending ?? 0),
+                        'deliveringOrdersCount' => (int) ($orderCounts->delivering ?? 0),
+                        'kitchenCount' => (int) ($orderCounts->kitchen ?? 0),
+                        'lowStockInventoryCount' => $lowStock,
                     ];
                 } catch (\Throwable $e) {
                     return [
                         'pendingOrdersCount' => 0,
                         'deliveringOrdersCount' => 0,
                         'kitchenCount' => 0,
+                        'lowStockInventoryCount' => 0,
                     ];
                 }
             });

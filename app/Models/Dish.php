@@ -167,27 +167,11 @@ class Dish extends Model
     }
 
     /**
-     * Get the packages that contain this dish.
-     */
-    public function packages(): BelongsToMany
-    {
-        return $this->belongsToMany(ServicePackage::class, 'package_dishes', 'dish_id', 'package_id');
-    }
-
-    /**
      * Get the order items for this dish.
      */
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
-    }
-
-    /**
-     * Get the daily schedules for this dish.
-     */
-    public function dailySchedules(): HasMany
-    {
-        return $this->hasMany(DailySchedule::class);
     }
 
     /**

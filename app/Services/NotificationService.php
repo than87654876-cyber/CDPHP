@@ -71,6 +71,7 @@ class NotificationService
         if ($userId) {
             Cache::put("user_{$userId}_latest_notification", $payload, 3600);
         }
+        self::clearUserNotiCache($userId);
 
         // 3. Bắn WebSocket Realtime tới Laravel Echo / Reverb
         try {
@@ -117,26 +118,42 @@ class NotificationService
     }
 
     /**
-     * Đếm số lượng chưa đọc
+     * Đếm số lượng chưa đọc (Được cache 15s để tối ưu tốc độ render mọi trang web)
      */
     public static function countUnread(?int $userId): int
     {
         try {
-            if (!$userId) {
-                return AppNotification::whereNull('user_id')
+            $cacheKey = $userId ? "noti_unread_user_{$userId}" : "noti_unread_global";
+            return Cache::remember($cacheKey, 15, function () use ($userId) {
+                if (!$userId) {
+                    return AppNotification::whereNull('user_id')
+                        ->whereNull('read_at')
+                        ->count();
+                }
+
+                return AppNotification::where(function ($q) use ($userId) {
+                        $q->where('user_id', $userId)
+                          ->orWhereNull('user_id');
+                    })
                     ->whereNull('read_at')
                     ->count();
-            }
-
-            return AppNotification::where(function ($q) use ($userId) {
-                    $q->where('user_id', $userId)
-                      ->orWhereNull('user_id');
-                })
-                ->whereNull('read_at')
-                ->count();
+            });
         } catch (\Throwable $e) {
             return 0;
         }
+    }
+
+    /**
+     * Xóa cache thông báo người dùng
+     */
+    public static function clearUserNotiCache(?int $userId): void
+    {
+        if ($userId) {
+            Cache::forget("noti_unread_user_{$userId}");
+            Cache::forget("noti_list_user_{$userId}_15");
+        }
+        Cache::forget("noti_unread_global");
+        Cache::forget("noti_list_global_15");
     }
 
     /**
@@ -154,6 +171,7 @@ class NotificationService
             $noti = $query->first();
             if ($noti) {
                 $noti->update(['read_at' => now()]);
+                self::clearUserNotiCache($userId ?? $noti->user_id);
                 return true;
             }
         } catch (\Throwable $e) {
@@ -172,11 +190,14 @@ class NotificationService
         }
 
         try {
-            return AppNotification::where(function ($q) use ($userId) {
+            $updated = AppNotification::where(function ($q) use ($userId) {
                     $q->where('user_id', $userId)->orWhereNull('user_id');
                 })
                 ->whereNull('read_at')
                 ->update(['read_at' => now()]);
+
+            self::clearUserNotiCache($userId);
+            return $updated;
         } catch (\Throwable $e) {
             Log::error('[NotificationService] markAllAsRead error: ' . $e->getMessage());
             return 0;

@@ -19,7 +19,7 @@ class PreventBackHistory
 
         // Apply no-cache only to admin/staff routes, auth routes, or authenticated sessions
         // This preserves public storefront browser cache and prevents laggy back/forward navigation
-        if ($request->is('quanly*') || $request->is('admin*') || $request->is('goidichvu*') || $request->is('giohang*') || auth()->check()) {
+        if ($request->is('quanly*') || $request->is('admin*') || $request->is('giohang*') || auth()->check()) {
             $response->headers->set('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
             $response->headers->set('Pragma', 'no-cache');
             $response->headers->set('Expires', 'Sun, 02 Jan 1990 00:00:00 GMT');

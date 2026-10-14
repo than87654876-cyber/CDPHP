@@ -584,19 +584,6 @@
             </div>
         </div>
 
-        <!-- TAB CONTENT: SPECIFIC CATEGORIES VIEW -->
-        @foreach($categories as $category)
-            <div id="cat-view-cat-{{ $category->id }}" class="cat-view-pane hidden">
-                <div id="cat-grid-{{ $category->id }}" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-                    @forelse($category->dishes as $cIndex => $dish)
-                        @include('client.partials.dish_card', ['dish' => $dish, 'dIndex' => $cIndex])
-                    @empty
-                        <div id="cat-empty-{{ $category->id }}" class="col-span-full py-8 text-center text-slate-400">Danh mục này hiện chưa có món ăn.</div>
-                    @endforelse
-                </div>
-            </div>
-        @endforeach
-
         <!-- INFINITE SCROLL LOADER & CONTROLS -->
         <div id="infinite-scroll-container" class="py-6 flex flex-col items-center justify-center space-y-3">
             <!-- Scroll Sentinel (Quan sát bởi IntersectionObserver để tự động tải thêm món) -->

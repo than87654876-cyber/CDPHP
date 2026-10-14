@@ -578,7 +578,7 @@
                                 weatherRec.innerText = "🧊 Gợi ý: Chạy ưu đãi Trà đào, Sinh tố, Nước ép & Salad tươi mát.";
                             } else {
                                 weatherText.innerText = "Thời tiết mát mẻ lý tưởng cho các bữa ăn ngon miệng";
-                                weatherRec.innerText = "🍱 Gợi ý: Quảng bá các Gói cơm văn phòng Combo tuần/tháng.";
+                                weatherRec.innerText = "🍱 Gợi ý: Quảng bá các phần cơm văn phòng và suất ăn trưa.";
                             }
                         }
                     })

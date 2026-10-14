@@ -46,21 +46,6 @@
 <body id="page-top" class="font-sans antialiased text-slate-800 bg-[#f8fafc] min-h-full selection:bg-[#ee4d2d] selection:text-white">
     <div id="wrapper" class="flex min-h-screen">
 
-        <!-- REALTIME COUNTS FOR SIDEBAR BADGES (CACHED 15s) -->
-        @php
-            $adminSidebarCounts = \Illuminate\Support\Facades\Cache::remember('admin_sidebar_counts', 15, function() {
-                return [
-                    'pending' => (int) \App\Models\Order::where('order_status', 'preparing')->count(),
-                    'delivering' => (int) \App\Models\Order::where('order_status', 'delivering')->count(),
-                    'kitchen' => (int) \App\Models\Order::whereIn('order_status', ['confirmed', 'preparing'])->count(),
-                    'low_stock' => (int) \App\Models\InventoryItem::where('current_stock', '<=', \Illuminate\Support\Facades\DB::raw('min_stock'))->count(),
-                ];
-            });
-            $pendingOrdersCount = $adminSidebarCounts['pending'] ?? 0;
-            $deliveringOrdersCount = $adminSidebarCounts['delivering'] ?? 0;
-            $kitchenCount = $adminSidebarCounts['kitchen'] ?? 0;
-            $lowStockInventoryCount = $adminSidebarCounts['low_stock'] ?? 0;
-        @endphp
 
         <!-- Mobile Sidebar Overlay Backdrop -->
         <div id="admin-sidebar-overlay" onclick="toggleAdminSidebar()" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-35 hidden lg:hidden transition-opacity"></div>
@@ -363,7 +348,11 @@
                 .then(response => response.json())
                 .then(data => {
                     lastCheckedTime = data.timestamp;
-                    setInterval(pollUpdates, 3000);
+                    setInterval(function() {
+                        if (!document.hidden) {
+                            pollUpdates();
+                        }
+                    }, 6000);
                 })
                 .catch(err => console.error('Error initializing admin polling:', err));
 
@@ -377,7 +366,7 @@
                         if (data.updates && data.updates.length > 0) {
                             data.updates.forEach(e => {
                                 const path = window.location.pathname;
-                                const isManagerPage = path.includes('quanly') || path.includes('donhang') || path.includes('goidangky') || path.includes('bep') || path.includes('kho');
+                                const isManagerPage = path.includes('quanly') || path.includes('donhang') || path.includes('bep') || path.includes('kho');
                                 
                                 if (e.action === 'created') {
                                     alert(`🔔 [Realtime Notification] Có đơn hàng mới #${e.order.id}! Vui lòng kiểm tra!`);

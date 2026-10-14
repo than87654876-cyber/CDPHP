@@ -25,9 +25,6 @@
         <a href="{{ route('quanly_khachhang', ['filter' => 'first_order']) }}" class="px-4 py-2 rounded-xl border transition-all {{ isset($filter) && $filter === 'first_order' ? 'bg-[#ee4d2d] text-white border-[#ee4d2d]' : 'bg-white text-slate-700 hover:bg-slate-100 border-slate-200' }}">
             Đã từng đặt hàng
         </a>
-        <a href="{{ route('quanly_khachhang', ['filter' => 'active_package']) }}" class="px-4 py-2 rounded-xl border transition-all {{ isset($filter) && $filter === 'active_package' ? 'bg-[#ee4d2d] text-white border-[#ee4d2d]' : 'bg-white text-slate-700 hover:bg-slate-100 border-slate-200' }}">
-            Đang dùng gói combo
-        </a>
     </div>
 
     <!-- Data Table Card -->

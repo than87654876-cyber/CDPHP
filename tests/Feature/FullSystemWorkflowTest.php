@@ -3,11 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
-use App\Models\DailySchedule;
 use App\Models\Dish;
 use App\Models\Order;
-use App\Models\ServicePackage;
-use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -47,13 +44,7 @@ class FullSystemWorkflowTest extends TestCase
             'image_url' => 'comtam.jpg',
         ]);
 
-        $package = ServicePackage::create([
-            'package_name' => 'Monthly Flex',
-            'price' => 179.99,
-            'days' => 30,
-            'description' => 'Monthly subscription flex menu',
-            'status' => true,
-        ]);
+
 
         // 2. Test Customer registration
         $registrationData = [
@@ -159,91 +150,5 @@ class FullSystemWorkflowTest extends TestCase
             'order_status' => 'completed',
             'payment_status' => 'paid',
         ]);
-
-        // 6. Test Subscription and Daily schedule flow
-        // Let's create a subscription order manually for testing
-        $subOrder = Order::create([
-            'user_id' => $user->id,
-            'order_type' => 'subscription',
-            'total_amount' => 179.99,
-            'final_amount' => 179.99,
-            'payment_method' => 'bank_transfer',
-            'payment_status' => 'paid',
-            'order_status' => 'confirmed',
-            'health_notes' => 'Subscription order notes',
-        ]);
-
-        $subscription = Subscription::create([
-            'order_id' => $subOrder->id,
-            'user_id' => $user->id,
-            'package_id' => $package->id,
-            'start_date' => '2026-06-01',
-            'end_date' => '2026-06-30',
-            'remaining_days' => 10,
-            'status' => 'active',
-        ]);
-
-        $schedule = DailySchedule::create([
-            'subscription_id' => $subscription->id,
-            'delivery_date' => '2026-06-15',
-            'dish_id' => $dish1->id,
-            'delivery_status' => 'pending',
-            'is_locked' => false,
-        ]);
-
-        // Staff/Admin triggers daily delivery order creation
-        $response = $this->actingAs($staff)->post(route('goidangky_tao_don', $subscription->id));
-        $response->assertRedirect();
-
-        $this->assertDatabaseHas('daily_schedules', [
-            'id' => $schedule->id,
-            'delivery_status' => 'delivered',
-            'is_locked' => true,
-        ]);
-
-        $this->assertDatabaseHas('subscriptions', [
-            'id' => $subscription->id,
-            'remaining_days' => 9,
-            'status' => 'active',
-        ]);
-
-        // 7. Test Front-end Package Purchase (buyPackage route)
-        // Ensure seeded package exists for mapping 'family'
-        $familyPackage = ServicePackage::create([
-            'package_name' => 'Gói Gia Đình Hàng Ngày',
-            'price' => 1500000.00,
-            'duration_days' => 30,
-            'status' => true,
-            'description' => 'Gia dinh test',
-        ]);
-
-        $purchaseData = [
-            'package_type' => 'family',
-            'package_duration' => 30,
-            'start_date' => date('Y-m-d', strtotime('+1 day')),
-            'delivery_slot' => 'noon',
-            'sub_phone' => '0987654321',
-            'sub_email' => 'customer_a@example.com',
-            'sub_address' => '123 Ly Thuong Kiet, HCMC',
-            'sub_payment_method' => 'bank_transfer',
-        ];
-
-        $response = $this->actingAs($user)->post(route('goidichvu.buy'), $purchaseData);
-        $response->assertRedirect(route('goidichvu'));
-
-        $this->assertDatabaseHas('orders', [
-            'user_id' => $user->id,
-            'order_type' => 'subscription',
-            'total_amount' => 1500000.00,
-            'payment_method' => 'bank_transfer',
-        ]);
-
-        $newSub = Subscription::where('user_id', $user->id)
-            ->where('package_id', $familyPackage->id)
-            ->first();
-
-        $this->assertNotNull($newSub);
-        $this->assertEquals(30, $newSub->remaining_days);
-        $this->assertEquals(30, $newSub->dailySchedules()->count());
     }
 }

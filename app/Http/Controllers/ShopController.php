@@ -16,8 +16,8 @@ class ShopController extends Controller
 
         $sort = $request->input('sort', 'rating_desc');
 
-        // Lấy tất cả các món ăn cho Tab "Tất cả"
-        $allDishesQuery = \App\Models\Dish::where('is_available', true);
+        // Lấy tất cả các món ăn cho Tab "Tất cả" (Eager-load category để loại bỏ N+1 query)
+        $allDishesQuery = \App\Models\Dish::with('category')->where('is_available', true);
         if ($query) {
             $allDishesQuery->where('dish_name', 'like', '%'.$query.'%');
         }
@@ -35,8 +35,8 @@ class ShopController extends Controller
             })->values();
         }
 
-        // Lấy các danh mục và liên kết với các món ăn đã được tải và sắp xếp sẵn (tiết kiệm truy vấn database)
-        $categories = Category::all();
+        // Lấy các danh mục và liên kết với các món ăn đã được sắp xếp
+        $categories = Category::orderBy('category_name')->get();
         foreach ($categories as $cat) {
             $catDishes = $allDishes->where('category_id', $cat->id)->values();
             $cat->setRelation('dishes', $catDishes);
@@ -48,9 +48,9 @@ class ShopController extends Controller
         $currentSelectedDish = null;
         $isPurchasedDish = false;
 
-        // Ưu tiên món đang được chọn qua URL hoặc trong session giỏ hàng
+        // Ưu tiên món đang được chọn qua URL hoặc trong session giỏ hàng (Lấy trực tiếp từ $allDishes đã nạp)
         if ($selectedDishId) {
-            $currentSelectedDish = \App\Models\Dish::with('category')->where('is_available', true)->find($selectedDishId);
+            $currentSelectedDish = $allDishes->firstWhere('id', (int) $selectedDishId);
         }
 
         // Nếu chưa chọn món cụ thể: Kiểm tra lịch sử mua hàng của khách (Chỉ cần mua 1 lần là hiển thị luôn)
@@ -63,7 +63,7 @@ class ShopController extends Controller
                 ->value('dish_id');
 
             if ($userLastPurchasedDishId) {
-                $currentSelectedDish = \App\Models\Dish::with('category')->where('is_available', true)->find($userLastPurchasedDishId);
+                $currentSelectedDish = $allDishes->firstWhere('id', (int) $userLastPurchasedDishId);
                 if ($currentSelectedDish) {
                     $isPurchasedDish = true;
                 }
@@ -79,7 +79,7 @@ class ShopController extends Controller
                     ->value('dish_id');
             }
             if ($guestDishId) {
-                $currentSelectedDish = \App\Models\Dish::with('category')->where('is_available', true)->find($guestDishId);
+                $currentSelectedDish = $allDishes->firstWhere('id', (int) $guestDishId);
                 if ($currentSelectedDish) {
                     $isPurchasedDish = true;
                 }
@@ -96,15 +96,18 @@ class ShopController extends Controller
             });
 
             if ($topDishId) {
-                $currentSelectedDish = \App\Models\Dish::with('category')->where('is_available', true)->find($topDishId);
+                $currentSelectedDish = $allDishes->firstWhere('id', (int) $topDishId);
             }
 
             if (!$currentSelectedDish) {
-                $currentSelectedDish = \App\Models\Dish::with('category')->where('is_available', true)->first();
+                $currentSelectedDish = $allDishes->first();
             }
         }
 
-        $sameCategoryDishes = $currentSelectedDish ? $currentSelectedDish->getRelatedDishes(6) : collect();
+        // Đề xuất món cùng loại: lọc trực tiếp từ $allDishes trong RAM, không query lại DB
+        $sameCategoryDishes = $currentSelectedDish 
+            ? $allDishes->where('category_id', $currentSelectedDish->category_id)->where('id', '!=', $currentSelectedDish->id)->take(6)->values()
+            : collect();
 
         // 2. THUẬT TOÁN: Món hay mua (Chỉ cần mua 1 lần là hiển thị luôn, không cần mua trên 2 lần)
         $frequentDishes = collect();
@@ -117,9 +120,10 @@ class ShopController extends Controller
                 ->groupBy('dish_id')
                 ->having('total_qty', '>=', 1)
                 ->orderByDesc('total_qty')
-                ->pluck('dish_id');
+                ->pluck('dish_id')
+                ->toArray();
 
-            $frequentDishes = \App\Models\Dish::whereIn('id', $frequentDishIds)->where('is_available', true)->get();
+            $frequentDishes = $allDishes->whereIn('id', $frequentDishIds)->take(4)->values();
         }
 
         if ($frequentDishes->isEmpty()) {
@@ -132,10 +136,10 @@ class ShopController extends Controller
                     ->toArray();
             });
 
-            $frequentDishes = \App\Models\Dish::whereIn('id', $topDishIds)->where('is_available', true)->take(4)->get();
+            $frequentDishes = $allDishes->whereIn('id', $topDishIds)->take(4)->values();
 
             if ($frequentDishes->isEmpty()) {
-                $frequentDishes = \App\Models\Dish::where('is_available', true)->take(4)->get();
+                $frequentDishes = $allDishes->take(4)->values();
             }
         }
 
@@ -278,7 +282,7 @@ class ShopController extends Controller
         }
 
         // 6. Lấy cấu hình trang chủ từ bảng settings (cached 1 hour)
-        $settings = \Illuminate\Support\Facades\Cache::remember('site_global_settings', 3600, function () {
+        $settings = \Illuminate\Support\Facades\Cache::remember('app_global_settings', 3600, function () {
             return \App\Models\Setting::pluck('value', 'key')->all();
         });
 
@@ -520,14 +524,12 @@ class ShopController extends Controller
             $lastDishUpdate = \App\Models\Dish::max('updated_at');
             $lastCategoryUpdate = \App\Models\Category::max('updated_at');
             $lastCouponUpdate = \App\Models\Coupon::max('updated_at');
-            $lastPackageUpdate = \App\Models\ServicePackage::max('updated_at');
 
             $fingerprint = md5(json_encode([
                 'settings' => $settings,
                 'dish' => $lastDishUpdate,
                 'category' => $lastCategoryUpdate,
                 'coupon' => $lastCouponUpdate,
-                'package' => $lastPackageUpdate,
             ]));
 
             return [

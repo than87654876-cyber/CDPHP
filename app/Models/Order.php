@@ -92,24 +92,6 @@ class Order extends Model
                     $order->saveQuietly();
                 }
             }
-
-            // Auto-activate subscription when order is paid
-            if ($order->order_type === 'subscription' && $order->payment_status === 'paid') {
-                $subscription = \App\Models\Subscription::where('order_id', $order->id)->first();
-                if ($subscription && $subscription->status === 'pending') {
-                    $subscription->status = 'active';
-                    $subscription->save();
-                }
-            }
-
-            // Auto-cancel subscription when order is refunded/cancelled
-            if ($order->order_type === 'subscription' && ($order->payment_status === 'refunded' || $order->order_status === 'cancelled')) {
-                $subscription = \App\Models\Subscription::where('order_id', $order->id)->first();
-                if ($subscription && !in_array($subscription->status, ['cancelled', 'expired'])) {
-                    $subscription->status = 'cancelled';
-                    $subscription->save();
-                }
-            }
         });
     }
 

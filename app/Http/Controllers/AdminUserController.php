@@ -37,10 +37,6 @@ class AdminUserController extends Controller
     {
         if ($filter === 'first_order') {
             $query->whereHas('orders');
-        } elseif ($filter === 'active_package') {
-            $query->whereHas('subscriptions', function ($q) {
-                $q->where('status', 'active');
-            });
         } elseif ($filter === 'inactive_3m') {
             $threeMonthsAgo = now()->subMonths(3);
             $query->where('created_at', '<', $threeMonthsAgo)
@@ -123,9 +119,9 @@ class AdminUserController extends Controller
     {
         $customer = User::where('role', 'customer')->findOrFail($id);
 
-        // Kiểm tra xem khách hàng có đơn hàng hoặc đăng ký gói không
-        if ($customer->orders()->count() > 0 || $customer->subscriptions()->count() > 0) {
-            return redirect()->route('quanly_khachhang')->with('error', 'Không thể xóa khách hàng này vì đã có dữ liệu đơn hàng hoặc gói dịch vụ liên kết.');
+        // Kiểm tra xem khách hàng có đơn hàng không
+        if ($customer->orders()->count() > 0) {
+            return redirect()->route('quanly_khachhang')->with('error', 'Không thể xóa khách hàng này vì đã có dữ liệu đơn hàng liên kết.');
         }
 
         $customer->delete();
@@ -482,8 +478,8 @@ class AdminUserController extends Controller
             return redirect()->route('quanly_nhanvien')->with('error', 'Bạn không thể tự xóa tài khoản của chính mình.');
         }
 
-        if ($employee->orders()->count() > 0 || $employee->subscriptions()->count() > 0) {
-            return redirect()->route('quanly_nhanvien')->with('error', 'Không thể xóa nhân viên này vì đã có dữ liệu đơn hàng hoặc gói dịch vụ liên kết.');
+        if ($employee->orders()->count() > 0) {
+            return redirect()->route('quanly_nhanvien')->with('error', 'Không thể xóa nhân viên này vì đã có dữ liệu đơn hàng liên kết.');
         }
 
         $employee->delete();

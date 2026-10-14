@@ -5,12 +5,8 @@ namespace App\Services;
 use App\Models\Coupon;
 use App\Models\CustomerBackup;
 use App\Models\CustomerBackupLog;
-use App\Models\DailySchedule;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\ServicePackage;
-use App\Models\Subscription;
-use App\Models\SubscriptionPause;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
@@ -158,13 +154,6 @@ class CustomerBackupService
         $orderItems = OrderItem::whereIn('order_id', $orderIds)->get();
         $couponIds = $orders->pluck('coupon_id')->filter()->unique()->all();
 
-        $subscriptions = Subscription::whereIn('user_id', $userIds)->get();
-        $subscriptionIds = $subscriptions->pluck('id')->all();
-        $packageIds = $subscriptions->pluck('package_id')->filter()->unique()->all();
-
-        $servicePackages = ServicePackage::whereIn('id', $packageIds)->get();
-        $dailySchedules = DailySchedule::whereIn('subscription_id', $subscriptionIds)->get();
-        $subscriptionPauses = SubscriptionPause::whereIn('subscription_id', $subscriptionIds)->get();
         $coupons = Coupon::whereIn('id', $couponIds)->get();
 
         return [
@@ -176,18 +165,6 @@ class CustomerBackupService
             })->all(),
             'order_items' => $orderItems->map(function (OrderItem $item) {
                 return $item->toArray();
-            })->all(),
-            'subscriptions' => $subscriptions->map(function (Subscription $subscription) {
-                return $subscription->toArray();
-            })->all(),
-            'service_packages' => $servicePackages->map(function (ServicePackage $package) {
-                return $package->toArray();
-            })->all(),
-            'daily_schedules' => $dailySchedules->map(function (DailySchedule $schedule) {
-                return $schedule->toArray();
-            })->all(),
-            'subscription_pauses' => $subscriptionPauses->map(function (SubscriptionPause $pause) {
-                return $pause->toArray();
             })->all(),
             'coupons' => $coupons->map(function (Coupon $coupon) {
                 return $coupon->toArray();
@@ -201,10 +178,6 @@ class CustomerBackupService
             'users',
             'orders',
             'order_items',
-            'subscriptions',
-            'service_packages',
-            'daily_schedules',
-            'subscription_pauses',
             'coupons',
         ];
 
@@ -218,7 +191,6 @@ class CustomerBackupService
     protected function performRestore(array $payload): void
     {
         $userIds = collect($payload['users'])->pluck('id')->all();
-        $subscriptionIds = collect($payload['subscriptions'])->pluck('id')->all();
         $orderIds = collect($payload['orders'])->pluck('id')->all();
 
         if (!empty($orderIds)) {
@@ -226,20 +198,9 @@ class CustomerBackupService
             DB::table('orders')->whereIn('id', $orderIds)->delete();
         }
 
-        if (!empty($subscriptionIds)) {
-            DB::table('daily_schedules')->whereIn('subscription_id', $subscriptionIds)->delete();
-            DB::table('subscription_pauses')->whereIn('subscription_id', $subscriptionIds)->delete();
-            DB::table('subscriptions')->whereIn('id', $subscriptionIds)->delete();
-        }
-
         if (!empty($userIds)) {
             DB::table('orders')->whereIn('user_id', $userIds)->delete();
-            DB::table('subscriptions')->whereIn('user_id', $userIds)->delete();
             DB::table('users')->whereIn('id', $userIds)->delete();
-        }
-
-        if (!empty($payload['service_packages'])) {
-            DB::table('service_packages')->upsert($payload['service_packages'], ['id']);
         }
 
         if (!empty($payload['coupons'])) {
@@ -248,18 +209,6 @@ class CustomerBackupService
 
         if (!empty($payload['users'])) {
             DB::table('users')->insert($payload['users']);
-        }
-
-        if (!empty($payload['subscriptions'])) {
-            DB::table('subscriptions')->insert($payload['subscriptions']);
-        }
-
-        if (!empty($payload['daily_schedules'])) {
-            DB::table('daily_schedules')->insert($payload['daily_schedules']);
-        }
-
-        if (!empty($payload['subscription_pauses'])) {
-            DB::table('subscription_pauses')->insert($payload['subscription_pauses']);
         }
 
         if (!empty($payload['orders'])) {

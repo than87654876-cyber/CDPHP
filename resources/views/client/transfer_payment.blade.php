@@ -2,6 +2,16 @@
 
 @section('title', 'Thanh toán Quét mã VietQR - FOODDAILY')
 
+@section('styles')
+<link rel="preconnect" href="https://img.vietqr.io" crossorigin>
+<link rel="dns-prefetch" href="https://img.vietqr.io">
+<link rel="preconnect" href="https://api.vietqr.io" crossorigin>
+<link rel="dns-prefetch" href="https://api.vietqr.io">
+@if(isset($order_id))
+<link rel="preload" as="image" href="https://img.vietqr.io/image/{{ config('services.sepay.bank', 'BIDV') }}-{{ config('services.sepay.account_number', '962477I87L') }}-compact2.jpg?amount={{ (int)($amount ?? ($order->final_amount ?? 0)) }}&addInfo=FDL-{{ $order_id }}&accountName={{ urlencode(config('services.sepay.account_name', 'Tran Le Than')) }}" fetchpriority="high">
+@endif
+@endsection
+
 @section('content')
 <div class="py-12 bg-transparent min-h-screen">
     <div class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -107,12 +117,30 @@
                 </div>
 
                 <!-- VietQR Image Box -->
-                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 max-w-xs mx-auto shadow-inner relative group">
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 max-w-xs mx-auto shadow-inner relative group min-h-[320px] flex flex-col justify-center items-center overflow-hidden">
+                    <!-- Instant Shimmer Skeleton while VietQR loads -->
+                    <div id="qr-skeleton" class="w-full aspect-[3/4] rounded-xl bg-gradient-to-br from-slate-100 via-rose-50/50 to-slate-100 flex flex-col items-center justify-center p-6 border border-slate-200/80 transition-all duration-300">
+                        <div class="w-16 h-16 rounded-2xl bg-white shadow-md flex items-center justify-center text-[#ee4d2d] text-3xl mb-3 animate-bounce">
+                            <i class="fas fa-qrcode"></i>
+                        </div>
+                        <p class="text-xs font-black text-slate-800 text-center flex items-center gap-1.5">
+                            <i class="fas fa-spinner fa-spin text-[#ee4d2d]"></i> Đang nạp mã VietQR...
+                        </p>
+                        <p class="text-[10px] text-slate-400 text-center mt-1">Kết nối ngân hàng {{ $sepayBank }}</p>
+                        <div class="w-28 h-1.5 bg-slate-200 rounded-full mt-3 overflow-hidden">
+                            <div class="w-full h-full bg-[#ee4d2d] animate-pulse"></div>
+                        </div>
+                    </div>
+
+                    <!-- Official VietQR Image -->
                     <img id="vietqr-image"
                          src="https://img.vietqr.io/image/{{ $sepayBank }}-{{ $sepayAcc }}-compact2.jpg?amount={{ (int)$displayAmount }}&addInfo=FDL-{{ $order_id }}&accountName={{ urlencode($sepayName) }}"
-                         onerror="this.onerror=null; this.src='{{ asset('qr_code.png') }}';"
+                         onload="handleQrLoaded(this)"
+                         onerror="handleQrError(this)"
+                         fetchpriority="high"
+                         decoding="async"
                          alt="Mã VietQR Thanh Toán"
-                         class="w-full h-auto rounded-xl shadow-xs transition-transform duration-300 group-hover:scale-102">
+                         class="hidden w-full h-auto rounded-xl shadow-xs transition-all duration-300 group-hover:scale-102">
                     <div class="mt-2 text-[11px] font-bold text-slate-500 flex items-center justify-center gap-1">
                         <i class="fas fa-camera text-slate-400"></i> Mở App Ngân Hàng hoặc MoMo quét mã
                     </div>
@@ -210,6 +238,36 @@
 
 @section('scripts')
 <script>
+    // Xử lý nạp mã QR hỏa tốc
+    function handleQrLoaded(img) {
+        const skeleton = document.getElementById('qr-skeleton');
+        if (skeleton) skeleton.style.display = 'none';
+        if (img) {
+            img.classList.remove('hidden');
+            img.classList.remove('opacity-0');
+        }
+    }
+
+    function handleQrError(img) {
+        console.warn('Primary VietQR CDN slow or failed, trying backup mirror...');
+        const backupUrl = "https://api.vietqr.io/image/{{ $sepayBank }}-{{ $sepayAcc }}-compact2.jpg?amount={{ (int)$displayAmount }}&addInfo=FDL-{{ $order_id }}&accountName={{ urlencode($sepayName) }}";
+        if (img && img.src !== backupUrl) {
+            img.src = backupUrl;
+        } else if (img) {
+            img.onerror = null;
+            img.src = "{{ asset('qr_code.png') }}";
+            handleQrLoaded(img);
+        }
+    }
+
+    // Kiểm tra nếu ảnh QR đã nạp sẵn trong cache trình duyệt
+    (function checkQrCached() {
+        const existingQr = document.getElementById('vietqr-image');
+        if (existingQr && existingQr.complete && existingQr.naturalWidth > 0) {
+            handleQrLoaded(existingQr);
+        }
+    })();
+
     // Hàm sao chép vào clipboard
     function copyToClipboard(text, btn) {
         if (!text) return;

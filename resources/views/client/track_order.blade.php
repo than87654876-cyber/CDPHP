@@ -306,7 +306,11 @@
                 })
                 .catch(err => console.error('Error polling order status:', err));
         }
-        setInterval(pollOrderStatus, 2000);
+        setInterval(function() {
+            if (!document.hidden) {
+                pollOrderStatus();
+            }
+        }, 5000);
     });
 </script>
 @endif

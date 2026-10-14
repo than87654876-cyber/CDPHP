@@ -4,11 +4,9 @@ use App\Http\Controllers\AdminCategoryController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminDishController;
 use App\Http\Controllers\AdminOrderController;
-use App\Http\Controllers\AdminPackageController;
 use App\Http\Controllers\AdminProcurementController;
 use App\Http\Controllers\AdminPromotionController;
 use App\Http\Controllers\AdminSettingController;
-use App\Http\Controllers\AdminSubscriptionController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
@@ -17,7 +15,6 @@ use App\Http\Controllers\GroupOrderController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\StaffWorkspaceController;
-use App\Http\Controllers\SubscriptionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -137,17 +134,8 @@ Route::post('/order/review', [CartController::class, 'reviewOrder'])->name('orde
 // Dynamic Realtime Orders Polling API
 Route::get('/api/orders/poll', [CartController::class, 'pollUserOrders'])->name('api.orders.poll');
 
-// Gói dịch vụ khách hàng (Subscriptions)
+// Phân hệ Hồ sơ tài khoản khách hàng (Hồ sơ, Sổ địa chỉ, Bảo mật, Thành viên & Voucher)
 Route::middleware(['auth'])->group(function () {
-    Route::get('/goidichvu', [SubscriptionController::class, 'index'])->name('goidichvu');
-    Route::post('/goidichvu/doimon', [SubscriptionController::class, 'changeMenu'])->name('goidichvu.change_menu');
-    Route::post('/goidichvu/ghichu', [SubscriptionController::class, 'addNote'])->name('goidichvu.add_note');
-    Route::post('/goidichvu/tamngung', [SubscriptionController::class, 'pause'])->name('goidichvu.pause');
-    Route::post('/goidichvu/huy', [SubscriptionController::class, 'cancel'])->name('goidichvu.cancel');
-    Route::post('/goidichvu/danhgia', [SubscriptionController::class, 'review'])->name('goidichvu.review');
-    Route::post('/goidichvu/mua', [SubscriptionController::class, 'buyPackage'])->name('goidichvu.buy');
-
-    // Phân hệ Hồ sơ tài khoản khách hàng (Hồ sơ, Sổ địa chỉ, Bảo mật, Thành viên & Voucher)
     Route::get('/hoso', [ProfileController::class, 'index'])->name('hoso');
     Route::post('/hoso/thong-tin', [ProfileController::class, 'updateInfo'])->name('hoso.update_info');
     Route::post('/hoso/dia-chi', [ProfileController::class, 'updateAddress'])->name('hoso.update_address');
@@ -168,15 +156,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
         // Cấu hình trang chủ
         Route::get('/quanly_cauhinh', [AdminSettingController::class, 'index'])->name('quanly_cauhinh');
         Route::post('/quanly_cauhinh', [AdminSettingController::class, 'update'])->name('quanly_cauhinh.post');
-
-        // Quản lý Gói dịch vụ Combo
-        Route::get('/quanly_goidichvu', [AdminPackageController::class, 'index'])->name('quanly_goidichvu');
-        Route::get('/goidichvu_them', [AdminPackageController::class, 'create'])->name('goidichvu_them');
-        Route::post('/goidichvu_them', [AdminPackageController::class, 'store'])->name('goidichvu_them.post');
-        Route::get('/goidichvu_xem/{id}', [AdminPackageController::class, 'show'])->name('goidichvu_xem');
-        Route::get('/goidichvu_chinhsua/{id}', [AdminPackageController::class, 'edit'])->name('goidichvu_chinhsua');
-        Route::post('/goidichvu_chinhsua/{id}', [AdminPackageController::class, 'update'])->name('goidichvu_chinhsua.post');
-        Route::post('/goidichvu_xoa/{id}', [AdminPackageController::class, 'destroy'])->name('goidichvu_xoa');
 
         // Quản lý Nhân viên
         Route::get('/quanly_nhanvien', [AdminUserController::class, 'employeesList'])->name('quanly_nhanvien');
@@ -253,14 +232,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     // Bếp chuẩn bị món
     Route::get('/quanly_bep', [AdminOrderController::class, 'kitchenReport'])->name('quanly_bep');
-
-    // Quản lý Gói đăng ký
-    Route::get('/quanly_goidangky', [AdminSubscriptionController::class, 'index'])->name('quanly_goidangky');
-    Route::get('/goidangky_xem/{id}', [AdminSubscriptionController::class, 'show'])->name('goidangky_xem');
-    Route::get('/goidangky_chinhsua/{id}', [AdminSubscriptionController::class, 'edit'])->name('goidangky_chinhsua');
-    Route::post('/goidangky_chinhsua/{id}', [AdminSubscriptionController::class, 'update'])->name('goidangky_chinhsua.post');
-    Route::post('/goidangky_xoa/{id}', [AdminSubscriptionController::class, 'destroy'])->name('goidangky_xoa');
-    Route::post('/goidangky_tao_don/{id}', [AdminSubscriptionController::class, 'createDailyOrder'])->name('goidangky_tao_don');
 
     // Quản lý Khách hàng
     Route::get('/quanly_khachhang', [AdminUserController::class, 'customersList'])->name('quanly_khachhang');

@@ -70,6 +70,10 @@ class CartController extends Controller
         $search = $request->input('search');
         $user = Auth::user();
 
+        if (!$user) {
+            return redirect()->route('dangnhap')->with('error', 'Vui lòng đăng nhập để xem lịch sử đơn hàng.');
+        }
+
         $query = Order::where('user_id', $user->id)
             ->with(['orderItems.dish', 'reviews'])
             ->orderBy('created_at', 'desc');
@@ -666,10 +670,10 @@ class CartController extends Controller
 
         try {
             if ($order->user && $order->user->email) {
-                Mail::to($order->user->email)->send(new OrderPlacedMail($order));
+                Mail::to($order->user->email)->queue(new OrderPlacedMail($order));
             }
         } catch (\Exception $mailError) {
-            \Illuminate\Support\Facades\Log::warning('OrderPlacedMail sending warning: ' . $mailError->getMessage());
+            \Illuminate\Support\Facades\Log::warning('OrderPlacedMail queueing warning: ' . $mailError->getMessage());
         }
 
         try {
@@ -1067,6 +1071,10 @@ class CartController extends Controller
 
     public function pollUserOrders(Request $request)
     {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_write_close();
+        }
+
         if (!Auth::check()) {
             return response()->json(['orders' => []]);
         }
@@ -1085,6 +1093,10 @@ class CartController extends Controller
     // API kiểm tra trạng thái thanh toán đơn hàng (dùng cho polling chuyển khoản/momo)
     public function getPaymentStatus(Request $request, $id)
     {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_write_close();
+        }
+
         $order = Order::find($id);
         if (!$order) {
             return response()->json(['error' => 'Order not found'], 404);

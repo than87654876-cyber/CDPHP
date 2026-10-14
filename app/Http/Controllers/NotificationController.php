@@ -206,6 +206,10 @@ class NotificationController extends Controller
      */
     public function poll(Request $request)
     {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_write_close();
+        }
+
         $lastSeenId = $request->input('last_id');
         $userId = Auth::id();
 

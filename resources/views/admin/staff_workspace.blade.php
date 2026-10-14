@@ -115,30 +115,22 @@
                         </div>
                     </div>
                     <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-extrabold border border-blue-200">
-                        {{ $shipDeliveringOrders + $shipTodaySubscriptions }} đơn giao
+                        {{ $shipDeliveringOrders }} đơn giao
                     </span>
                 </div>
 
                 <p class="text-xs text-slate-500 leading-relaxed font-medium">
-                    Theo dõi vị trí và tiến độ giao hàng của shipper cho các đơn lẻ và gói combo đăng ký.
+                    Theo dõi vị trí và tiến độ giao hàng của shipper cho các đơn hàng của khách.
                 </p>
 
                 <div class="space-y-3">
                     <a href="{{ route('quanly_donhang', ['status' => 'delivering']) }}" class="p-3.5 rounded-2xl bg-slate-50 hover:bg-blue-50/50 border border-slate-100 flex items-center justify-between transition-colors block">
                         <div>
-                            <p class="text-xs font-bold text-slate-800">Shipper đang giao đơn lẻ</p>
-                            <p class="text-[10px] text-slate-400">Đơn hàng đang trên đường</p>
+                            <p class="text-xs font-bold text-slate-800">Shipper đang giao hàng</p>
+                            <p class="text-[10px] text-slate-400">Đơn hàng đang trên đường tới khách</p>
                         </div>
                         <span class="px-3 py-1 bg-blue-600 text-white rounded-xl text-xs font-black">{{ $shipDeliveringOrders }} đơn</span>
                     </a>
-
-                    <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-bold text-slate-800">Giao hàng gói Combo tuần/tháng</p>
-                            <p class="text-[10px] text-slate-400">Lịch trình hôm nay</p>
-                        </div>
-                        <span class="px-3 py-1 bg-slate-800 text-white rounded-xl text-xs font-black">{{ $shipTodaySubscriptions }} đơn</span>
-                    </div>
                 </div>
             </div>
 

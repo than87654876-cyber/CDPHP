@@ -188,13 +188,6 @@ class User extends Authenticatable
         return $this->hasMany(Order::class);
     }
 
-    /**
-     * Get the subscriptions for this user.
-     */
-    public function subscriptions(): HasMany
-    {
-        return $this->hasMany(Subscription::class);
-    }
 
     /**
      * Get the reviews made by this user.

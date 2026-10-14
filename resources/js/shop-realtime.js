@@ -24,24 +24,27 @@ export function filterCategory(targetId) {
         visibleLimits[key] = INITIAL_LIMIT;
     }
 
-    // Ẩn tất cả các khung hiển thị món
-    document.querySelectorAll('.cat-view-pane').forEach(pane => pane.classList.add('hidden'));
+    // Kiểm tra xem có pane riêng cho danh mục này không
+    const specificPane = document.getElementById('cat-view-' + key);
+    const allPane = document.getElementById('cat-view-all');
 
-    // Hiển thị khung danh mục được chọn
-    const targetPane = document.getElementById('cat-view-' + key);
-    if (targetPane) {
-        targetPane.classList.remove('hidden');
+    if (specificPane && specificPane !== allPane) {
+        document.querySelectorAll('.cat-view-pane').forEach(pane => pane.classList.add('hidden'));
+        specificPane.classList.remove('hidden');
+    } else if (allPane) {
+        document.querySelectorAll('.cat-view-pane').forEach(pane => pane.classList.add('hidden'));
+        allPane.classList.remove('hidden');
     }
 
     // Cập nhật kiểu dáng nút tab bên dưới
     document.querySelectorAll('.cat-tab-btn').forEach(btn => {
         btn.classList.remove('bg-[#ee4d2d]', 'text-white');
-        btn.classList.add('bg-white', 'text-slate-700', 'hover:bg-slate-100', 'border', 'border-slate-200');
+        btn.classList.add('bg-slate-100', 'text-slate-700', 'hover:bg-slate-200');
     });
 
     const activeBtn = document.getElementById('tab-btn-' + key);
     if (activeBtn) {
-        activeBtn.classList.remove('bg-white', 'text-slate-700', 'hover:bg-slate-100', 'border', 'border-slate-200');
+        activeBtn.classList.remove('bg-slate-100', 'text-slate-700', 'hover:bg-slate-200');
         activeBtn.classList.add('bg-[#ee4d2d]', 'text-white');
     }
 
@@ -49,18 +52,51 @@ export function filterCategory(targetId) {
 }
 
 export function updateActiveTabVisibility() {
-    const activePane = document.getElementById('cat-view-' + currentActiveTab);
-    if (!activePane) return;
+    // 1. Nếu có pane riêng biệt trong DOM thì dùng pane đó
+    const specificPane = currentActiveTab !== 'all' ? document.getElementById('cat-view-' + currentActiveTab) : null;
+    if (specificPane) {
+        const items = specificPane.querySelectorAll('.dish-card-item');
+        const total = items.length;
+        const currentLimit = visibleLimits[currentActiveTab] || INITIAL_LIMIT;
 
-    const items = activePane.querySelectorAll('.dish-card-item');
-    const total = items.length;
-    const currentLimit = visibleLimits[currentActiveTab] || INITIAL_LIMIT;
-
-    items.forEach((item, idx) => {
-        if (idx < currentLimit) {
-            if (item.classList.contains('hidden')) {
+        items.forEach((item, idx) => {
+            if (idx < currentLimit) {
                 item.classList.remove('hidden');
                 item.classList.add('dish-card-appear');
+            } else {
+                item.classList.add('hidden');
+                item.classList.remove('dish-card-appear');
+            }
+        });
+        updateScrollIndicators(total, currentLimit);
+        return;
+    }
+
+    // 2. Chế độ Siêu Tốc (Unified Grid): Lọc trực tiếp trên #all-dishes-grid qua data-category-id (Tiết kiệm 50% DOM & dung lượng HTML)
+    const grid = document.getElementById('all-dishes-grid');
+    if (!grid) return;
+
+    const allItems = Array.from(grid.querySelectorAll('.dish-card-item'));
+    const isAll = currentActiveTab === 'all';
+    const targetCatId = !isAll ? currentActiveTab.replace('cat-', '') : null;
+
+    let visibleCount = 0;
+    let matchCount = 0;
+    const currentLimit = visibleLimits[currentActiveTab] || INITIAL_LIMIT;
+
+    allItems.forEach(item => {
+        const itemCatId = String(item.dataset.categoryId || '');
+        const isMatch = isAll || (itemCatId === String(targetCatId));
+
+        if (isMatch) {
+            matchCount++;
+            if (visibleCount < currentLimit) {
+                item.classList.remove('hidden');
+                item.classList.add('dish-card-appear');
+                visibleCount++;
+            } else {
+                item.classList.add('hidden');
+                item.classList.remove('dish-card-appear');
             }
         } else {
             item.classList.add('hidden');
@@ -68,6 +104,31 @@ export function updateActiveTabVisibility() {
         }
     });
 
+    // Thông báo rỗng khi danh mục không có món
+    let emptyMsg = document.getElementById('all-dishes-empty');
+    if (matchCount === 0) {
+        if (!emptyMsg) {
+            emptyMsg = document.createElement('div');
+            emptyMsg.id = 'all-dishes-empty';
+            emptyMsg.className = 'col-span-full py-8 text-center text-slate-400 font-medium';
+            grid.appendChild(emptyMsg);
+        }
+        emptyMsg.innerText = 'Danh mục này hiện chưa có món ăn.';
+        emptyMsg.classList.remove('hidden');
+    } else if (emptyMsg) {
+        emptyMsg.classList.add('hidden');
+    }
+
+    // Cập nhật số lượng kết quả trên thanh lọc
+    const countEl = document.getElementById('menu-dishes-count');
+    if (countEl) {
+        countEl.innerText = matchCount + ' Kết quả';
+    }
+
+    updateScrollIndicators(matchCount, currentLimit);
+}
+
+function updateScrollIndicators(total, currentLimit) {
     const sentinel = document.getElementById('scroll-sentinel');
     const btnMore = document.getElementById('btn-load-more');
     const allLoaded = document.getElementById('all-loaded-indicator');
@@ -92,15 +153,6 @@ export function updateActiveTabVisibility() {
 export function loadMoreDishes() {
     if (isLoadingMore) return;
 
-    const activePane = document.getElementById('cat-view-' + currentActiveTab);
-    if (!activePane) return;
-
-    const items = activePane.querySelectorAll('.dish-card-item');
-    const total = items.length;
-    const currentLimit = visibleLimits[currentActiveTab] || INITIAL_LIMIT;
-
-    if (currentLimit >= total) return;
-
     isLoadingMore = true;
     const sentinel = document.getElementById('scroll-sentinel');
     if (sentinel) {
@@ -112,7 +164,7 @@ export function loadMoreDishes() {
         visibleLimits[currentActiveTab] = (visibleLimits[currentActiveTab] || INITIAL_LIMIT) + BATCH_SIZE;
         updateActiveTabVisibility();
         isLoadingMore = false;
-    }, 300);
+    }, 200);
 }
 
 export function initInfiniteScrollObserver() {
@@ -625,7 +677,11 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
 
-        // Fast-Sync Polling Engine mỗi 2.5s
-        setInterval(pollDishesLiveFeed, 2500);
+        // Fast-Sync Polling Engine mỗi 10s (chỉ khi tab đang mở)
+        setInterval(function() {
+            if (!document.hidden) {
+                pollDishesLiveFeed();
+            }
+        }, 10000);
     }
 });

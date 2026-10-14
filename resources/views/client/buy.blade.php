@@ -2,6 +2,11 @@
 
 @section('title', 'Giỏ Hàng & Thanh Toán - FOODDAILY')
 
+@section('styles')
+<link rel="preconnect" href="https://img.vietqr.io" crossorigin>
+<link rel="dns-prefetch" href="https://img.vietqr.io">
+@endsection
+
 @section('content')
 <div class="py-8 bg-transparent min-h-screen">
     <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -313,6 +318,27 @@
             </div>
         </div>
 
+        @if(isset($relatedDishes) && $relatedDishes->isNotEmpty())
+        <div class="mt-8 bg-white/95 backdrop-blur-md rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm border border-slate-200/80">
+            <h3 class="text-sm sm:text-base font-extrabold text-slate-900 mb-4 flex items-center gap-2">
+                <i class="fas fa-thumbs-up text-[#ee4d2d]"></i> Có thể bạn cũng thích
+            </h3>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                @foreach($relatedDishes as $rDish)
+                    <div class="p-2.5 rounded-xl border border-slate-100 hover:border-rose-200 hover:shadow-xs transition-all bg-slate-50/50 flex flex-col justify-between">
+                        <img src="{{ $rDish->display_image }}" alt="{{ $rDish->dish_name }}" class="w-full h-24 object-cover rounded-lg mb-2">
+                        <h4 class="text-xs font-bold text-slate-800 line-clamp-1">{{ $rDish->dish_name }}</h4>
+                        <div class="flex items-center justify-between mt-2">
+                            <span class="text-xs font-black text-[#ee4d2d]">{{ number_format($rDish->price, 0, ',', '.') }}đ</span>
+                            <button type="button" onclick="quickAddDish({{ $rDish->id }}, '{{ addslashes($rDish->dish_name) }}', {{ $rDish->price }}, '{{ $rDish->display_image }}')" class="w-6 h-6 rounded-lg bg-rose-50 text-[#ee4d2d] hover:bg-[#ee4d2d] hover:text-white transition-colors flex items-center justify-center text-xs">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
     </div>
 </div>
 @endsection

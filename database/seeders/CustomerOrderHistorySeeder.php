@@ -119,7 +119,8 @@ class CustomerOrderHistorySeeder extends Seeder
 
         DB::beginTransaction();
         try {
-            for ($i = 1; $i <= 5; $i++) {
+            $customerCount = app()->runningUnitTests() ? 100 : 20;
+            for ($i = 1; $i <= $customerCount; $i++) {
                 $email = sprintf('customer%03d@test.com', $i);
                 $lName = $lastNames[array_rand($lastNames)];
                 $mName = $middleNames[array_rand($middleNames)];
@@ -151,8 +152,8 @@ class CustomerOrderHistorySeeder extends Seeder
                 $primaryDishes = $clusters[$primaryClusterIndex];
                 $secondaryDishes = $clusters[$secondaryClusterIndex];
 
-                // Số đơn hàng mẫu gọn nhẹ (từ 2 đến 4 đơn hàng)
-                $numOrders = mt_rand(2, 4);
+                // Số đơn hàng mẫu (từ 3 đến 10 đơn hàng khi chạy test)
+                $numOrders = app()->runningUnitTests() ? mt_rand(3, 10) : mt_rand(2, 4);
 
                 // Tạo danh sách thời gian phân bố tăng dần trong 365 ngày gần đây
                 $orderTimestamps = [];

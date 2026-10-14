@@ -326,7 +326,11 @@
                         orderStates[o.id] = o.order_status;
                     });
                 }
-                setInterval(checkUserOrdersRealtime, 3000);
+                setInterval(function() {
+                    if (!document.hidden) {
+                        checkUserOrdersRealtime();
+                    }
+                }, 6000);
             });
 
         function checkUserOrdersRealtime() {

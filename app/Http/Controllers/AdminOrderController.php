@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\DailySchedule;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\Subscription;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -53,15 +51,21 @@ class AdminOrderController extends Controller
     {
         $todayStr = Carbon::today()->format('Y-m-d');
 
-        // Lấy tất cả OrderItems của các đơn đang chờ bếp nấu (kể cả vừa đặt 'pending', 'confirmed', 'preparing')
-        $kitchenOrderItems = OrderItem::with(['order.user', 'dish.category'])
-            ->whereHas('order', function ($q) {
-                $q->whereIn('order_status', ['pending', 'confirmed', 'preparing'])
-                  ->where('order_type', '!=', 'subscription');
-            })
+        // 1. Danh sách các đơn hàng chi tiết đang chờ nấu (Vé bếp / Order Tickets)
+        $activeOrders = Order::with(['user', 'orderItems.dish.category'])
+            ->whereIn('order_status', ['pending', 'confirmed', 'preparing'])
+            ->where('order_type', '!=', 'subscription')
+            ->orderBy('created_at', 'asc') // Đơn đặt trước làm trước (FIFO)
             ->get();
 
-        // Gom nhóm theo món ăn kèm danh sách mã vận đơn chi tiết
+        // 2. Gom nhóm theo món ăn trực tiếp từ $activeOrders (Tránh query lại bảng order_items, users, dishes, categories lần 2)
+        $kitchenOrderItems = $activeOrders->flatMap(function ($order) {
+            foreach ($order->orderItems as $item) {
+                $item->setRelation('order', $order);
+            }
+            return $order->orderItems;
+        });
+
         $singleDishes = $kitchenOrderItems->groupBy('dish_id')->map(function ($items) {
             $first = $items->first();
             $dish = $first->dish;
@@ -89,57 +93,13 @@ class AdminOrderController extends Controller
             ];
         })->sortByDesc('total_qty')->values();
 
-        // Lấy lịch giao combo định kỳ hôm nay kèm mã vận đơn
-        $subscriptionSchedules = DailySchedule::with(['dish', 'subscription.user', 'subscription.package'])
-            ->where('delivery_date', $todayStr)
-            ->whereIn('delivery_status', ['pending', 'delivered', 'preparing'])
-            ->get();
-
-        $subscriptionDishes = $subscriptionSchedules->groupBy('dish_id')->map(function ($items) {
-            $first = $items->first();
-            $schedules = $items->map(function ($s) {
-                return (object) [
-                    'schedule_id' => $s->id,
-                    'subscription_id' => $s->subscription_id,
-                    'tracking_code' => 'SUB-' . $s->subscription_id . '-D' . $s->id,
-                    'customer_name' => $s->subscription->user->fullname ?? $s->subscription->user->name ?? 'Hội viên',
-                    'package_name' => $s->subscription->package->package_name ?? 'Gói Combo',
-                    'delivery_notes' => $s->delivery_notes,
-                ];
-            })->values();
-
-            return (object) [
-                'dish_id' => $first->dish_id,
-                'dish' => $first->dish,
-                'total_qty' => $items->count(),
-                'schedules' => $schedules,
-            ];
-        })->sortByDesc('total_qty')->values();
-
-        // Danh sách các đơn hàng chi tiết đang chờ nấu (Vé bếp / Order Tickets)
-        $activeOrders = Order::with(['user', 'orderItems.dish'])
-            ->whereIn('order_status', ['pending', 'confirmed', 'preparing'])
-            ->where('order_type', '!=', 'subscription')
-            ->orderBy('created_at', 'asc') // Đơn đặt trước làm trước (FIFO)
-            ->get();
-
-        // Danh sách các đơn vừa nấu xong gần đây (delivering hoặc completed trong ngày hoặc gần nhất) để hỗ trợ tra cứu xử lý sự cố
-        $recentCompletedOrders = Order::with(['user', 'orderItems.dish'])
+        // 3. Danh sách các đơn vừa nấu xong gần đây (delivering hoặc completed) để hỗ trợ tra cứu xử lý sự cố
+        $recentCompletedOrders = Order::with(['user', 'orderItems.dish.category'])
             ->whereIn('order_status', ['delivering', 'completed'])
             ->where('order_type', '!=', 'subscription')
-            ->whereDate('updated_at', Carbon::today())
             ->orderBy('updated_at', 'desc')
-            ->take(30)
+            ->take(20)
             ->get();
-
-        if ($recentCompletedOrders->isEmpty()) {
-            $recentCompletedOrders = Order::with(['user', 'orderItems.dish'])
-                ->whereIn('order_status', ['delivering', 'completed'])
-                ->where('order_type', '!=', 'subscription')
-                ->orderBy('updated_at', 'desc')
-                ->take(15)
-                ->get();
-        }
 
         // Format dữ liệu chi tiết cho modal tra cứu và giải quyết khiếu nại của khách
         $initialCompletedOrders = $recentCompletedOrders->map(function ($order) {
@@ -167,7 +127,7 @@ class AdminOrderController extends Controller
             ];
         })->values()->toArray();
 
-        return view('admin.kitchen_report', compact('singleDishes', 'subscriptionDishes', 'activeOrders', 'recentCompletedOrders', 'initialCompletedOrders', 'todayStr'));
+        return view('admin.kitchen_report', compact('singleDishes', 'activeOrders', 'recentCompletedOrders', 'initialCompletedOrders', 'todayStr'));
     }
 
     // Xem chi tiết đơn hàng
@@ -268,13 +228,6 @@ class AdminOrderController extends Controller
     public function destroy($id)
     {
         $order = Order::findOrFail($id);
-
-        $subscription = Subscription::where('order_id', $order->id)->first();
-        if ($subscription) {
-            $subscription->dailySchedules()->delete();
-            $subscription->pauses()->delete();
-            $subscription->delete();
-        }
 
         $order->orderItems()->delete();
         $order->delete();
@@ -456,16 +409,23 @@ class AdminOrderController extends Controller
             });
         }
 
-        // Toàn bộ thống kê tổng quan (tính trên toàn bộ cơ sở dữ liệu để chính xác khi phân trang)
-        $allReviews = \App\Models\Review::all();
-        $totalReviewsCount = $allReviews->count();
-        $orderReviewsCount = $allReviews->whereNotNull('order_id')->count();
-        $generalReviewsCount = $allReviews->whereNull('order_id')->count();
+        // Toàn bộ thống kê tổng quan (tính toán bằng 1 truy vấn SQL tổng hợp thay vì nạp toàn bộ Model vào RAM)
+        $reviewStats = \Illuminate\Support\Facades\DB::table('reviews')->selectRaw("
+            COUNT(id) as total_count,
+            SUM(CASE WHEN order_id IS NOT NULL THEN 1 ELSE 0 END) as order_count,
+            SUM(CASE WHEN order_id IS NULL THEN 1 ELSE 0 END) as general_count,
+            AVG(rating) as avg_rating,
+            SUM(CASE WHEN rating = 5 THEN 1 ELSE 0 END) as five_star_count,
+            SUM(CASE WHEN comment IS NOT NULL AND comment != '' THEN 1 ELSE 0 END) as comment_count
+        ")->first();
 
-        $avgRating = $totalReviewsCount > 0 ? round($allReviews->avg('rating'), 1) : 5.0;
-        $fiveStarCount = $allReviews->where('rating', 5)->count();
+        $totalReviewsCount = (int) ($reviewStats->total_count ?? 0);
+        $orderReviewsCount = (int) ($reviewStats->order_count ?? 0);
+        $generalReviewsCount = (int) ($reviewStats->general_count ?? 0);
+        $avgRating = $totalReviewsCount > 0 ? round((float) ($reviewStats->avg_rating ?? 5.0), 1) : 5.0;
+        $fiveStarCount = (int) ($reviewStats->five_star_count ?? 0);
         $fiveStarPercent = $totalReviewsCount > 0 ? round(($fiveStarCount / $totalReviewsCount) * 100) : 100;
-        $withCommentCount = $allReviews->filter(fn($r) => !empty($r->comment))->count();
+        $withCommentCount = (int) ($reviewStats->comment_count ?? 0);
 
         $reviews = $query->paginate(10)->withQueryString();
 

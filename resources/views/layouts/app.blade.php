@@ -51,17 +51,6 @@
     <!-- Vite Assets -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    @php
-        $globalSettings = \Illuminate\Support\Facades\Cache::remember('site_global_settings', 3600, function() {
-            return \App\Models\Setting::pluck('value', 'key')->all();
-        });
-        $siteBgUrl = isset($globalSettings['site_background']) && $globalSettings['site_background'] 
-            ? (\Illuminate\Support\Str::startsWith($globalSettings['site_background'], 'http') ? $globalSettings['site_background'] : asset($globalSettings['site_background']))
-            : asset('uploads/cf1a02d49dc2b801e809fcb9adefd77e.jpg');
-        $siteLogoUrl = isset($globalSettings['logo_url']) && $globalSettings['logo_url']
-            ? (\Illuminate\Support\Str::startsWith($globalSettings['logo_url'], 'http') ? $globalSettings['logo_url'] : asset($globalSettings['logo_url']))
-            : asset('logo.jpg');
-    @endphp
 
     <style>
         body, .site-bg-overlay {
