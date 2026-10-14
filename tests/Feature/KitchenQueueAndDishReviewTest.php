@@ -194,9 +194,6 @@ class KitchenQueueAndDishReviewTest extends TestCase
         $detailResponse->assertDontSee('Món ăn giao nhanh, gà rất giòn rụm');
     }
 
-    /**
-     * Test direct dish review on dish detail page.
-     */
     public function test_user_can_submit_review_directly_for_dish(): void
     {
         $response = $this->actingAs($this->customer)->post(route('dish.review', $this->dishA->id), [
@@ -212,12 +209,31 @@ class KitchenQueueAndDishReviewTest extends TestCase
             'dish_id' => $this->dishA->id,
             'rating' => 5,
             'comment' => 'Gà rán ngon nhất từng ăn, nước chấm đậm đà xuất sắc!',
+            'is_visible' => false,
         ]);
 
-        // View dish detail
-        $detailResponse = $this->get(route('dish.detail', $this->dishA->id));
+        // 1. Khách hàng gửi đánh giá (chủ tài khoản) nhìn thấy đánh giá của chính mình
+        $detailResponse = $this->actingAs($this->customer)->get(route('dish.detail', $this->dishA->id));
         $detailResponse->assertStatus(200);
         $detailResponse->assertSee('Gà rán ngon nhất từng ăn, nước chấm đậm đà xuất sắc!');
+        $detailResponse->assertSee('Chờ duyệt (Chỉ bạn nhìn thấy)');
+
+        // 2. Khách vãng lai / người dùng khác KHÔNG nhìn thấy đánh giá khi chưa được Admin duyệt
+        $otherUser = User::factory()->create();
+        $otherResponse = $this->actingAs($otherUser)->get(route('dish.detail', $this->dishA->id));
+        $otherResponse->assertStatus(200);
+        $otherResponse->assertDontSee('Gà rán ngon nhất từng ăn, nước chấm đậm đà xuất sắc!');
+
+        // 3. Admin duyệt hiển thị đánh giá
+        $review = \App\Models\Review::where('comment', 'Gà rán ngon nhất từng ăn, nước chấm đậm đà xuất sắc!')->first();
+        $toggleResp = $this->actingAs($this->admin)->post(route('quanly_reviews.toggle_visibility', $review->id));
+        $toggleResp->assertRedirect();
+        $this->assertTrue($review->fresh()->is_visible);
+
+        // 4. Sau khi Admin duyệt, người dùng khác bây giờ ĐÃ nhìn thấy công khai
+        $publicResponse = $this->actingAs($otherUser)->get(route('dish.detail', $this->dishA->id));
+        $publicResponse->assertStatus(200);
+        $publicResponse->assertSee('Gà rán ngon nhất từng ăn, nước chấm đậm đà xuất sắc!');
     }
 
     /**

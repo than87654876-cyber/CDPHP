@@ -324,7 +324,21 @@ class ShopController extends Controller
         session(['recently_viewed_dishes' => $recentlyViewed]);
 
         $relatedDishes = $dish->getRelatedDishes(6);
-        $reviews = $dish->reviews;
+
+        // Lấy đánh giá đã duyệt hiển thị công khai (is_visible = true)
+        // Nếu khách hàng đang đăng nhập, cho phép họ nhìn thấy thêm đánh giá của chính mình (kể cả khi đang chờ duyệt)
+        $currentUserId = auth()->id();
+        $reviews = \App\Models\Review::with('user')
+            ->where('dish_id', $dish->id)
+            ->whereNull('order_id')
+            ->where(function ($q) use ($currentUserId) {
+                $q->where('is_visible', true);
+                if ($currentUserId) {
+                    $q->orWhere('user_id', $currentUserId);
+                }
+            })
+            ->latest()
+            ->get();
 
         return view('client.dish_detail', compact('dish', 'relatedDishes', 'reviews'));
     }
@@ -348,11 +362,12 @@ class ShopController extends Controller
             'dish_id' => $dish->id,
             'rating' => $request->rating,
             'comment' => $request->comment,
+            'is_visible' => false, // Mặc định chưa duyệt hiển thị công khai, chỉ khách hàng gửi đánh giá và Admin thấy
         ]);
 
         \App\Models\Dish::clearReviewsSummaryCache();
 
-        return back()->with('success', 'Cảm ơn bạn đã gửi đánh giá cho món ' . $dish->dish_name . '!');
+        return back()->with('success', 'Cảm ơn bạn đã gửi đánh giá cho món ' . $dish->dish_name . '! Đánh giá của bạn đã được ghi nhận và đang chờ Quản trị viên duyệt để hiển thị công khai.');
     }
 
     // Xóa lịch sử xem món ăn gần đây
@@ -524,6 +539,7 @@ class ShopController extends Controller
             $lastDishUpdate = \App\Models\Dish::max('updated_at');
             $lastCategoryUpdate = \App\Models\Category::max('updated_at');
             $lastCouponUpdate = \App\Models\Coupon::max('updated_at');
+            $lastPackageUpdate = null;
 
             $fingerprint = md5(json_encode([
                 'settings' => $settings,

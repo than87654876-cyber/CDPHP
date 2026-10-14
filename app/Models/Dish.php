@@ -58,7 +58,7 @@ class Dish extends Model
      */
     public function reviews(): HasMany
     {
-        return $this->hasMany(Review::class)->whereNull('order_id')->with('user')->latest();
+        return $this->hasMany(Review::class)->whereNull('order_id')->where('is_visible', true)->with('user')->latest();
     }
 
     /**
@@ -98,11 +98,11 @@ class Dish extends Model
         self::$reviewsSummaryCache = \Illuminate\Support\Facades\Cache::remember('dishes_reviews_summary_cache', 600, function () {
             $summary = [];
             try {
-                // Chỉ lấy các đánh giá chung cho món ăn (order_id IS NULL)
-                // Đánh giá từng đơn (order_id IS NOT NULL) là nội bộ dành cho Admin
+                // Chỉ lấy các đánh giá chung đã được duyệt hiển thị (order_id IS NULL và is_visible = 1)
                 $directReviews = \Illuminate\Support\Facades\DB::table('reviews')
                     ->whereNotNull('dish_id')
                     ->whereNull('order_id')
+                    ->where('is_visible', 1)
                     ->select(
                         'dish_id',
                         \Illuminate\Support\Facades\DB::raw('AVG(rating) as avg_rating'),

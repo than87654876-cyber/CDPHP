@@ -17,11 +17,29 @@ class Review extends Model
         'rating',
         'comment',
         'image_url',
+        'is_visible',
     ];
 
     protected $casts = [
         'rating' => 'integer',
+        'is_visible' => 'boolean',
     ];
+
+    /**
+     * Scope lấy các đánh giá đã duyệt hiển thị công khai
+     */
+    public function scopeVisible($query)
+    {
+        return $query->where('is_visible', true);
+    }
+
+    /**
+     * Scope lấy các đánh giá đang ẩn hoặc chờ duyệt
+     */
+    public function scopePending($query)
+    {
+        return $query->where('is_visible', false);
+    }
 
     /**
      * Get the user who made the review.

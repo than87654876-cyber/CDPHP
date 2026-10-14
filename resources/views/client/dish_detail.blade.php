@@ -352,9 +352,15 @@
                                             <div>
                                                 <h4 class="font-black text-slate-900 text-xs flex items-center gap-2">
                                                     <span>{{ $rev->user->fullname ?? $rev->user->name ?? 'Khách hàng FOODDAILY' }}</span>
-                                                    <span class="px-2 py-0.2 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">
-                                                        <i class="fas fa-check-circle text-[9px] mr-0.5"></i> Đã mua món
-                                                    </span>
+                                                    @if($rev->is_visible)
+                                                        <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">
+                                                            <i class="fas fa-check-circle text-[9px] mr-0.5"></i> Đã mua món
+                                                        </span>
+                                                    @else
+                                                        <span class="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-[10px] font-bold border border-amber-200 shadow-2xs">
+                                                            <i class="fas fa-clock text-[9px] mr-0.5"></i> Chờ duyệt (Chỉ bạn nhìn thấy)
+                                                        </span>
+                                                    @endif
                                                 </h4>
                                                 <!-- Stars -->
                                                 <div class="flex items-center gap-2 text-xs pt-0.5">
@@ -377,6 +383,12 @@
 
                                     <!-- Review Content -->
                                     <div class="pl-12">
+                                        @if(!$rev->is_visible)
+                                            <div class="mb-1.5 p-2 bg-amber-50/90 border border-amber-200/80 rounded-xl text-[11px] text-amber-800 font-semibold flex items-center gap-1.5">
+                                                <i class="fas fa-info-circle text-amber-600"></i>
+                                                <span>Đánh giá này hiện đang chờ Quản trị viên duyệt và chỉ hiển thị với riêng bạn.</span>
+                                            </div>
+                                        @endif
                                         <p class="text-xs text-slate-700 leading-relaxed font-medium bg-slate-50/80 p-3 rounded-xl border border-slate-100">
                                             {{ $rev->comment }}
                                         </p>

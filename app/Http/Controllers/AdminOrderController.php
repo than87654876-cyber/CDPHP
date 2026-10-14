@@ -384,6 +384,7 @@ class AdminOrderController extends Controller
     {
         $search = $request->input('search');
         $type = $request->input('type', 'all');
+        $status = $request->input('status', 'all');
 
         $query = \App\Models\Review::with(['user', 'order', 'dish'])
             ->orderBy('created_at', 'desc');
@@ -392,6 +393,12 @@ class AdminOrderController extends Controller
             $query->whereNotNull('order_id');
         } elseif ($type === 'general') {
             $query->whereNull('order_id');
+        }
+
+        if ($status === 'visible') {
+            $query->where('is_visible', true);
+        } elseif ($status === 'hidden') {
+            $query->where('is_visible', false);
         }
 
         if ($search) {
@@ -414,6 +421,8 @@ class AdminOrderController extends Controller
             COUNT(id) as total_count,
             SUM(CASE WHEN order_id IS NOT NULL THEN 1 ELSE 0 END) as order_count,
             SUM(CASE WHEN order_id IS NULL THEN 1 ELSE 0 END) as general_count,
+            SUM(CASE WHEN is_visible = 1 THEN 1 ELSE 0 END) as visible_count,
+            SUM(CASE WHEN is_visible = 0 THEN 1 ELSE 0 END) as hidden_count,
             AVG(rating) as avg_rating,
             SUM(CASE WHEN rating = 5 THEN 1 ELSE 0 END) as five_star_count,
             SUM(CASE WHEN comment IS NOT NULL AND comment != '' THEN 1 ELSE 0 END) as comment_count
@@ -422,6 +431,8 @@ class AdminOrderController extends Controller
         $totalReviewsCount = (int) ($reviewStats->total_count ?? 0);
         $orderReviewsCount = (int) ($reviewStats->order_count ?? 0);
         $generalReviewsCount = (int) ($reviewStats->general_count ?? 0);
+        $visibleCount = (int) ($reviewStats->visible_count ?? 0);
+        $hiddenCount = (int) ($reviewStats->hidden_count ?? 0);
         $avgRating = $totalReviewsCount > 0 ? round((float) ($reviewStats->avg_rating ?? 5.0), 1) : 5.0;
         $fiveStarCount = (int) ($reviewStats->five_star_count ?? 0);
         $fiveStarPercent = $totalReviewsCount > 0 ? round(($fiveStarCount / $totalReviewsCount) * 100) : 100;
@@ -434,13 +445,29 @@ class AdminOrderController extends Controller
             'totalReviewsCount',
             'orderReviewsCount',
             'generalReviewsCount',
+            'visibleCount',
+            'hiddenCount',
             'avgRating',
             'fiveStarCount',
             'fiveStarPercent',
             'withCommentCount',
             'search',
-            'type'
+            'type',
+            'status'
         ));
+    }
+
+    // Bật / tắt hiển thị đánh giá công khai lên website
+    public function toggleReviewVisibility($id)
+    {
+        $review = \App\Models\Review::findOrFail($id);
+        $review->is_visible = !$review->is_visible;
+        $review->save();
+
+        \App\Models\Dish::clearReviewsSummaryCache();
+
+        $actionText = $review->is_visible ? 'DUYỆT HIỂN THỊ CÔNG KHAI' : 'ẨN KHỎI WEBSITE';
+        return redirect()->back()->with('success', "Đã {$actionText} đánh giá #{$review->id} thành công.");
     }
 
     // Xóa đánh giá
@@ -448,6 +475,8 @@ class AdminOrderController extends Controller
     {
         $review = \App\Models\Review::findOrFail($id);
         $review->delete();
+
+        \App\Models\Dish::clearReviewsSummaryCache();
 
         return redirect()->route('quanly_reviews')->with('success', 'Đã xóa đánh giá thành công.');
     }

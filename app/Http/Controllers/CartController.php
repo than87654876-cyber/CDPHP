@@ -450,6 +450,7 @@ class CartController extends Controller
             'order_id' => $order->id,
             'rating' => $request->rating_stars,
             'comment' => $request->review_comment,
+            'is_visible' => false,
         ]);
 
         \App\Models\Dish::clearReviewsSummaryCache();

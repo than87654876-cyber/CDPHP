@@ -228,6 +228,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     // Quản lý Đánh giá
     Route::get('/quanly_reviews', [AdminOrderController::class, 'reviewsList'])->name('quanly_reviews');
+    Route::post('/quanly_reviews/toggle-visibility/{id}', [AdminOrderController::class, 'toggleReviewVisibility'])->name('quanly_reviews.toggle_visibility');
     Route::post('/quanly_reviews/xoa/{id}', [AdminOrderController::class, 'destroyReview'])->name('quanly_reviews.xoa');
 
     // Bếp chuẩn bị món
