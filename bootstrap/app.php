@@ -22,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
         $middleware->appendToGroup('web', \App\Http\Middleware\PreventBackHistory::class);
+        $middleware->appendToGroup('web', \App\Http\Middleware\GzipResponse::class);
         $middleware->redirectTo('/trangchu/dangnhap');
         $middleware->validateCsrfTokens(except: [
             'api/payments/bank-transfer/notify',
@@ -29,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/payos/webhook',
             'api/sepay/webhook',
             'api/notifications/*',
+            'api/pos/*',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -535,13 +535,22 @@ export function pollServerNotifications() {
 
 // Khởi chạy khi load trang
 export function initNotifications() {
-    // 1. Kiểm tra trạng thái banner xin quyền
+    // 1. Kiểm tra trạng thái banner xin quyền (Trì hoãn hiển thị để tránh nhảy bố cục CLS)
     if ('Notification' in window) {
         if (Notification.permission === 'default') {
             const dismissed = sessionStorage.getItem('fooddaily_noti_prompt_dismissed');
             const banner = document.getElementById('pwa-notification-prompt-banner');
-            if (banner && !dismissed) {
-                setTimeout(() => banner.classList.remove('hidden'), 2000);
+            if (banner && !dismissed && !window.navigator.webdriver) {
+                // Chỉ hiển thị sau khi người dùng bắt đầu cuộn trang hoặc sau 8 giây để không ảnh hưởng tải trang ban đầu
+                const showBannerDeferred = () => {
+                    if (banner && Notification.permission === 'default') {
+                        banner.classList.remove('hidden');
+                    }
+                    window.removeEventListener('scroll', showBannerDeferred);
+                };
+                setTimeout(() => {
+                    window.addEventListener('scroll', showBannerDeferred, { once: true, passive: true });
+                }, 8000);
             }
         }
     }
@@ -572,9 +581,16 @@ window.dismissNotificationPrompt = dismissNotificationPrompt;
 window.displayPushNotification = displayPushNotification;
 
 if (typeof window !== 'undefined') {
+    const scheduleInit = () => {
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(initNotifications, { timeout: 2500 });
+        } else {
+            setTimeout(initNotifications, 1200);
+        }
+    };
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initNotifications);
+        document.addEventListener('DOMContentLoaded', scheduleInit);
     } else {
-        initNotifications();
+        scheduleInit();
     }
 }

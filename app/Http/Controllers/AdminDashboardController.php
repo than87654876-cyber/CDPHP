@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Dish;
+use App\Models\GoodsReceipt;
+use App\Models\InventoryItem;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Carbon\Carbon;
@@ -168,6 +170,27 @@ class AdminDashboardController extends Controller
             $availableYears = [$currentYear];
         }
 
+        // 5. THỐNG KÊ KHO VẬN & NHẬP HÀNG (Tổng quan toàn diện cho Quản trị viên)
+        $monthReceiptsCost = (float) GoodsReceipt::whereMonth('receipt_date', $currentMonth)
+            ->whereYear('receipt_date', $currentYear)
+            ->sum('total_amount');
+
+        $yearlyReceiptsCost = (float) GoodsReceipt::whereYear('receipt_date', $selectedYear)
+            ->sum('total_amount');
+
+        $estimatedProfit = $monthlyRevenue - $monthReceiptsCost;
+
+        $monthReceiptsCount = GoodsReceipt::whereMonth('receipt_date', $currentMonth)
+            ->whereYear('receipt_date', $currentYear)
+            ->count();
+
+        $recentGoodsReceipts = GoodsReceipt::with(['creator', 'supplier', 'items'])
+            ->latest('receipt_date')
+            ->take(5)
+            ->get();
+
+        $lowStockCount = InventoryItem::where('current_stock', '<=', \Illuminate\Support\Facades\DB::raw('min_stock'))->count();
+
         return view('admin.revenue_report', compact(
             'monthlyRevenue',
             'monthlyGrowth',
@@ -188,7 +211,13 @@ class AdminDashboardController extends Controller
             'momoPercent',
             'bestSellingDishes',
             'slowMovingDishes',
-            'unsoldDishesCount'
+            'unsoldDishesCount',
+            'monthReceiptsCost',
+            'yearlyReceiptsCost',
+            'estimatedProfit',
+            'monthReceiptsCount',
+            'recentGoodsReceipts',
+            'lowStockCount'
         ));
     }
 }

@@ -6,8 +6,8 @@
      data-name="{{ $dish->dish_name }}">
     <div class="space-y-2">
         <!-- Image Thumbnail with Rating Badge & Favorite Badge -->
-        <a href="{{ route('dish.detail', $dish->id) }}" class="aspect-square bg-slate-100 relative overflow-hidden block">
-            <img src="{{ $dish->display_image }}" alt="{{ $dish->dish_name }}" class="dish-card-img w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" decoding="async">
+        <a href="{{ route('dish.detail', $dish->id) }}" class="aspect-square bg-slate-100 relative overflow-hidden block" aria-label="Xem chi tiết {{ $dish->dish_name }}">
+            <img src="{{ $dish->display_image }}" alt="{{ $dish->dish_name }}" class="dish-card-img w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" decoding="async" width="180" height="180">
             
             <!-- Star Rating Badge on Top Right -->
             <span class="absolute top-2 right-2 bg-slate-900/80 backdrop-blur-xs text-amber-400 text-[10px] font-black px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1 border border-white/20">
@@ -24,13 +24,13 @@
 
         <!-- Content Details (Checkmark + Title + Address + Rating Stars + Promo Tag) -->
         <div class="p-2.5 space-y-1.5">
-            <a href="{{ route('dish.detail', $dish->id) }}" class="flex items-start gap-1 group/title block">
+            <a href="{{ route('dish.detail', $dish->id) }}" class="flex items-start gap-1 group/title block" aria-label="{{ $dish->dish_name }}">
                 <span class="text-amber-500 text-xs shrink-0 mt-0.5">✔</span>
                 <h4 class="dish-card-name font-extrabold text-slate-900 text-xs line-clamp-1 leading-snug group-hover/title:text-[#ee4d2d] transition-colors">
                     {{ $dish->dish_name }}
                 </h4>
             </a>
-            <p class="dish-card-desc text-[10px] text-slate-500 font-medium line-clamp-1 leading-tight">
+            <p class="dish-card-desc text-[10px] text-slate-600 font-medium line-clamp-1 leading-tight">
                 {{ $dish->description ?? 'FOODDAILY Store - TP. HCM' }}
             </p>
             
@@ -40,7 +40,7 @@
                     <i class="fas fa-star text-[9px] text-amber-500"></i>
                     <span class="dish-rating-score-text">{{ number_format($dish->rating_score, 1) }}</span>
                 </div>
-                <span class="dish-reviews-count-text text-[10px] font-semibold text-slate-400">
+                <span class="dish-reviews-count-text text-[10px] font-semibold text-slate-500">
                     {{ $dish->reviews_count > 0 ? "({$dish->reviews_count} đánh giá)" : '(Chưa có đánh giá)' }}
                 </span>
             </div>
@@ -61,7 +61,7 @@
             @csrf
             <input type="hidden" name="dish_id" value="{{ $dish->id }}">
             <input type="hidden" name="quantity" value="1">
-            <button type="submit" class="w-7 h-7 rounded-lg bg-[#ee4d2d] hover:bg-red-600 text-white flex items-center justify-center text-xs font-bold transition-colors cursor-pointer" title="Thêm vào giỏ hàng">
+            <button type="submit" class="w-7 h-7 rounded-lg bg-[#ee4d2d] hover:bg-red-600 text-white flex items-center justify-center text-xs font-bold transition-colors cursor-pointer" title="Thêm vào giỏ hàng" aria-label="Thêm {{ $dish->dish_name }} vào giỏ hàng">
                 +
             </button>
         </form>

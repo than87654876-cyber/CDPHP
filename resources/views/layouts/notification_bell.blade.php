@@ -17,7 +17,8 @@
             id="global-notification-bell-btn" 
             onclick="toggleNotificationDropdown(event)" 
             class="relative w-9 h-9 text-slate-700 hover:text-[#ee4d2d] bg-slate-100 hover:bg-orange-50 transition-all rounded-full border border-slate-200/80 cursor-pointer flex items-center justify-center shadow-2xs hover:scale-105 active:scale-95" 
-            title="Xem thông báo hệ thống">
+            title="Xem thông báo hệ thống"
+            aria-label="Xem thông báo hệ thống">
         <i class="fas fa-bell text-base transition-transform" id="global-notification-bell-icon"></i>
         
         <!-- Badge số lượng thông báo chưa đọc -->
@@ -50,7 +51,8 @@
                         onclick="markAllNotificationsAsRead(event)" 
                         id="global-notification-mark-all-btn"
                         class="text-[11px] font-bold text-[#ee4d2d] hover:text-red-700 hover:underline px-2 py-1 rounded-lg hover:bg-orange-100/50 transition-colors cursor-pointer flex items-center gap-1"
-                        title="Đánh dấu tất cả thông báo là đã đọc">
+                        title="Đánh dấu tất cả thông báo là đã đọc"
+                        aria-label="Đánh dấu tất cả thông báo là đã đọc">
                     <i class="fas fa-check-double text-[10px]"></i>
                     <span>Đã đọc tất cả</span>
                 </button>
@@ -111,7 +113,8 @@
             <!-- Nút Bắn thử Noti nhanh -->
             <button type="button" 
                     onclick="triggerTestNotification(event)" 
-                    class="text-[10px] font-extrabold text-white bg-gradient-to-r from-orange-500 to-[#ee4d2d] hover:opacity-90 px-2.5 py-1 rounded-lg shadow-xs transition-all flex items-center gap-1 cursor-pointer">
+                    class="text-[10px] font-extrabold text-white bg-gradient-to-r from-orange-500 to-[#ee4d2d] hover:opacity-90 px-2.5 py-1 rounded-lg shadow-xs transition-all flex items-center gap-1 cursor-pointer"
+                    aria-label="Gửi thông báo thử nghiệm">
                 <i class="fas fa-paper-plane text-[9px]"></i>
                 <span>Bắn thử Noti</span>
             </button>

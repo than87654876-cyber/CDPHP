@@ -12,6 +12,16 @@
         </div>
         
         <div class="flex flex-wrap items-center gap-2.5 sm:gap-3">
+            <a href="{{ route('nhaphang_them') }}" class="px-3.5 sm:px-4 py-2.5 rounded-xl bg-[#ee4d2d] hover:bg-[#d73211] text-white font-black text-xs flex items-center gap-2 shadow-sm shadow-rose-500/20 transition-all hover:scale-102" title="Lập phiếu nhập hàng vào kho">
+                <i class="fas fa-cart-arrow-down"></i>
+                <span class="hidden sm:inline">Lập Phiếu Nhập</span>
+                <span class="sm:hidden">Nhập Kho</span>
+            </a>
+            <a href="{{ route('quanly_nhaphang') }}" class="px-3 sm:px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs flex items-center gap-2 shadow-2xs transition-all hover:border-slate-300" title="Xem danh sách tất cả phiếu nhập kho">
+                <i class="fas fa-file-invoice-dollar text-emerald-500"></i>
+                <span class="hidden sm:inline">Lịch Sử Nhập</span>
+            </a>
+
             <!-- Year Selector Form -->
             <form action="{{ route('quanly') }}" method="GET" class="flex items-center gap-2">
                 <span class="text-xs font-bold text-slate-500">Năm:</span>
@@ -117,6 +127,51 @@
                 <i class="fas fa-utensils"></i>
             </div>
         </div>
+    </div>
+
+    <!-- Procurement & Financial Overview Cards Grid (Kho Vận & Dòng Tiền Nhập Hàng) -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <!-- 5. Chi Phí Nhập Kho Tháng Này -->
+        <div class="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-slate-100 flex items-center justify-between group hover:border-emerald-200 transition-all">
+            <div>
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Chi phí Nhập kho Tháng {{ now()->format('m/Y') }}</p>
+                <h3 class="text-2xl font-black text-slate-900 mt-1.5">{{ number_format($monthReceiptsCost, 0, ',', '.') }}đ</h3>
+                <p class="text-[11px] text-emerald-600 font-semibold mt-1 flex items-center gap-1">
+                    <i class="fas fa-file-invoice"></i> {{ $monthReceiptsCount }} phiếu nhập kho hoàn tất
+                </p>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold group-hover:scale-110 transition-transform">
+                <i class="fas fa-truck-ramp-box"></i>
+            </div>
+        </div>
+
+        <!-- 6. Lợi Nhuận Gộp Ước Tính -->
+        <div class="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-slate-100 flex items-center justify-between group hover:border-amber-200 transition-all">
+            <div>
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Lợi nhuận gộp ước tính</p>
+                <h3 class="text-2xl font-black {{ $estimatedProfit >= 0 ? 'text-amber-500' : 'text-rose-500' }} mt-1.5">{{ number_format($estimatedProfit, 0, ',', '.') }}đ</h3>
+                <p class="text-[11px] text-slate-400 font-semibold mt-1 flex items-center gap-1">
+                    <i class="fas fa-scale-balanced"></i> Doanh thu trừ tiền nhập hàng
+                </p>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center text-xl font-bold group-hover:scale-110 transition-transform">
+                <i class="fas fa-coins"></i>
+            </div>
+        </div>
+
+        <!-- 7. Cảnh Báo Tồn Kho Cần Nhập Thêm -->
+        <a href="{{ route('quanly_kho') }}" class="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-slate-100 flex items-center justify-between group hover:border-rose-200 transition-all block">
+            <div>
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Hàng cần nhập thêm</p>
+                <h3 class="text-2xl font-black text-rose-500 mt-1.5">{{ number_format($lowStockCount) }} mặt hàng</h3>
+                <p class="text-[11px] text-rose-600 font-semibold mt-1 flex items-center gap-1">
+                    <i class="fas fa-triangle-exclamation"></i> Chạm mức tồn an toàn <i class="fas fa-arrow-right text-[10px] ml-1"></i>
+                </p>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center text-xl font-bold group-hover:scale-110 transition-transform">
+                <i class="fas fa-boxes-stacked"></i>
+            </div>
+        </a>
     </div>
 
     <!-- Charts Section -->
@@ -401,6 +456,103 @@
             </div>
         </div>
 
+    </div>
+
+    <!-- Biến Động Kho Vận & Lịch Sử Nhập Hàng Gần Đây (Tổng quan Quản trị viên) -->
+    <div class="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-slate-100">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-100">
+            <div>
+                <h3 class="text-base font-extrabold text-slate-800 flex items-center gap-2">
+                    <i class="fas fa-boxes-packing text-[#ee4d2d]"></i> Lịch Sử Nhập Kho Gần Đây (Thu Ngân & Kho Vận)
+                </h3>
+                <p class="text-xs text-slate-400 mt-0.5">Theo dõi thời gian thực các phiếu nhập kho do Thu ngân hoặc Thủ kho tạo</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="{{ route('nhaphang_them') }}" class="px-3.5 py-2 rounded-xl bg-[#ee4d2d] hover:bg-[#d73211] text-white text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5">
+                    <i class="fas fa-plus"></i> Nhập Kho Mới
+                </a>
+                <a href="{{ route('quanly_nhaphang') }}" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all flex items-center gap-1.5">
+                    Xem Tất Cả ({{ \App\Models\GoodsReceipt::count() }}) <i class="fas fa-arrow-right text-[10px]"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50/80 border-b border-slate-100 text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">
+                        <th class="py-3 px-4">Mã Phiếu</th>
+                        <th class="py-3 px-4">Nhà Cung Cấp</th>
+                        <th class="py-3 px-4">Người Nhập Hàng</th>
+                        <th class="py-3 px-4">Thời Gian</th>
+                        <th class="py-3 px-4 text-center">Số Mặt Hàng</th>
+                        <th class="py-3 px-4 text-right">Tổng Tiền</th>
+                        <th class="py-3 px-4 text-center">Thanh Toán</th>
+                        <th class="py-3 px-4 text-center">Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-xs">
+                    @forelse($recentGoodsReceipts as $receipt)
+                    <tr class="hover:bg-slate-50/80 transition-colors">
+                        <td class="py-3.5 px-4 font-mono font-bold text-blue-600">
+                            <a href="{{ route('nhaphang_xem', $receipt->id) }}" class="hover:underline">
+                                {{ $receipt->receipt_code }}
+                            </a>
+                        </td>
+                        <td class="py-3.5 px-4 font-bold text-slate-800">
+                            {{ $receipt->supplier->name ?? 'NCC vãng lai' }}
+                        </td>
+                        <td class="py-3.5 px-4">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 font-semibold text-[11px]">
+                                <i class="fas fa-user-circle text-slate-400"></i>
+                                {{ $receipt->creator->fullname ?? $receipt->creator->name ?? 'Thu ngân' }}
+                            </span>
+                        </td>
+                        <td class="py-3.5 px-4 text-slate-500 text-[11px]">
+                            {{ \Carbon\Carbon::parse($receipt->receipt_date)->format('d/m/Y H:i') }}
+                        </td>
+                        <td class="py-3.5 px-4 text-center font-bold text-slate-700">
+                            {{ $receipt->items->count() }} món
+                        </td>
+                        <td class="py-3.5 px-4 text-right font-black text-emerald-600 text-[13px]">
+                            {{ number_format($receipt->total_amount, 0, ',', '.') }}đ
+                        </td>
+                        <td class="py-3.5 px-4 text-center">
+                            @if($receipt->payment_status === 'paid')
+                                <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold">
+                                    Đã thanh toán
+                                </span>
+                            @elseif($receipt->payment_status === 'pending')
+                                <span class="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold">
+                                    Chờ duyệt chi
+                                </span>
+                            @else
+                                <span class="px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-bold">
+                                    Ghi nợ NCC
+                                </span>
+                            @endif
+                        </td>
+                        <td class="py-3.5 px-4 text-center">
+                            <div class="flex items-center justify-center gap-1.5">
+                                <a href="{{ route('nhaphang_xem', $receipt->id) }}" class="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs transition-colors" title="Xem chi tiết">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ route('nhaphang_in', $receipt->id) }}" target="_blank" class="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs transition-colors" title="In phiếu">
+                                    <i class="fas fa-print"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="8" class="py-8 text-center text-slate-400">
+                            Chưa có phiếu nhập kho nào được ghi nhận.
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
 
 </div>

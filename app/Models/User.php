@@ -34,6 +34,8 @@ class User extends Authenticatable
         'password',
         'status',
         'role',
+        'branch_id',
+        'manager_pin',
         'points',
         'membership',
         'notes',
@@ -48,7 +50,13 @@ class User extends Authenticatable
         'remember_token',
         'password_reset_token',
         'password_reset_expires_at',
+        'manager_pin',
     ];
+
+    public function branch(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Branch::class, 'branch_id');
+    }
 
     /**
      * Get user address with fallback to notes
@@ -186,6 +194,14 @@ class User extends Authenticatable
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Get the subscriptions for this user.
+     */
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class);
     }
 
 

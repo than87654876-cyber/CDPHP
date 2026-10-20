@@ -237,9 +237,9 @@ class AuthController extends Controller
     public function sendClientResetLinkEmail(Request $request)
     {
         $request->validate(['email' => 'required|email']);
-        $user = User::where('email', $request->email)->where('role', 'customer')->first();
+        $user = User::where('email', $request->email)->first();
         if (!$user) {
-            return back()->withErrors(['email' => 'Email này không tồn tại hoặc không thuộc tài khoản thành viên.']);
+            return back()->withErrors(['email' => 'Email này không tồn tại trong hệ thống.']);
         }
         
         // Sinh OTP gồm 6 chữ số
@@ -282,10 +282,10 @@ class AuthController extends Controller
             'password' => 'required|string|min:6|confirmed',
         ]);
         
-        $user = User::where('email', $request->email)->where('role', 'customer')->first();
+        $user = User::where('email', $request->email)->first();
         
         if (!$user) {
-            return back()->withErrors(['email' => 'Không tìm thấy tài khoản thành viên.'])->withInput();
+            return back()->withErrors(['email' => 'Không tìm thấy tài khoản người dùng trong hệ thống.'])->withInput();
         }
 
         $attemptsKey = 'otp_attempts_' . md5($user->email);

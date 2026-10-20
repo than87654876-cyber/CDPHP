@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi" class="h-full bg-slate-900">
+<html lang="vi" class="h-full bg-[#f8fafc]">
 
 <head>
     <meta charset="utf-8">
@@ -19,24 +19,23 @@
     <!-- Vite Assets -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
-
-        /* Sleek Dark Scrollbar for Admin Sidebar */
+        /* Sleek Light Scrollbar for Admin Sidebar */
         aside nav::-webkit-scrollbar {
-            width: 5px;
+            width: 4px;
         }
         aside nav::-webkit-scrollbar-track {
-            background: #0f172a;
+            background: transparent;
         }
         aside nav::-webkit-scrollbar-thumb {
-            background: #334155;
+            background: #e2e8f0;
             border-radius: 9999px;
         }
         aside nav::-webkit-scrollbar-thumb:hover {
-            background: #475569;
+            background: #cbd5e1;
         }
         aside nav {
             scrollbar-width: thin;
-            scrollbar-color: #334155 #0f172a;
+            scrollbar-color: #cbd5e1 transparent;
         }
     </style>
     @yield('styles')
@@ -48,78 +47,82 @@
 
 
         <!-- Mobile Sidebar Overlay Backdrop -->
-        <div id="admin-sidebar-overlay" onclick="toggleAdminSidebar()" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-35 hidden lg:hidden transition-opacity"></div>
+        <!-- Mobile Sidebar Overlay Backdrop -->
+        <div id="admin-sidebar-overlay" onclick="toggleAdminSidebar()" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-35 hidden lg:hidden transition-opacity"></div>
 
-        <!-- Ultra-Modern Dark Sidebar Navigation (Cố định trên PC, Drawer trượt trên Mobile) -->
-        <aside id="admin-sidebar" class="fixed inset-y-0 left-0 w-64 bg-[#0f172a] text-slate-300 flex flex-col justify-between z-40 border-r border-slate-800/80 shadow-2xl h-screen transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0">
+        <!-- Ultra-Modern Light Sidebar Navigation (Cố định trên PC, Drawer trượt trên Mobile) -->
+        <aside id="admin-sidebar" class="fixed inset-y-0 left-0 w-64 bg-white text-slate-700 flex flex-col justify-between z-40 border-r border-slate-200/80 shadow-xl lg:shadow-none h-screen transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0">
             <div class="flex flex-col h-full min-h-0">
                 <!-- Brand Header -->
-                <div class="h-16 lg:h-20 shrink-0 flex items-center justify-between px-6 border-b border-slate-800/80">
+                <div class="h-16 lg:h-20 shrink-0 flex items-center justify-between px-6 border-b border-slate-100">
                     <a class="flex items-center gap-3 group" href="{{ route('quanly') }}">
-                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#ee4d2d] to-[#ff6b4a] flex items-center justify-center text-white shadow-lg shadow-rose-500/30 group-hover:scale-105 transition-all">
+                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#ee4d2d] to-[#ff6b4a] flex items-center justify-center text-white shadow-md shadow-rose-500/20 group-hover:scale-105 transition-all">
                             <i class="fas fa-utensils text-lg"></i>
                         </div>
                         <div class="flex flex-col">
-                            <span class="font-black text-lg text-white tracking-wider">FOODDAILY</span>
+                            <span class="font-black text-lg text-slate-900 tracking-wider">FOODDAILY</span>
                             <span class="text-[10px] font-extrabold text-[#ee4d2d] uppercase tracking-widest -mt-1">Admin Portal</span>
                         </div>
                     </a>
                     <!-- Mobile Close Button -->
-                    <button type="button" onclick="toggleAdminSidebar()" class="lg:hidden w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center text-sm transition-colors cursor-pointer" title="Đóng menu">
+                    <button type="button" onclick="toggleAdminSidebar()" class="lg:hidden w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 flex items-center justify-center text-sm transition-colors cursor-pointer" title="Đóng menu">
                         <i class="fas fa-xmark"></i>
                     </button>
                 </div>
 
                 <!-- Quick Link to Storefront -->
-                <div class="shrink-0 px-4 pt-3 pb-1">
-                    <a href="{{ route('trangchu') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-amber-400 hover:text-white text-xs font-bold transition-all border border-slate-700/80 shadow-xs group">
-                        <span class="flex items-center gap-2.5"><i class="fas fa-store text-amber-400 group-hover:scale-110 transition-transform"></i>Xem Trang Chủ</span>
-                        <i class="fas fa-arrow-up-right-from-square text-[10px] text-slate-400 group-hover:text-white"></i>
+                <div class="shrink-0 px-4 pt-3.5 pb-1">
+                    <a href="{{ route('trangchu') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-amber-50/80 hover:bg-amber-100/90 text-amber-900 text-xs font-bold transition-all border border-amber-200/70 shadow-2xs group">
+                        <span class="flex items-center gap-2.5">
+                            <i class="fas fa-store text-amber-600 group-hover:scale-110 transition-transform"></i>
+                            <span>Xem Trang Chủ</span>
+                        </span>
+                        <i class="fas fa-arrow-up-right-from-square text-[10px] text-amber-500 group-hover:text-amber-800 transition-colors"></i>
                     </a>
                 </div>
 
                 <!-- Navigation Links (Cuộn độc lập mượt mà) -->
                 <nav class="flex-1 min-h-0 p-4 space-y-1.5 overflow-y-auto">
                     @if(in_array(Auth::user()->role, ['superadmin', 'admin']))
-                    <a href="{{ route('quanly') }}" class="flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all {{ Route::is('quanly') ? 'bg-[#ee4d2d] text-white shadow-lg shadow-rose-500/30' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                    <a href="{{ route('quanly') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all group {{ Route::is('quanly') ? 'bg-[#ee4d2d] text-white font-black shadow-md shadow-rose-500/20' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 font-semibold' }}">
                         <div class="flex items-center gap-3">
-                            <i class="fas fa-chart-pie w-5 text-center text-sm"></i>
+                            <i class="fas fa-chart-pie w-5 text-center text-sm {{ Route::is('quanly') ? 'text-white' : 'text-slate-400 group-hover:text-[#ee4d2d]' }} transition-colors"></i>
                             <span>Báo cáo doanh thu</span>
                         </div>
                     </a>
                     @endif
 
-                    <a href="{{ route('quanly_banlamviec') }}" class="flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all {{ Route::is('quanly_banlamviec') ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/30' : 'text-slate-400 hover:bg-slate-800/80 hover:text-amber-400' }}">
+                    <a href="{{ route('quanly_banlamviec') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all group {{ Route::is('quanly_banlamviec') ? 'bg-amber-500 text-white font-black shadow-md shadow-amber-500/20' : 'text-slate-600 hover:bg-amber-50/70 hover:text-amber-700 font-semibold' }}">
                         <div class="flex items-center gap-3">
-                            <i class="fas fa-desktop w-5 text-center text-sm"></i>
+                            <i class="fas fa-desktop w-5 text-center text-sm {{ Route::is('quanly_banlamviec') ? 'text-white' : 'text-amber-500 group-hover:text-amber-600' }} transition-colors"></i>
                             <span>Bàn làm việc Nhân viên</span>
                         </div>
                     </a>
 
                     <div class="pt-4 pb-1">
-                        <p class="px-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Dịch vụ & Thực đơn</p>
+                        <p class="px-3.5 text-[10px] font-black text-slate-400 uppercase tracking-wider">Dịch vụ & Thực đơn</p>
                     </div>
 
                     @if(Auth::user()->role === 'superadmin')
-                    <a href="{{ route('quanly_cauhinh') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_cauhinh') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                    <a href="{{ route('quanly_cauhinh') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all group {{ Route::is('quanly_cauhinh') ? 'bg-rose-50 text-[#ee4d2d] font-black border border-rose-200/70 shadow-2xs' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 font-semibold' }}">
                         <div class="flex items-center gap-3">
-                            <i class="fas fa-sliders w-5 text-center"></i>
+                            <i class="fas fa-sliders w-5 text-center {{ Route::is('quanly_cauhinh') ? 'text-[#ee4d2d]' : 'text-slate-400 group-hover:text-slate-700' }} transition-colors"></i>
                             <span>Cấu hình trang chủ</span>
                         </div>
                     </a>
                     @endif
 
                     @if(in_array(Auth::user()->role, ['superadmin', 'admin']))
-                    <a href="{{ route('quanly_danhmuc') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_danhmuc') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                    <a href="{{ route('quanly_danhmuc') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all group {{ Route::is('quanly_danhmuc') ? 'bg-rose-50 text-[#ee4d2d] font-black border border-rose-200/70 shadow-2xs' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 font-semibold' }}">
                         <div class="flex items-center gap-3">
-                            <i class="fas fa-list w-5 text-center"></i>
+                            <i class="fas fa-list w-5 text-center {{ Route::is('quanly_danhmuc') ? 'text-[#ee4d2d]' : 'text-slate-400 group-hover:text-slate-700' }} transition-colors"></i>
                             <span>Danh mục món ăn</span>
                         </div>
                     </a>
 
-                    <a href="{{ route('quanly_khuyenmai') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_khuyenmai') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                    <a href="{{ route('quanly_khuyenmai') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all group {{ Route::is('quanly_khuyenmai') ? 'bg-rose-50 text-[#ee4d2d] font-black border border-rose-200/70 shadow-2xs' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 font-semibold' }}">
                         <div class="flex items-center gap-3">
-                            <i class="fas fa-ticket w-5 text-center"></i>
+                            <i class="fas fa-ticket w-5 text-center {{ Route::is('quanly_khuyenmai') ? 'text-[#ee4d2d]' : 'text-slate-400 group-hover:text-slate-700' }} transition-colors"></i>
                             <span>Mã khuyến mãi</span>
                         </div>
                     </a>
@@ -127,12 +130,12 @@
 
                     @if(in_array(Auth::user()->role, ['superadmin', 'admin']))
                     <div class="pt-4 pb-1">
-                        <p class="px-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Đơn hàng & Khách hàng</p>
+                        <p class="px-3.5 text-[10px] font-black text-slate-400 uppercase tracking-wider">Đơn hàng & Khách hàng</p>
                     </div>
 
-                    <a href="{{ route('quanly_donhang') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_donhang') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                    <a href="{{ route('quanly_donhang') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all group {{ Route::is('quanly_donhang') ? 'bg-rose-50 text-[#ee4d2d] font-black border border-rose-200/70 shadow-2xs' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 font-semibold' }}">
                         <div class="flex items-center gap-3">
-                            <i class="fas fa-file-invoice-dollar w-5 text-center"></i>
+                            <i class="fas fa-file-invoice-dollar w-5 text-center {{ Route::is('quanly_donhang') ? 'text-[#ee4d2d]' : 'text-slate-400 group-hover:text-[#ee4d2d]' }} transition-colors"></i>
                             <span>Danh sách đơn hàng</span>
                         </div>
                         @if($pendingOrdersCount > 0)
@@ -142,105 +145,198 @@
                         @endif
                     </a>
 
-                    <a href="{{ route('quanly_reviews') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_reviews') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                    <a href="{{ route('quanly_reviews') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all group {{ Route::is('quanly_reviews') ? 'bg-rose-50 text-[#ee4d2d] font-black border border-rose-200/70 shadow-2xs' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 font-semibold' }}">
                         <div class="flex items-center gap-3">
-                            <i class="fas fa-star w-5 text-center"></i>
+                            <i class="fas fa-star w-5 text-center {{ Route::is('quanly_reviews') ? 'text-[#ee4d2d]' : 'text-amber-400 group-hover:text-amber-500' }} transition-colors"></i>
                             <span>Đánh giá khách hàng</span>
                         </div>
                     </a>
                     @endif
 
                     <div class="pt-4 pb-1">
-                        <p class="px-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Nghiệp vụ Vận hành</p>
+                        <p class="px-3.5 text-[10px] font-black text-slate-400 uppercase tracking-wider">Nghiệp vụ Vận hành</p>
                     </div>
 
-                    <a href="{{ route('quanly_bep') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_bep') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                    <a href="{{ route('quanly_bep') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all group {{ Route::is('quanly_bep') ? 'bg-amber-50 text-amber-800 font-black border border-amber-200/70 shadow-2xs' : 'text-slate-600 hover:bg-amber-50/60 hover:text-amber-700 font-semibold' }}">
                         <div class="flex items-center gap-3">
-                            <i class="fas fa-fire-burner w-5 text-center text-amber-400"></i>
+                            <i class="fas fa-fire-burner w-5 text-center text-amber-500 group-hover:scale-105 transition-transform"></i>
                             <span>Màn hình Bếp nấu</span>
                         </div>
                         @if($kitchenCount > 0)
-                            <span class="px-2 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-black">
+                            <span class="px-2 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-black shadow-xs">
                                 {{ $kitchenCount }}
                             </span>
                         @endif
                     </a>
 
                     <div class="pt-4 pb-1">
-                        <p class="px-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Kho Vận & Nhập Hàng</p>
+                        <p class="px-3.5 text-[10px] font-black text-slate-400 uppercase tracking-wider">Kho Vận & Nhập Hàng</p>
                     </div>
 
-                    <a href="{{ route('quanly_kho') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_kho*') || Route::is('kho_*') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                    <a href="{{ route('quanly_kho') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all group {{ Route::is('quanly_kho*') || Route::is('kho_*') ? 'bg-rose-50 text-[#ee4d2d] font-black border border-rose-200/70 shadow-2xs' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 font-semibold' }}">
                         <div class="flex items-center gap-3">
-                            <i class="fas fa-boxes-stacked w-5 text-center text-blue-400"></i>
+                            <i class="fas fa-boxes-stacked w-5 text-center {{ Route::is('quanly_kho*') || Route::is('kho_*') ? 'text-[#ee4d2d]' : 'text-blue-500 group-hover:text-blue-600' }} transition-colors"></i>
                             <span>Kho & Hàng tồn thực tế</span>
                         </div>
                         @if($lowStockInventoryCount > 0)
-                            <span class="px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black animate-pulse" title="Mặt hàng cần nhập thêm">
+                            <span class="px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black shadow-xs animate-pulse" title="Mặt hàng cần nhập thêm">
                                 {{ $lowStockInventoryCount }}
                             </span>
                         @endif
                     </a>
 
-                    <a href="{{ route('quanly_nhacungcap') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_nhacungcap*') || Route::is('nhacungcap_*') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                    <a href="{{ route('quanly_nhacungcap') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all group {{ Route::is('quanly_nhacungcap*') || Route::is('nhacungcap_*') ? 'bg-rose-50 text-[#ee4d2d] font-black border border-rose-200/70 shadow-2xs' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 font-semibold' }}">
                         <div class="flex items-center gap-3">
-                            <i class="fas fa-truck-field w-5 text-center text-amber-400"></i>
+                            <i class="fas fa-truck-field w-5 text-center {{ Route::is('quanly_nhacungcap*') || Route::is('nhacungcap_*') ? 'text-[#ee4d2d]' : 'text-amber-500 group-hover:text-amber-600' }} transition-colors"></i>
                             <span>Nguồn hàng & Nhà cung cấp</span>
                         </div>
                     </a>
 
-                    <a href="{{ route('quanly_nhaphang') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_nhaphang*') || Route::is('nhaphang_*') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                    <a href="{{ route('quanly_nhaphang') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all group {{ Route::is('quanly_nhaphang*') || Route::is('nhaphang_*') ? 'bg-rose-50 text-[#ee4d2d] font-black border border-rose-200/70 shadow-2xs' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 font-semibold' }}">
                         <div class="flex items-center gap-3">
-                            <i class="fas fa-file-invoice-dollar w-5 text-center text-emerald-400"></i>
+                            <i class="fas fa-file-invoice-dollar w-5 text-center {{ Route::is('quanly_nhaphang*') || Route::is('nhaphang_*') ? 'text-[#ee4d2d]' : 'text-emerald-500 group-hover:text-emerald-600' }} transition-colors"></i>
                             <span>Phiếu Nhập Hàng (Nhập kho)</span>
                         </div>
                     </a>
 
                     @if(in_array(Auth::user()->role, ['superadmin', 'admin']))
                     <div class="pt-4 pb-1">
-                        <p class="px-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Tài khoản & Hệ thống</p>
+                        <p class="px-3.5 text-[10px] font-black text-slate-400 uppercase tracking-wider">Tài khoản & Hệ thống</p>
                     </div>
 
-                    <a href="{{ route('quanly_khachhang') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_khachhang') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                    <a href="{{ route('quanly_khachhang') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all group {{ Route::is('quanly_khachhang') ? 'bg-rose-50 text-[#ee4d2d] font-black border border-rose-200/70 shadow-2xs' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 font-semibold' }}">
                         <div class="flex items-center gap-3">
-                            <i class="fas fa-users w-5 text-center"></i>
+                            <i class="fas fa-users w-5 text-center {{ Route::is('quanly_khachhang') ? 'text-[#ee4d2d]' : 'text-cyan-600 group-hover:text-cyan-700' }} transition-colors"></i>
                             <span>Quản lý Khách hàng</span>
                         </div>
                     </a>
                     @endif
 
                     @if(Auth::user()->role === 'superadmin' || (method_exists(Auth::user(), 'can') && Auth::user()->can('employees.manage')))
-                    <a href="{{ route('quanly_nhanvien') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_nhanvien*') || Route::is('nhanvien_*') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                    <a href="{{ route('quanly_nhanvien') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all group {{ Route::is('quanly_nhanvien*') || Route::is('nhanvien_*') ? 'bg-rose-50 text-[#ee4d2d] font-black border border-rose-200/70 shadow-2xs' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 font-semibold' }}">
                         <div class="flex items-center gap-3">
-                            <i class="fas fa-id-badge w-5 text-center text-blue-400"></i>
+                            <i class="fas fa-id-badge w-5 text-center {{ Route::is('quanly_nhanvien*') || Route::is('nhanvien_*') ? 'text-[#ee4d2d]' : 'text-blue-500 group-hover:text-blue-600' }} transition-colors"></i>
                             <span>Tài khoản Nhân viên</span>
                         </div>
                     </a>
                     @endif
 
                     @if(Auth::user()->role === 'superadmin' || (method_exists(Auth::user(), 'can') && Auth::user()->can('roles.manage')))
-                    <a href="{{ route('quanly_vaitro') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold transition-all {{ Route::is('quanly_vaitro*') || Route::is('vaitro_*') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/80 hover:text-white' }}">
+                    <a href="{{ route('quanly_vaitro') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all group {{ Route::is('quanly_vaitro*') || Route::is('vaitro_*') ? 'bg-rose-50 text-[#ee4d2d] font-black border border-rose-200/70 shadow-2xs' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 font-semibold' }}">
                         <div class="flex items-center gap-3">
-                            <i class="fas fa-crown w-5 text-center text-amber-400"></i>
+                            <i class="fas fa-crown w-5 text-center {{ Route::is('quanly_vaitro*') || Route::is('vaitro_*') ? 'text-[#ee4d2d]' : 'text-amber-500 group-hover:text-amber-600' }} transition-colors"></i>
                             <span>Vai trò & Phân quyền</span>
                         </div>
-                        <span class="px-1.5 py-0.5 rounded-md bg-purple-500/20 text-purple-300 text-[9px] font-black uppercase">RBAC</span>
+                        <span class="px-1.5 py-0.5 rounded-md bg-purple-100 text-purple-700 border border-purple-200/80 text-[9px] font-black uppercase">RBAC</span>
+                    </a>
+
+                    <a href="{{ route('quanly_nhatky') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all group {{ Route::is('quanly_nhatky*') ? 'bg-rose-50 text-[#ee4d2d] font-black border border-rose-200/70 shadow-2xs' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 font-semibold' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-fingerprint w-5 text-center {{ Route::is('quanly_nhatky*') ? 'text-[#ee4d2d]' : 'text-rose-500 group-hover:text-rose-600' }} transition-colors"></i>
+                            <span>Nhật ký Audit Trail</span>
+                        </div>
+                        <span class="px-1.5 py-0.5 rounded-md bg-rose-100 text-rose-700 border border-rose-200/80 text-[9px] font-black uppercase">LOG</span>
+                    </a>
+
+                    <a href="{{ route('quanly_pheduyet') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all group {{ Route::is('quanly_pheduyet*') ? 'bg-rose-50 text-[#ee4d2d] font-black border border-rose-200/70 shadow-2xs' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 font-semibold' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-signature w-5 text-center {{ Route::is('quanly_pheduyet*') ? 'text-[#ee4d2d]' : 'text-indigo-500 group-hover:text-indigo-600' }} transition-colors"></i>
+                            <span>Phê duyệt 2 bước</span>
+                        </div>
+                        <span class="px-1.5 py-0.5 rounded-md bg-indigo-100 text-indigo-700 border border-indigo-200/80 text-[9px] font-black uppercase">DUAL</span>
                     </a>
                     @endif
                 </nav>
             </div>
 
             <!-- Footer Sidebar Account Quick Action -->
-            <div class="shrink-0 p-4 border-t border-slate-800">
-                <a href="{{ route('trangchu') }}" class="flex items-center justify-center gap-2 w-full py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 transition-colors">
-                    <i class="fas fa-globe text-[#ee4d2d]"></i>
+            <div class="shrink-0 p-3.5 border-t border-slate-100 bg-slate-50/60">
+                <a href="{{ route('trangchu') }}" class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-white hover:bg-slate-100 text-xs font-bold text-slate-700 border border-slate-200/90 shadow-2xs hover:shadow-xs hover:border-slate-300 hover:text-slate-900 transition-all group">
+                    <i class="fas fa-globe text-[#ee4d2d] group-hover:scale-110 transition-transform"></i>
                     <span>Xem Trang Web</span>
                 </a>
             </div>
         </aside>
 
         <!-- Main Content Area (ml-0 trên Mobile, ml-64 trên Desktop) -->
-        <div class="flex-grow flex flex-col min-w-0 bg-[#f8fafc] ml-0 lg:ml-64 min-h-screen transition-all">
+        <div class="flex-grow flex flex-col min-w-0 bg-[#f8fafc] ml-0 lg:ml-64 min-h-screen transition-all relative">
+
+            <!-- Global Admin Floating Toast Notification Container -->
+            <div id="admin-toast-container" class="fixed top-20 right-4 sm:right-6 z-50 flex flex-col gap-3 max-w-sm sm:max-w-md w-full pointer-events-none">
+                {{-- Session Success --}}
+                @if(session('success'))
+                    <div class="admin-toast pointer-events-auto flex items-start gap-3 p-4 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-emerald-200/90 text-slate-800 transition-all duration-300 transform translate-x-0">
+                        <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 text-sm font-bold shadow-2xs">
+                            <i class="fas fa-circle-check"></i>
+                        </div>
+                        <div class="flex-grow min-w-0 pr-2">
+                            <h5 class="text-xs font-black text-emerald-700 uppercase tracking-wider">Thành công</h5>
+                            <p class="text-xs font-medium text-slate-700 mt-0.5 leading-relaxed">{{ session('success') }}</p>
+                        </div>
+                        <button type="button" onclick="dismissAdminToast(this.closest('.admin-toast'))" class="text-slate-400 hover:text-slate-600 p-1 text-sm shrink-0 cursor-pointer">&times;</button>
+                    </div>
+                @endif
+
+                {{-- Session Error --}}
+                @if(session('error'))
+                    <div class="admin-toast pointer-events-auto flex items-start gap-3 p-4 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-rose-200/90 text-slate-800 transition-all duration-300 transform translate-x-0">
+                        <div class="w-8 h-8 rounded-xl bg-rose-100 text-[#ee4d2d] flex items-center justify-center shrink-0 text-sm font-bold shadow-2xs">
+                            <i class="fas fa-circle-exclamation"></i>
+                        </div>
+                        <div class="flex-grow min-w-0 pr-2">
+                            <h5 class="text-xs font-black text-[#ee4d2d] uppercase tracking-wider">Thông báo lỗi</h5>
+                            <p class="text-xs font-medium text-slate-700 mt-0.5 leading-relaxed">{{ session('error') }}</p>
+                        </div>
+                        <button type="button" onclick="dismissAdminToast(this.closest('.admin-toast'))" class="text-slate-400 hover:text-slate-600 p-1 text-sm shrink-0 cursor-pointer">&times;</button>
+                    </div>
+                @endif
+
+                {{-- Session Warning --}}
+                @if(session('warning'))
+                    <div class="admin-toast pointer-events-auto flex items-start gap-3 p-4 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-amber-200/90 text-slate-800 transition-all duration-300 transform translate-x-0">
+                        <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0 text-sm font-bold shadow-2xs">
+                            <i class="fas fa-triangle-exclamation"></i>
+                        </div>
+                        <div class="flex-grow min-w-0 pr-2">
+                            <h5 class="text-xs font-black text-amber-700 uppercase tracking-wider">Cảnh báo</h5>
+                            <p class="text-xs font-medium text-slate-700 mt-0.5 leading-relaxed">{{ session('warning') }}</p>
+                        </div>
+                        <button type="button" onclick="dismissAdminToast(this.closest('.admin-toast'))" class="text-slate-400 hover:text-slate-600 p-1 text-sm shrink-0 cursor-pointer">&times;</button>
+                    </div>
+                @endif
+
+                {{-- Session Info --}}
+                @if(session('info'))
+                    <div class="admin-toast pointer-events-auto flex items-start gap-3 p-4 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-sky-200/90 text-slate-800 transition-all duration-300 transform translate-x-0">
+                        <div class="w-8 h-8 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center shrink-0 text-sm font-bold shadow-2xs">
+                            <i class="fas fa-circle-info"></i>
+                        </div>
+                        <div class="flex-grow min-w-0 pr-2">
+                            <h5 class="text-xs font-black text-sky-700 uppercase tracking-wider">Thông tin</h5>
+                            <p class="text-xs font-medium text-slate-700 mt-0.5 leading-relaxed">{{ session('info') }}</p>
+                        </div>
+                        <button type="button" onclick="dismissAdminToast(this.closest('.admin-toast'))" class="text-slate-400 hover:text-slate-600 p-1 text-sm shrink-0 cursor-pointer">&times;</button>
+                    </div>
+                @endif
+
+                {{-- Validation Errors --}}
+                @if($errors->any())
+                    <div class="admin-toast pointer-events-auto flex items-start gap-3 p-4 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-rose-200/90 text-slate-800 transition-all duration-300 transform translate-x-0">
+                        <div class="w-8 h-8 rounded-xl bg-rose-100 text-[#ee4d2d] flex items-center justify-center shrink-0 text-sm font-bold shadow-2xs">
+                            <i class="fas fa-triangle-exclamation"></i>
+                        </div>
+                        <div class="flex-grow min-w-0 pr-2">
+                            <h5 class="text-xs font-black text-[#ee4d2d] uppercase tracking-wider">Dữ liệu không hợp lệ</h5>
+                            <ul class="text-xs font-medium text-slate-700 mt-1 list-disc list-inside space-y-0.5 leading-relaxed">
+                                @foreach($errors->all() as $err)
+                                    <li>{{ $err }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        <button type="button" onclick="dismissAdminToast(this.closest('.admin-toast'))" class="text-slate-400 hover:text-slate-600 p-1 text-sm shrink-0 cursor-pointer">&times;</button>
+                    </div>
+                @endif
+            </div>
 
             <!-- Topbar Header -->
             <header class="h-16 lg:h-20 bg-white border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 flex items-center justify-between shadow-xs sticky top-0 z-20">
@@ -425,6 +521,9 @@
                         feedback.className = 'p-3 rounded-xl text-xs font-bold text-center mb-3 bg-emerald-50 text-emerald-700 border border-emerald-200 block';
                         feedback.innerHTML = `✅ Bắn thông báo thành công: <strong>${data.data.title}</strong>! Thiết bị khách hàng sẽ nhận ngay bây giờ.`;
                     }
+                    if (window.showAdminToast) {
+                        window.showAdminToast(`📢 Bắn thông báo "${data.data.title}" thành công!`, 'success');
+                    }
                     // Nếu admin đã cấp quyền thông báo, hiển thị thử luôn trên máy admin
                     if ('Notification' in window && Notification.permission === 'granted') {
                         new Notification(data.data.title, {
@@ -440,6 +539,9 @@
                 if (feedback) {
                     feedback.className = 'p-3 rounded-xl text-xs font-bold text-center mb-3 bg-rose-50 text-rose-700 border border-rose-200 block';
                     feedback.innerText = '❌ Gửi thất bại: ' + err.message;
+                }
+                if (window.showAdminToast) {
+                    window.showAdminToast('❌ Bắn thông báo thất bại: ' + err.message, 'error');
                 }
             });
         }
@@ -559,6 +661,94 @@
             if (menu && container && !container.contains(e.target)) {
                 menu.classList.add('hidden');
             }
+        });
+
+        // Global Toast Notification Utilities for Admin
+        function dismissAdminToast(toastEl) {
+            if (!toastEl) return;
+            toastEl.classList.remove('translate-x-0', 'opacity-100');
+            toastEl.classList.add('translate-x-8', 'opacity-0');
+            setTimeout(() => {
+                if (toastEl && toastEl.parentElement) {
+                    toastEl.remove();
+                }
+            }, 300);
+        }
+
+        function showAdminToast(message, type = 'success', duration = 5000) {
+            const container = document.getElementById('admin-toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = 'admin-toast pointer-events-auto flex items-start gap-3 p-4 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border text-slate-800 transition-all duration-300 transform translate-x-8 opacity-0';
+
+            let iconHtml = '';
+            let titleText = 'Thông báo';
+            let titleClass = '';
+            let borderClass = 'border-slate-200/90';
+
+            switch (type) {
+                case 'success':
+                    iconHtml = '<div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 text-sm font-bold shadow-2xs"><i class="fas fa-circle-check"></i></div>';
+                    titleText = 'Thành công';
+                    titleClass = 'text-emerald-700';
+                    borderClass = 'border-emerald-200/90';
+                    break;
+                case 'error':
+                    iconHtml = '<div class="w-8 h-8 rounded-xl bg-rose-100 text-[#ee4d2d] flex items-center justify-center shrink-0 text-sm font-bold shadow-2xs"><i class="fas fa-circle-exclamation"></i></div>';
+                    titleText = 'Thông báo lỗi';
+                    titleClass = 'text-[#ee4d2d]';
+                    borderClass = 'border-rose-200/90';
+                    break;
+                case 'warning':
+                    iconHtml = '<div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0 text-sm font-bold shadow-2xs"><i class="fas fa-triangle-exclamation"></i></div>';
+                    titleText = 'Cảnh báo';
+                    titleClass = 'text-amber-700';
+                    borderClass = 'border-amber-200/90';
+                    break;
+                case 'info':
+                default:
+                    iconHtml = '<div class="w-8 h-8 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center shrink-0 text-sm font-bold shadow-2xs"><i class="fas fa-circle-info"></i></div>';
+                    titleText = 'Thông tin';
+                    titleClass = 'text-sky-700';
+                    borderClass = 'border-sky-200/90';
+                    break;
+            }
+
+            toast.classList.add(...borderClass.split(' '));
+            toast.innerHTML = `
+                ${iconHtml}
+                <div class="flex-grow min-w-0 pr-2">
+                    <h5 class="text-xs font-black ${titleClass} uppercase tracking-wider">${titleText}</h5>
+                    <p class="text-xs font-medium text-slate-700 mt-0.5 leading-relaxed">${message}</p>
+                </div>
+                <button type="button" onclick="dismissAdminToast(this.closest('.admin-toast'))" class="text-slate-400 hover:text-slate-600 p-1 text-sm shrink-0 cursor-pointer">&times;</button>
+            `;
+
+            container.appendChild(toast);
+
+            // Animate in
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-x-8', 'opacity-0');
+                toast.classList.add('translate-x-0', 'opacity-100');
+            });
+
+            // Auto dismiss
+            setTimeout(() => {
+                dismissAdminToast(toast);
+            }, duration);
+        }
+
+        window.dismissAdminToast = dismissAdminToast;
+        window.showAdminToast = showAdminToast;
+
+        // Auto dismiss initial session toasts
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('#admin-toast-container .admin-toast').forEach(toast => {
+                setTimeout(() => {
+                    dismissAdminToast(toast);
+                }, 6000);
+            });
         });
     </script>
 </body>

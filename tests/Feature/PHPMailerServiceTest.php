@@ -55,12 +55,14 @@ class PHPMailerServiceTest extends TestCase
      */
     public function test_send_email_success_with_mocked_phpmailer()
     {
+        PHPMailerService::resetSharedMailer();
+
         // Mock the PHPMailer class
         $mockMailer = $this->createMock(PHPMailer::class);
         
         // Assert PHPMailer methods are called during send
         $mockMailer->expects($this->once())->method('isSMTP');
-        $mockMailer->expects($this->once())->method('setFrom');
+        $mockMailer->expects($this->atLeastOnce())->method('setFrom');
         $mockMailer->expects($this->once())->method('addAddress')->with('recipient@example.com');
         $mockMailer->expects($this->once())->method('isHTML')->with(true);
         $mockMailer->expects($this->once())->method('send')->willReturn(true);

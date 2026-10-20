@@ -18,11 +18,22 @@
     <link rel="apple-touch-icon" href="{{ asset('icons/apple-touch-icon.png') }}">
     <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('icons/icon-192x192.png') }}">
     
-    <!-- Fonts & FontAwesome -->
+    <!-- Preconnect & Non-blocking Font Loading for Maximum Speed -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"></noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+
+    @php
+        $heroBannerUrl = isset($globalSettings['banner_image']) && $globalSettings['banner_image']
+            ? (\Illuminate\Support\Str::startsWith($globalSettings['banner_image'], 'http') ? $globalSettings['banner_image'] : asset(ltrim($globalSettings['banner_image'], '/')))
+            : asset('uploads/ve-dep-sai-gon-qua-ong-kinh-cua-nguoi-me-anh-ivivu-2.jpg');
+    @endphp
+    <!-- Preload Hero LCP Banner Image for High Mobile Performance -->
+    <link rel="preload" as="image" href="{{ $heroBannerUrl }}" fetchpriority="high">
 
     <script>
         window.FoodDailyConfig = {
@@ -51,7 +62,6 @@
     <!-- Vite Assets -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-
     <style>
         body, .site-bg-overlay {
             background-image: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url("{{ $siteBgUrl }}") !important;
@@ -60,6 +70,13 @@
             background-repeat: no-repeat !important;
             background-size: cover !important;
             min-height: 100vh !important;
+        }
+        @media (max-width: 768px) {
+            body, .site-bg-overlay {
+                background-image: none !important;
+                background-color: #f8fafc !important;
+                background-attachment: scroll !important;
+            }
         }
     </style>
     @yield('styles')
@@ -73,8 +90,8 @@
                 
                 <!-- Left: Brand Logo & Location -->
                 <div class="flex items-center gap-6">
-                    <a href="{{ route('trangchu') }}" class="flex items-center gap-2.5 group">
-                        <img src="{{ $siteLogoUrl }}" alt="Logo" class="w-9 h-9 rounded-xl object-cover shadow-xs border border-slate-100">
+                    <a href="{{ route('trangchu') }}" class="flex items-center gap-2.5 group" aria-label="FOODDAILY Trang chủ">
+                        <img src="{{ $siteLogoUrl }}" alt="FOODDAILY Logo" class="w-9 h-9 rounded-xl object-cover shadow-xs border border-slate-100" width="36" height="36">
                         <div class="flex flex-col">
                             <span class="font-black text-2xl tracking-tighter text-[#ee4d2d] group-hover:opacity-90 transition-opacity">FOODDAILY</span>
                             <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest -mt-1.5">Food Delivery</span>
@@ -90,12 +107,12 @@
                     <a href="{{ route('tracuu') }}" class="h-full flex items-center {{ request()->routeIs('tracuu') ? 'border-b-2 border-[#ee4d2d] text-[#ee4d2d] font-extrabold' : 'hover:text-[#ee4d2d] transition-colors' }} px-1">
                         Tra cứu đơn
                     </a>
-                    <button type="button" onclick="openGlobalUserVoucherModal('all')" class="h-full flex items-center hover:text-[#ee4d2d] transition-colors px-1 cursor-pointer">
+                    <button type="button" onclick="openGlobalUserVoucherModal('all')" class="h-full flex items-center hover:text-[#ee4d2d] transition-colors px-1 cursor-pointer" aria-label="Xem kho voucher ưu đãi">
                         <i class="fas fa-ticket-alt text-[#ee4d2d] mr-1.5 text-xs"></i>
                         <span>Kho Ưu Đãi</span>
                         <span class="ml-1.5 px-1.5 py-0.2 bg-gradient-to-r from-red-500 to-amber-500 text-[9px] text-white font-black rounded-full animate-pulse">HOT</span>
                     </button>
-                    <button type="button" onclick="openSpinWheelModal()" class="h-full flex items-center hover:text-[#ee4d2d] transition-colors px-1 cursor-pointer font-bold text-slate-600" title="Quay chọn món ngẫu nhiên">
+                    <button type="button" onclick="openSpinWheelModal()" class="h-full flex items-center hover:text-[#ee4d2d] transition-colors px-1 cursor-pointer font-bold text-slate-600" title="Quay chọn món ngẫu nhiên" aria-label="Vòng quay may mắn Hôm nay ăn gì">
                         <span class="mr-1 text-sm">🎡</span>
                         <span>Hôm nay ăn gì?</span>
                     </button>
@@ -105,12 +122,12 @@
                 <!-- Right: Search, Auth & Language -->
                 <div class="flex items-center gap-4">
                     <!-- Search Icon Trigger -->
-                    <button type="button" onclick="toggleHeaderSearch()" class="p-2 text-slate-600 hover:text-[#ee4d2d] text-base transition-colors" title="Tìm kiếm món ăn">
+                    <button type="button" onclick="toggleHeaderSearch()" class="p-2 text-slate-600 hover:text-[#ee4d2d] text-base transition-colors" title="Tìm kiếm món ăn" aria-label="Tìm kiếm món ăn">
                         <i class="fas fa-magnifying-glass"></i>
                     </button>
 
                     <!-- Cart Icon (Dành cho cả Khách vãng lai & Thành viên) -->
-                    <a href="{{ route('muahang') }}" class="relative p-2 text-slate-600 hover:text-[#ee4d2d] transition-colors" title="Giỏ hàng & Thanh toán">
+                    <a href="{{ route('muahang') }}" class="relative p-2 text-slate-600 hover:text-[#ee4d2d] transition-colors" title="Giỏ hàng & Thanh toán" aria-label="Giỏ hàng và thanh toán">
                         <i class="fas fa-shopping-cart text-lg"></i>
                         <span id="global-header-cart-badge" class="absolute -top-1.5 -right-2 bg-[#ee4d2d] text-white text-xs font-black min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center border-2 border-white shadow-sm hidden">
                             0
@@ -133,7 +150,7 @@
 
                         <!-- User Profile Dropdown (Hỗ trợ cả chạm/click trên mobile và hover trên desktop) -->
                         <div class="relative group" id="user-profile-container">
-                            <button type="button" id="user-profile-toggle-btn" onclick="toggleUserProfileDropdown(event)" class="flex items-center gap-2 p-1 pl-2 pr-2.5 bg-slate-100 hover:bg-slate-200/80 rounded-full border border-slate-200 transition-all cursor-pointer">
+                            <button type="button" id="user-profile-toggle-btn" onclick="toggleUserProfileDropdown(event)" class="flex items-center gap-2 p-1 pl-2 pr-2.5 bg-slate-100 hover:bg-slate-200/80 rounded-full border border-slate-200 transition-all cursor-pointer" aria-label="Menu tài khoản người dùng">
                                 @if(Auth::user()->avatar)
                                     <img src="{{ Auth::user()->avatar_url }}" alt="Avatar" class="w-6 h-6 rounded-full object-cover border border-rose-200">
                                 @else
@@ -355,7 +372,8 @@
     <!-- Floating AI Chatbot Widget (Tránh đè thanh điều hướng đáy và thanh đặt món trên Mobile) -->
     <button type="button" id="chatbot-toggle-btn" onclick="toggleChatbot()" 
             class="fixed bottom-32 right-3 md:bottom-6 md:right-6 z-50 w-11 h-11 md:w-12 md:h-12 rounded-full bg-[#ee4d2d] hover:bg-red-600 text-white shadow-xl shadow-rose-500/40 flex items-center justify-center text-lg md:text-xl hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer border-2 border-white" 
-            title="Trợ lý AI FOODDAILY">
+            title="Trợ lý AI FOODDAILY"
+            aria-label="Mở trợ lý AI tư vấn món ăn">
         <span class="relative flex items-center justify-center">
             <i class="fas fa-robot text-base md:text-lg"></i>
             <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#ee4d2d] animate-pulse"></span>
@@ -375,7 +393,7 @@
                     <p class="text-[10px] text-white/80 font-medium">Sẵn sàng gợi ý & tìm món cho bạn 24/7</p>
                 </div>
             </div>
-            <button type="button" onclick="toggleChatbot()" class="text-white/80 hover:text-white text-lg"><i class="fas fa-xmark"></i></button>
+            <button type="button" onclick="toggleChatbot()" class="text-white/80 hover:text-white text-lg cursor-pointer" aria-label="Đóng trợ lý AI"><i class="fas fa-xmark"></i></button>
         </div>
 
         <!-- Chat Messages Area -->
@@ -390,8 +408,8 @@
 
         <!-- Chat Input Form -->
         <form id="chatbot-form" onsubmit="sendChatbotMessage(event)" class="p-3 bg-white border-t border-slate-100 flex items-center gap-2">
-            <input type="text" id="chatbot-input" placeholder="Nhập tên món ăn hoặc hỏi AI..." class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 outline-none focus:border-[#ee4d2d]">
-            <button type="submit" class="w-9 h-9 rounded-xl bg-[#ee4d2d] hover:bg-red-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
+            <input type="text" id="chatbot-input" placeholder="Nhập tên món ăn hoặc hỏi AI..." aria-label="Nhập câu hỏi hoặc tên món ăn" class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 outline-none focus:border-[#ee4d2d]">
+            <button type="submit" aria-label="Gửi tin nhắn" class="w-9 h-9 rounded-xl bg-[#ee4d2d] hover:bg-red-600 text-white flex items-center justify-center text-xs font-bold shrink-0 cursor-pointer">
                 <i class="fas fa-paper-plane"></i>
             </button>
         </form>
@@ -462,7 +480,7 @@
                         <p class="text-[11px] text-rose-100 font-semibold">Tự động áp dụng mã tốt nhất khi thanh toán</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeGlobalUserVoucherModal()" class="w-8 h-8 rounded-full bg-black/15 hover:bg-black/30 text-white flex items-center justify-center text-lg font-bold transition-colors">
+                <button type="button" onclick="closeGlobalUserVoucherModal()" class="w-8 h-8 rounded-full bg-black/15 hover:bg-black/30 text-white flex items-center justify-center text-lg font-bold transition-colors cursor-pointer" aria-label="Đóng kho ưu đãi">
                     &times;
                 </button>
             </div>
@@ -505,7 +523,7 @@
 
     <!-- MOBILE FLOATING QUICK CART BAR (Chuẩn ShopeeFood / GrabFood) -->
     <div id="mobile-floating-cart-bar" class="hidden md:hidden fixed bottom-16 left-3 right-3 z-45 animate-in slide-in-from-bottom duration-200">
-        <a href="{{ route('muahang') }}" class="flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 text-white shadow-2xl border border-slate-700/60 active:scale-98 transition-all">
+        <a href="{{ route('muahang') }}" aria-label="Giỏ hàng của bạn, nhấn để đặt món" class="flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 text-white shadow-2xl border border-slate-700/60 active:scale-98 transition-all">
             <div class="flex items-center gap-2.5">
                 <div class="relative w-8 h-8 rounded-xl bg-[#ee4d2d] flex items-center justify-center font-bold text-xs text-white shadow-inner">
                     <i class="fas fa-shopping-bag"></i>
@@ -524,23 +542,23 @@
     </div>
 
     <!-- MOBILE BOTTOM NAVIGATION (Chuẩn App ShopeeFood / GrabFood) -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-1 py-1.5 flex items-center justify-around shadow-lg">
-        <a href="{{ route('trangchu') }}" class="flex flex-col items-center justify-center py-1 px-2 {{ request()->routeIs('trangchu') ? 'text-[#ee4d2d] font-bold' : 'text-slate-500 hover:text-[#ee4d2d]' }} transition-colors">
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-1 py-1.5 flex items-center justify-around shadow-lg" aria-label="Điều hướng chính trên điện thoại">
+        <a href="{{ route('trangchu') }}" aria-label="Trang chủ Đồ ăn" class="flex flex-col items-center justify-center py-1 px-2 {{ request()->routeIs('trangchu') ? 'text-[#ee4d2d] font-bold' : 'text-slate-500 hover:text-[#ee4d2d]' }} transition-colors">
             <i class="fas fa-utensils text-sm"></i>
             <span class="text-[10px] mt-0.5 font-semibold">Đồ ăn</span>
         </a>
 
-        <a href="{{ route('tracuu') }}" class="flex flex-col items-center justify-center py-1 px-2 {{ request()->routeIs('tracuu') ? 'text-[#ee4d2d] font-bold' : 'text-slate-500 hover:text-[#ee4d2d]' }} transition-colors">
+        <a href="{{ route('tracuu') }}" aria-label="Tra cứu đơn hàng" class="flex flex-col items-center justify-center py-1 px-2 {{ request()->routeIs('tracuu') ? 'text-[#ee4d2d] font-bold' : 'text-slate-500 hover:text-[#ee4d2d]' }} transition-colors">
             <i class="fas fa-receipt text-sm"></i>
             <span class="text-[10px] mt-0.5 font-semibold">Tra cứu</span>
         </a>
 
-        <button type="button" onclick="openGlobalUserVoucherModal('all')" class="flex flex-col items-center justify-center py-1 px-2 text-slate-500 hover:text-[#ee4d2d] transition-colors cursor-pointer">
+        <button type="button" onclick="openGlobalUserVoucherModal('all')" aria-label="Kho voucher ưu đãi" class="flex flex-col items-center justify-center py-1 px-2 text-slate-500 hover:text-[#ee4d2d] transition-colors cursor-pointer">
             <i class="fas fa-ticket-alt text-sm"></i>
             <span class="text-[10px] mt-0.5 font-semibold">Ưu đãi</span>
         </button>
 
-        <a href="{{ route('muahang') }}" class="relative flex flex-col items-center justify-center py-1 px-2 {{ request()->routeIs('muahang') || request()->routeIs('giohang') ? 'text-[#ee4d2d] font-bold' : 'text-slate-500 hover:text-[#ee4d2d]' }} transition-colors">
+        <a href="{{ route('muahang') }}" aria-label="Xem giỏ hàng" class="relative flex flex-col items-center justify-center py-1 px-2 {{ request()->routeIs('muahang') || request()->routeIs('giohang') ? 'text-[#ee4d2d] font-bold' : 'text-slate-500 hover:text-[#ee4d2d]' }} transition-colors">
             <i class="fas fa-shopping-cart text-sm"></i>
             <span id="mobile-nav-cart-badge" class="absolute top-0 right-2 bg-[#ee4d2d] text-white text-[9px] font-black min-w-[15px] h-3.5 px-1 rounded-full flex items-center justify-center border border-white shadow-xs hidden">
                 0
@@ -549,12 +567,12 @@
         </a>
 
         @auth
-            <a href="{{ route('hoso') }}" class="flex flex-col items-center justify-center py-1 px-2 {{ request()->routeIs('hoso*') ? 'text-[#ee4d2d] font-bold' : 'text-slate-500 hover:text-[#ee4d2d]' }} transition-colors">
+            <a href="{{ route('hoso') }}" aria-label="Hồ sơ tài khoản" class="flex flex-col items-center justify-center py-1 px-2 {{ request()->routeIs('hoso*') ? 'text-[#ee4d2d] font-bold' : 'text-slate-500 hover:text-[#ee4d2d]' }} transition-colors">
                 <i class="fas fa-user-circle text-sm"></i>
                 <span class="text-[10px] mt-0.5 font-semibold">Hồ sơ</span>
             </a>
         @else
-            <a href="{{ route('dangnhap') }}" class="flex flex-col items-center justify-center py-1 px-2 text-slate-500 hover:text-[#ee4d2d] transition-colors">
+            <a href="{{ route('dangnhap') }}" aria-label="Đăng nhập tài khoản" class="flex flex-col items-center justify-center py-1 px-2 text-slate-500 hover:text-[#ee4d2d] transition-colors">
                 <i class="fas fa-user-circle text-sm"></i>
                 <span class="text-[10px] mt-0.5 font-semibold">Tài khoản</span>
             </a>
@@ -573,7 +591,7 @@
                 <button type="button" onclick="triggerPWAInstall()" class="px-3 py-1.5 bg-[#ee4d2d] hover:bg-[#d03b1d] text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer">
                     Cài đặt
                 </button>
-                <button type="button" onclick="dismissPWABanner()" class="w-7 h-7 text-slate-400 hover:text-slate-600 rounded-full flex items-center justify-center text-sm cursor-pointer">
+                <button type="button" onclick="dismissPWABanner()" aria-label="Đóng banner cài đặt" class="w-7 h-7 text-slate-400 hover:text-slate-600 rounded-full flex items-center justify-center text-sm cursor-pointer">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -583,7 +601,7 @@
     <!-- PWA iOS GUIDE MODAL -->
     <div id="pwa-ios-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm hidden">
         <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center animate-in zoom-in-95 duration-200">
-            <img src="{{ asset('icons/icon-192x192.png') }}" class="w-14 h-14 rounded-2xl mx-auto mb-3 shadow-md border border-orange-100">
+            <img src="{{ asset('icons/icon-192x192.png') }}" alt="FOODDAILY Icon" class="w-14 h-14 rounded-2xl mx-auto mb-3 shadow-md border border-orange-100" width="56" height="56">
             <h3 class="text-base font-extrabold text-slate-900">Cài đặt FOODDAILY cho iPhone</h3>
             <p class="text-xs text-slate-500 mt-1 mb-4 leading-relaxed">
                 Thêm vào màn hình chính để mở ứng dụng toàn màn hình như ứng dụng gốc:
@@ -602,7 +620,7 @@
                     <span>Nhấn <strong>Thêm (Add)</strong> ở góc trên bên phải để hoàn tất!</span>
                 </div>
             </div>
-            <button type="button" onclick="closeIOSInstallGuideModal()" class="w-full py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-colors cursor-pointer">
+            <button type="button" onclick="closeIOSInstallGuideModal()" class="w-full py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-colors cursor-pointer" aria-label="Đã hiểu hướng dẫn cài đặt">
                 Đã hiểu
             </button>
         </div>
@@ -613,13 +631,13 @@
         <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 text-center animate-in zoom-in-95 duration-200">
             <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div class="flex items-center gap-2.5">
-                    <img src="{{ asset('icons/icon-192x192.png') }}" class="w-10 h-10 rounded-xl shadow-xs border border-orange-100 object-cover" alt="FOODDAILY">
+                    <img src="{{ asset('icons/icon-192x192.png') }}" class="w-10 h-10 rounded-xl shadow-xs border border-orange-100 object-cover" alt="FOODDAILY Logo" width="40" height="40">
                     <div class="text-left">
                         <h3 class="text-sm font-extrabold text-slate-900 leading-tight">Cài Đặt App FOODDAILY (PWA)</h3>
                         <p class="text-[11px] text-slate-500">Mở toàn màn hình & nhận thông báo giờ ăn</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeUniversalPWAModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-sm font-bold transition-colors cursor-pointer">
+                <button type="button" onclick="closeUniversalPWAModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-sm font-bold transition-colors cursor-pointer" aria-label="Đóng hướng dẫn cài đặt">
                     <i class="fas fa-times"></i>
                 </button>
             </div>

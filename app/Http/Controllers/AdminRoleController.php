@@ -146,7 +146,7 @@ class AdminRoleController extends Controller
     {
         $role = Role::findOrFail($id);
 
-        $protectedRoles = ['superadmin', 'admin', 'staff', 'kitchen', 'shipper', 'customer'];
+        $protectedRoles = ['superadmin', 'admin', 'manager', 'accountant', 'warehouse', 'staff', 'kitchen', 'shipper', 'customer'];
         if (in_array($role->name, $protectedRoles)) {
             return redirect()->route('quanly_vaitro')->with('error', "Không thể xóa vai trò hệ thống mặc định '{$role->name}'.");
         }
@@ -164,103 +164,107 @@ class AdminRoleController extends Controller
     }
 
     /**
-     * Định nghĩa các nhóm quyền Module trong hệ thống
+     * Định nghĩa các nhóm quyền Module trong hệ thống (RBAC Ma Trận Chi Tiết)
      */
     public static function getPermissionModules(): array
     {
         return [
-            'Bảng điều khiển & Thống kê' => [
-                'icon' => 'fas fa-chart-pie',
-                'color' => 'indigo',
+            'Kho & Nhập kho (Inventory & Purchasing)' => [
+                'icon' => 'fas fa-boxes-stacked',
+                'color' => 'amber',
                 'items' => [
-                    'dashboard.view' => 'Xem Dashboard doanh thu, biểu đồ & thống kê',
+                    'po.create' => 'Tạo đơn đặt hàng NCC (PO) - Quản lý / Thủ kho lập',
+                    'po.approve_price' => 'Duyệt giá đơn đặt hàng NCC - Admin / Kế toán duyệt giá',
+                    'grn.create' => 'Tạo phiếu nhập kho (GRN) - Ghi nhận SL thực nhận, số lô, HSD',
+                    'inventory.view_cost' => 'Xem giá vốn / Giá nhập (Bảo mật: Admin, Kế toán, Quản lý)',
+                    'inventory.transfer' => 'Điều chuyển kho - Tạo yêu cầu chuyển kho, xác nhận xuất/nhập',
+                    'inventory.stock_count' => 'Kiểm kê kho - Nhập số lượng đếm thực tế tồn kho',
+                    'inventory.balance' => 'Cân bằng kho (Điều chỉnh tồn) - Chỉ Quản lý / Admin duyệt',
+                    'inventory.discard_return' => 'Hủy hàng / Xuất trả NCC - Quy trình phê duyệt 2 bước',
                 ]
             ],
-            'Quản lý Đơn hàng' => [
-                'icon' => 'fas fa-file-invoice-dollar',
+            'Bán hàng & Thu ngân (POS & Sales)' => [
+                'icon' => 'fas fa-cash-register',
+                'color' => 'emerald',
+                'items' => [
+                    'pos.create_order' => 'Tạo và thanh toán đơn hàng (Thu ngân, Nhân viên bán hàng)',
+                    'pos.discount_limit' => 'Sửa giá / Chiết khấu tự do trong hạn mức (Tối đa 5%)',
+                    'pos.discount_override' => 'Chiết khấu vượt hạn mức (> 5%) - Cần mã PIN Quản lý',
+                    'pos.cancel_order' => 'Hủy hóa đơn / Trả hàng hoàn tiền - Cần Quản lý duyệt qua PIN',
+                    'pos.view_stock' => 'Xem tồn kho khi bán hàng (Ẩn giá vốn và chi tiết NCC)',
+                ]
+            ],
+            'Nhà cung cấp & Khách hàng' => [
+                'icon' => 'fas fa-handshake',
                 'color' => 'blue',
                 'items' => [
+                    'suppliers.view_contact' => 'Xem thông tin liên hệ Nhà cung cấp (Thủ kho)',
+                    'suppliers.manage_debts' => 'Quản lý công nợ & điều khoản thanh toán NCC (Kế toán)',
+                    'suppliers.manage' => 'Duyệt tạo / chỉnh sửa / xóa Nhà cung cấp (Admin)',
+                    'customers.view_basic' => 'Xem dữ liệu khách hàng (Tên, SĐT, Điểm tích lũy cơ bản)',
+                    'customers.export' => 'Xuất file Excel & Sao lưu toàn bộ dữ liệu khách hàng',
+                ]
+            ],
+            'Phân quyền Phạm vi Dữ liệu (Data Scope)' => [
+                'icon' => 'fas fa-network-wired',
+                'color' => 'indigo',
+                'items' => [
+                    'scope.cross_branch' => 'Phạm vi Chi nhánh: Được phép thao tác chéo giữa các Kho/Chi nhánh',
+                    'scope.all_shifts' => 'Phạm vi Ca làm việc: Xem tổng kết doanh thu & tiền mặt toàn bộ ca',
+                    'scope.all_customers' => 'Phạm vi Nhân viên: Xem toàn bộ tệp khách và đơn hàng hệ thống',
+                ]
+            ],
+            'An toàn & Chống gian lận (Anti-Fraud)' => [
+                'icon' => 'fas fa-shield-halved',
+                'color' => 'rose',
+                'items' => [
+                    'audit.view' => 'Nhật ký hoạt động (Audit Trail): Xem chi tiết ai sửa tồn, đổi giá, hủy đơn',
+                    'approval.dual_step' => 'Quyền phê duyệt 2 bước (Dual Approval): Duyệt phiếu giá trị lớn/hủy hàng',
+                    'pos.manager_pin_authorize' => 'Ủy quyền tạm thời qua mã PIN: Mở khóa quyền trên máy POS',
+                ]
+            ],
+            'Bảng điều khiển & Đơn hàng' => [
+                'icon' => 'fas fa-chart-pie',
+                'color' => 'purple',
+                'items' => [
+                    'dashboard.view' => 'Xem Dashboard doanh thu, biểu đồ & thống kê',
                     'orders.view' => 'Xem danh sách và chi tiết đơn hàng',
                     'orders.process' => 'Duyệt đơn & Cập nhật trạng thái đơn hàng',
-                    'orders.refund' => 'Xử lý hoàn tiền cho đơn hủy hoặc lỗi thanh toán',
+                    'orders.refund' => 'Xử lý hoàn tiền cho đơn lỗi thanh toán',
                     'orders.delete' => 'Xóa đơn hàng khỏi hệ thống',
                 ]
             ],
-            'Nghiệp vụ Nhà bếp' => [
-                'icon' => 'fas fa-fire-burner',
-                'color' => 'amber',
-                'items' => [
-                    'kitchen.view' => 'Xem màn hình Bếp & số lượng món cần làm trong ngày',
-                    'kitchen.update_status' => 'Cập nhật trạng thái hoàn thành món nấu',
-                ]
-            ],
-            'Nghiệp vụ Giao hàng (Shipper)' => [
-                'icon' => 'fas fa-truck-fast',
-                'color' => 'emerald',
-                'items' => [
-                    'delivery.view' => 'Xem danh sách các đơn cần đi giao',
-                    'delivery.update_status' => 'Cập nhật trạng thái giao hàng thành công / thất bại',
-                ]
-            ],
-            'Thực đơn & Món ăn' => [
-                'icon' => 'fas fa-bowl-food',
+            'Thực đơn, Bếp & Giao nhận' => [
+                'icon' => 'fas fa-utensils',
                 'color' => 'orange',
                 'items' => [
                     'dishes.view' => 'Xem danh sách món ăn',
                     'dishes.create' => 'Thêm món ăn mới vào thực đơn',
                     'dishes.edit' => 'Chỉnh sửa thông tin, giá bán và hình ảnh món',
                     'dishes.delete' => 'Xóa món ăn',
-                ]
-            ],
-            'Danh mục món ăn' => [
-                'icon' => 'fas fa-list',
-                'color' => 'lime',
-                'items' => [
                     'categories.manage' => 'Toàn quyền thêm, sửa, xóa danh mục món',
-                ]
-            ],
-            'Gói Combo & Suất ăn định kỳ' => [
-                'icon' => 'fas fa-box-open',
-                'color' => 'rose',
-                'items' => [
                     'packages.manage' => 'Quản lý các gói ăn combo theo tuần/tháng & lịch trình',
+                    'kitchen.view' => 'Xem màn hình Bếp & số lượng món cần làm trong ngày',
+                    'kitchen.update_status' => 'Cập nhật trạng thái hoàn thành món nấu',
+                    'delivery.view' => 'Xem danh sách các đơn cần đi giao',
+                    'delivery.update_status' => 'Cập nhật trạng thái giao hàng thành công / thất bại',
                 ]
             ],
-            'Khuyến mãi & Tiếp thị' => [
+            'Khuyến mãi & Đánh giá' => [
                 'icon' => 'fas fa-ticket',
                 'color' => 'pink',
                 'items' => [
                     'promotions.manage' => 'Tạo & quản lý mã ưu đãi, voucher giảm giá',
                     'coupons.send' => 'Gửi mã coupon trực tiếp cho khách hàng',
-                ]
-            ],
-            'Đánh giá & Phản hồi' => [
-                'icon' => 'fas fa-star',
-                'color' => 'yellow',
-                'items' => [
                     'reviews.manage' => 'Quản lý và kiểm duyệt / xóa đánh giá món ăn',
                 ]
             ],
-            'Khách hàng' => [
-                'icon' => 'fas fa-users',
-                'color' => 'cyan',
-                'items' => [
-                    'customers.view' => 'Xem danh sách khách hàng, lịch sử mua hàng & điểm',
-                    'customers.backup' => 'Xuất file Excel & Sao lưu/phục hồi dữ liệu khách',
-                ]
-            ],
-            'Nhân sự & Phân quyền' => [
-                'icon' => 'fas fa-user-shield',
-                'color' => 'purple',
+            'Nhân sự, Phân quyền & Cài đặt' => [
+                'icon' => 'fas fa-user-gear',
+                'color' => 'slate',
                 'items' => [
                     'employees.manage' => 'Quản lý nhân viên (thêm, sửa, xóa tài khoản)',
                     'roles.manage' => 'Toàn quyền quản lý Vai trò & Phân quyền RBAC',
-                ]
-            ],
-            'Cấu hình hệ thống' => [
-                'icon' => 'fas fa-sliders',
-                'color' => 'slate',
-                'items' => [
                     'settings.manage' => 'Cài đặt trang chủ, banner và thông tin hệ thống',
                 ]
             ],

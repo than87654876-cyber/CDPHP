@@ -39,6 +39,19 @@
             <button onclick="this.parentElement.remove()" class="text-rose-600 hover:text-rose-800 text-lg leading-none">&times;</button>
         </div>
     @endif
+    @if($errors->any())
+        <div class="bg-rose-50 border border-rose-200 text-rose-800 px-4 py-3 rounded-2xl flex items-center justify-between shadow-xs text-xs font-semibold">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-circle-exclamation text-rose-600 text-sm"></i>
+                <div>
+                    @foreach($errors->all() as $err)
+                        <p>{{ $err }}</p>
+                    @endforeach
+                </div>
+            </div>
+            <button onclick="this.parentElement.remove()" class="text-rose-600 hover:text-rose-800 text-lg leading-none">&times;</button>
+        </div>
+    @endif
 
     <!-- Generated Coupons Log (If any) -->
     @if(session('details'))
@@ -78,7 +91,7 @@
         </div>
     @endif
 
-    <form action="{{ route('quanly_guima.post') }}" method="POST" class="space-y-6">
+    <form id="send-coupon-form" action="{{ route('quanly_guima.post') }}" method="POST" class="space-y-6">
         @csrf
 
         <!-- BƯỚC 1: ĐIỀU KIỆN LỌC -->
@@ -145,8 +158,8 @@
                         </h4>
                         <p class="text-[10px] text-slate-400 font-bold uppercase mt-3 mb-1">Thời gian đăng ký:</p>
                         <select id="new_customer_range" name="new_customer_range" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:border-[#ee4d2d] outline-none bg-white">
-                            <option value="all">-- Không lọc tiêu chí này --</option>
-                            <option value="7_days" selected>Mới đăng ký trong 7 ngày qua</option>
+                            <option value="all" selected>-- Không lọc tiêu chí này --</option>
+                            <option value="7_days">Mới đăng ký trong 7 ngày qua</option>
                             <option value="15_days">Mới đăng ký trong 15 ngày qua</option>
                             <option value="30_days">Mới đăng ký trong 30 ngày qua</option>
                         </select>
@@ -209,8 +222,8 @@
                 </div>
 
                 <div class="space-y-1.5">
-                    <label for="discount_value" class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider">
-                        Mức giảm giá <span class="text-[#ee4d2d]">*</span>
+                    <label for="discount_value" id="discount_value_label" class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+                        Mức giảm giá (%) <span class="text-[#ee4d2d]">*</span>
                     </label>
                     <input type="number" id="discount_value" name="discount_value" value="15" min="1" max="90" required placeholder="Ví dụ: 15 (tức giảm 15%)" class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs font-black text-rose-600 focus:border-[#ee4d2d] outline-none shadow-xs">
                 </div>
@@ -275,11 +288,53 @@
                     <i class="fas fa-shield-halved text-emerald-500"></i>
                     <span>Hệ thống tự động loại bỏ trùng lặp nếu khách hàng thỏa mãn nhiều nhóm lọc.</span>
                 </p>
-                <button type="submit" class="px-8 py-3.5 rounded-2xl bg-[#ee4d2d] hover:bg-red-600 text-white font-extrabold text-xs shadow-md shadow-rose-500/25 hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2">
-                    <i class="fas fa-paper-plane"></i> Bắt đầu sinh mã & Gửi
+                <button type="submit" id="btn-submit-coupon" class="px-8 py-3.5 rounded-2xl bg-[#ee4d2d] hover:bg-red-600 text-white font-extrabold text-xs shadow-md shadow-rose-500/25 hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2">
+                    <i class="fas fa-paper-plane"></i> <span>Bắt đầu sinh mã & Gửi</span>
                 </button>
             </div>
         </div>
     </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const typeSelect = document.getElementById('discount_type');
+        const valInput = document.getElementById('discount_value');
+        const valLabel = document.getElementById('discount_value_label');
+
+        function updateDiscountRules() {
+            if (!typeSelect || !valInput) return;
+            if (typeSelect.value === 'percentage') {
+                valInput.max = '90';
+                valInput.placeholder = 'Ví dụ: 15 (tức giảm 15%)';
+                if (valLabel) valLabel.innerHTML = 'Mức giảm giá (%) <span class="text-[#ee4d2d]">*</span>';
+                if (parseFloat(valInput.value) > 90) {
+                    valInput.value = '15';
+                }
+            } else {
+                valInput.removeAttribute('max');
+                valInput.placeholder = 'Ví dụ: 50000 (tức giảm 50.000đ)';
+                if (valLabel) valLabel.innerHTML = 'Mức giảm giá (đ) <span class="text-[#ee4d2d]">*</span>';
+                if (parseFloat(valInput.value) <= 90) {
+                    valInput.value = '50000';
+                }
+            }
+        }
+
+        if (typeSelect && valInput) {
+            typeSelect.addEventListener('change', updateDiscountRules);
+            updateDiscountRules();
+        }
+
+        const form = document.getElementById('send-coupon-form');
+        const submitBtn = document.getElementById('btn-submit-coupon');
+        if (form && submitBtn) {
+            form.addEventListener('submit', function () {
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-80', 'cursor-not-allowed');
+                submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> <span>Đang xử lý tạo mã & gửi...</span>';
+            });
+        }
+    });
+</script>
 @endsection

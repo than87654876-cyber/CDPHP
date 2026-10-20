@@ -144,6 +144,11 @@ class AdminProcurementController extends Controller
 
     public function inventoryAdjustStock(Request $request, $id)
     {
+        // Kiểm tra phân quyền RBAC: Chỉ Quản lý hoặc Admin mới có quyền bấm nút "Cân bằng kho"
+        if (!Auth::user()->can('inventory.balance') && !in_array(Auth::user()->role, ['superadmin', 'admin', 'manager'])) {
+            return redirect()->back()->with('error', 'Bạn không có quyền "Cân bằng kho (Điều chỉnh tồn)"! Thao tác này chỉ dành cho cấp Quản lý hoặc Quản trị viên theo ma trận phân quyền.');
+        }
+
         $item = InventoryItem::findOrFail($id);
 
         $validated = $request->validate([
@@ -151,13 +156,18 @@ class AdminProcurementController extends Controller
             'reason' => 'required|string|max:255',
         ]);
 
-        $oldStock = $item->current_stock;
+        $oldStock = (float) $item->current_stock;
+        $newStock = (float) $validated['new_stock'];
+
         $item->update([
-            'current_stock' => $validated['new_stock'],
-            'notes' => ($item->notes ? $item->notes . "\n" : '') . "[" . Carbon::now()->format('d/m/Y H:i') . "] Điều chỉnh từ {$oldStock} -> {$validated['new_stock']} ({$validated['reason']})",
+            'current_stock' => $newStock,
+            'notes' => ($item->notes ? $item->notes . "\n" : '') . "[" . Carbon::now()->format('d/m/Y H:i') . "] Cân bằng kho từ {$oldStock} -> {$newStock} ({$validated['reason']}) bởi " . Auth::user()->fullname,
         ]);
 
-        return redirect()->back()->with('success', "Đã cập nhật số lượng tồn kho của {$item->name} thành {$validated['new_stock']} {$item->unit}!");
+        // Ghi nhận hành vi nhạy cảm vào Nhật ký hoạt động (Audit Trail / Activity Log)
+        \App\Services\AuditLogService::logInventoryAdjustment($item, $oldStock, $newStock, $validated['reason']);
+
+        return redirect()->back()->with('success', "Đã cân bằng tồn kho của {$item->name} thành {$newStock} {$item->unit} và ghi nhận nhật ký an toàn!");
     }
 
     public function inventoryDestroy($id)

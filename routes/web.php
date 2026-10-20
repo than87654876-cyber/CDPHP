@@ -141,6 +141,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/hoso/dia-chi', [ProfileController::class, 'updateAddress'])->name('hoso.update_address');
     Route::post('/hoso/doi-mat-khau', [ProfileController::class, 'updatePassword'])->name('hoso.update_password');
     Route::post('/hoso/bao-mat', [ProfileController::class, 'updateSecurity'])->name('hoso.update_security');
+
+    // API Ủy quyền mã PIN Quản lý tại quầy POS (Bán hàng / Thu ngân)
+    Route::post('/api/pos/verify-manager-pin', [\App\Http\Controllers\AdminAuditLogController::class, 'verifyManagerPin'])->name('api.pos.verify_pin');
 });
 
 // --- Phân hệ Quản trị (Admin & Staff) ---
@@ -173,6 +176,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::get('/vaitro_chinhsua/{id}', [\App\Http\Controllers\AdminRoleController::class, 'edit'])->name('vaitro_chinhsua');
         Route::post('/vaitro_chinhsua/{id}', [\App\Http\Controllers\AdminRoleController::class, 'update'])->name('vaitro_chinhsua.post');
         Route::post('/vaitro_xoa/{id}', [\App\Http\Controllers\AdminRoleController::class, 'destroy'])->name('vaitro_xoa');
+
+        // An toàn, Nhật ký Audit & Phê duyệt 2 bước
+        Route::get('/quanly_nhatky', [\App\Http\Controllers\AdminAuditLogController::class, 'index'])->name('quanly_nhatky');
+        Route::get('/quanly_pheduyet', [\App\Http\Controllers\AdminAuditLogController::class, 'dualApprovalsIndex'])->name('quanly_pheduyet');
+        Route::post('/quanly_pheduyet/{id}/xuly', [\App\Http\Controllers\AdminAuditLogController::class, 'processApproval'])->name('quanly_pheduyet.xuly');
 
         // Quản lý Mã Khuyến mãi
         Route::get('/quanly_khuyenmai', [AdminPromotionController::class, 'index'])->name('quanly_khuyenmai');

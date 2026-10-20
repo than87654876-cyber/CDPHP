@@ -285,10 +285,8 @@ class AdminPromotionController extends Controller
                 return back()->with('error', 'Chỉ hỗ trợ gửi mã khuyến mãi đến địa chỉ Gmail kết thúc bằng @gmail.com!');
             }
 
-            // Kết nối với tài khoản khách hàng để xem có dữ liệu hay không
-            $customer = User::where('role', 'customer')
-                ->where('email', $targetEmail)
-                ->first();
+            // Kết nối với tài khoản người dùng theo email (Hỗ trợ cả admin và khách hàng)
+            $customer = User::where('email', $targetEmail)->first();
 
             // Nếu tài khoản đó không khớp (không có data), không gửi
             if (!$customer) {
@@ -324,12 +322,6 @@ class AdminPromotionController extends Controller
                       ->where('fullname', 'not like', '%mẹ%')
                       ->where('fullname', 'not like', '%admin%')
                       ->where('fullname', 'not like', '%khách%');
-                })
-                // Loại bỏ tài khoản không hoạt động lâu ngày (đăng ký > 7 ngày nhưng có 0 đơn hàng và 0 gói dịch vụ)
-                ->where(function($q) {
-                    $q->where('created_at', '>=', Carbon::now()->subDays(7))
-                      ->orWhereHas('orders')
-                      ->orWhereHas('subscriptions');
                 });
             }
 
@@ -377,7 +369,7 @@ class AdminPromotionController extends Controller
         }
 
         // 2. Tạo mã và lưu vào bảng Coupons cho từng người dùng
-        $prefix = strtoupper($request->code_prefix ?? 'CODE');
+        $prefix = $request->filled('code_prefix') ? strtoupper(trim($request->code_prefix)) : 'CODE';
         $discountType = $request->discount_type === 'fixed' ? 'fixed' : 'percent';
         $discountVal = (float) ($request->discount_value ?? 15);
         if ($discountType === 'percent' && $discountVal > 90) {
@@ -426,7 +418,7 @@ class AdminPromotionController extends Controller
                     $msgBody .= "\n\n👉 Truy cập website và đặt món ngay tại: " . $websiteUrl;
                 }
 
-                // Đưa việc gửi email vào hàng đợi (Queue) để tránh làm nghẽn trang web và tăng tốc độ phản hồi
+                // Đưa việc gửi email vào hàng đợi (Queue) xử lý ngầm, phản hồi ngay lập tức cho Admin
                 \App\Jobs\SendPromoCouponEmail::dispatch(
                     $customer->email,
                     $customer->fullname,
@@ -455,7 +447,19 @@ class AdminPromotionController extends Controller
         }
 
         // Tạo chuỗi thông báo kết quả chi tiết
-        $successMsg = 'Đã sinh mã và gửi thông báo thành công cho '.$sentCount.' khách hàng thành công!';
+        $successMsg = 'Đã sinh mã và đưa vào tiến trình gửi thông báo thành công cho '.$sentCount.' khách hàng!';
+
+        if (class_exists(\App\Services\NotificationService::class) && \Illuminate\Support\Facades\Auth::check()) {
+            try {
+                \App\Services\NotificationService::sendToUser(
+                    \Illuminate\Support\Facades\Auth::id(),
+                    '🎁 Phát hành mã khuyến mãi thành công',
+                    $successMsg,
+                    route('quanly_guima'),
+                    'promo'
+                );
+            } catch (\Throwable $e) {}
+        }
 
         return redirect()->route('quanly_guima')->with('success', $successMsg)->with('details', $details);
     }

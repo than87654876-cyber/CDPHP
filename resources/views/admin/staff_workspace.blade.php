@@ -173,6 +173,9 @@
             <a href="{{ route('quanly_nhacungcap') }}" class="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all flex items-center gap-2">
                 <i class="fas fa-truck-field text-amber-500"></i> Nguồn Hàng NCC
             </a>
+            <a href="{{ route('quanly_nhaphang') }}" class="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all flex items-center gap-2">
+                <i class="fas fa-file-invoice-dollar text-emerald-600"></i> Lịch Sử Nhập
+            </a>
             <a href="{{ route('nhaphang_them') }}" class="px-5 py-2.5 rounded-2xl bg-[#ee4d2d] hover:bg-[#d73211] text-white text-xs font-black shadow-md shadow-rose-500/20 transition-all flex items-center gap-2">
                 <i class="fas fa-cart-arrow-down"></i> Lập Phiếu Nhập Kho
             </a>

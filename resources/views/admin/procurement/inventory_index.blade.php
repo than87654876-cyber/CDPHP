@@ -99,8 +99,15 @@
         <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs flex items-center justify-between">
             <div>
                 <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Giá trị tồn kho ước tính</p>
-                <h3 class="text-2xl font-black text-emerald-600 mt-1">{{ number_format($totalInventoryValue, 0, ',', '.') }} <span class="text-xs font-bold text-emerald-500">đ</span></h3>
-                <p class="text-[11px] font-semibold text-slate-500 mt-1">Dựa trên giá vốn nhập gần nhất</p>
+                @if(auth()->user()->can('inventory.view_cost') || in_array(auth()->user()->role, ['superadmin', 'admin', 'manager', 'accountant']))
+                    <h3 class="text-2xl font-black text-emerald-600 mt-1">{{ number_format($totalInventoryValue, 0, ',', '.') }} <span class="text-xs font-bold text-emerald-500">đ</span></h3>
+                    <p class="text-[11px] font-semibold text-slate-500 mt-1">Dựa trên giá vốn nhập gần nhất</p>
+                @else
+                    <h3 class="text-2xl font-black text-slate-400 mt-1 select-none flex items-center gap-1.5">
+                        <i class="fas fa-lock text-sm text-amber-500"></i> ******
+                    </h3>
+                    <p class="text-[11px] font-semibold text-amber-600/80 mt-1">Bị ẩn theo quyền hạn RBAC</p>
+                @endif
             </div>
             <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-xl font-bold">
                 <i class="fas fa-coins"></i>
@@ -264,12 +271,18 @@
                             @endif
                         </td>
 
-                        <!-- Giá vốn nhập gần nhất -->
+                        <!-- Giá vốn nhập gần nhất (Bảo mật RBAC) -->
                         <td class="py-4 px-4 text-right">
-                            <span class="font-bold text-slate-800">
-                                {{ number_format($item->cost_price, 0, ',', '.') }}đ
-                            </span>
-                            <span class="text-[10px] text-slate-400 block font-normal">/ {{ $item->unit }}</span>
+                            @if(auth()->user()->can('inventory.view_cost') || in_array(auth()->user()->role, ['superadmin', 'admin', 'manager', 'accountant']))
+                                <span class="font-bold text-slate-800">
+                                    {{ number_format($item->cost_price, 0, ',', '.') }}đ
+                                </span>
+                                <span class="text-[10px] text-slate-400 block font-normal">/ {{ $item->unit }}</span>
+                            @else
+                                <span class="inline-flex items-center gap-1 font-mono text-[11px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-lg select-none" title="Giá vốn bị ẩn theo phân quyền bảo mật">
+                                    <i class="fas fa-lock text-[9px] text-amber-500"></i> ***
+                                </span>
+                            @endif
                         </td>
 
                         <!-- Thao tác -->
