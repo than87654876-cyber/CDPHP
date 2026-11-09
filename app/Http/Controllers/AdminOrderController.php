@@ -156,6 +156,7 @@ class AdminOrderController extends Controller
         ]);
 
         $order = Order::findOrFail($id);
+        $oldStatus = $order->order_status;
         $order->order_status = $request->order_status;
         $order->payment_status = $request->payment_status;
         if ($order->payment_status === 'paid' && $order->order_status === 'pending') {
@@ -166,6 +167,15 @@ class AdminOrderController extends Controller
             $order->health_notes = ($order->health_notes ? $order->health_notes."\n" : '').'[Điều phối: '.$request->admin_notes.']';
         }
         $order->save();
+
+        // Ghi nhận Audit Log nếu đơn hàng bị hủy
+        if ($order->order_status === 'cancelled' && $oldStatus !== 'cancelled') {
+            \App\Services\AuditLogService::logOrderCancellation(
+                $order,
+                $request->admin_notes ?: 'Hủy đơn hàng từ bảng điều phối quản trị',
+                \Illuminate\Support\Facades\Auth::id()
+            );
+        }
 
         try {
             event(new \App\Events\OrderUpdated($order, 'status_updated'));
@@ -228,6 +238,12 @@ class AdminOrderController extends Controller
     public function destroy($id)
     {
         $order = Order::findOrFail($id);
+
+        \App\Services\AuditLogService::logOrderCancellation(
+            $order,
+            'Xóa đơn hàng vĩnh viễn khỏi hệ thống bởi ' . (\Illuminate\Support\Facades\Auth::user()?->fullname ?? 'Nhân sự'),
+            \Illuminate\Support\Facades\Auth::id()
+        );
 
         $order->orderItems()->delete();
         $order->delete();

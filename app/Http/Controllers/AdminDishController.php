@@ -110,6 +110,8 @@ class AdminDishController extends Controller
         ]);
 
         $dish = Dish::findOrFail($id);
+        $oldPrice = (float) $dish->price;
+        $oldName = $dish->dish_name;
         $data = $request->only('dish_name', 'category_id', 'price', 'description');
         $data['is_available'] = $request->has('is_available');
 
@@ -129,6 +131,21 @@ class AdminDishController extends Controller
         $dish->update($data);
         \App\Services\DishSyncService::recordMutation('updated', $dish);
 
+        // Ghi nhận nhật ký an toàn (Audit Trail)
+        $newPrice = (float) $dish->price;
+        $userName = \Illuminate\Support\Facades\Auth::user()?->fullname ?? 'Nhân sự';
+        if (abs($newPrice - $oldPrice) > 0.01) {
+            \App\Services\AuditLogService::logPriceChange($dish, $oldPrice, $newPrice, 'sale_price');
+        } else {
+            \App\Services\AuditLogService::log(
+                'price_changed',
+                $dish,
+                ['name' => $oldName, 'price' => $oldPrice],
+                ['name' => $dish->dish_name, 'price' => $newPrice],
+                "Cập nhật thông tin món ăn '{$dish->dish_name}' bởi {$userName}"
+            );
+        }
+
         return redirect()->route('quanly_monandon')->with('success', 'Đã cập nhật món ăn thành công!');
     }
 
@@ -146,6 +163,15 @@ class AdminDishController extends Controller
 
         $dish->delete();
         \App\Services\DishSyncService::recordMutation('deleted', $dishCopy, $dishId);
+
+        $userName = \Illuminate\Support\Facades\Auth::user()?->fullname ?? 'Nhân sự';
+        \App\Services\AuditLogService::log(
+            'price_changed',
+            null,
+            ['name' => $dishCopy->dish_name, 'price' => (float) $dishCopy->price],
+            null,
+            "Xóa món ăn '{$dishCopy->dish_name}' (ID: {$dishId}) khỏi thực đơn bởi {$userName}"
+        );
 
         return redirect()->route('quanly_monandon')->with('success', 'Đã xóa món ăn thành công!');
     }

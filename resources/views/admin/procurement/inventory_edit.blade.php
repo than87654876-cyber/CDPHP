@@ -77,6 +77,13 @@
                            class="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-[#ee4d2d]/30 focus:border-[#ee4d2d]">
                 </div>
 
+                <!-- Tồn kho thực tế (Hiện có) -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Tồn kho thực tế (Hiện có) *</label>
+                    <input type="number" step="0.01" min="0" name="current_stock" value="{{ old('current_stock', $item->current_stock) }}" required
+                           class="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-extrabold text-blue-600 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500">
+                </div>
+
                 <!-- Ngưỡng tồn kho tối thiểu (Min stock) -->
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Ngưỡng tối thiểu (Cảnh báo hết) *</label>

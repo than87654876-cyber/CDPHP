@@ -131,21 +131,74 @@ class AdminProcurementController extends Controller
             'name' => 'required|string|max:255',
             'category' => 'nullable|string|max:100',
             'unit' => 'required|string|max:50',
+            'current_stock' => 'nullable|numeric|min:0',
             'min_stock' => 'required|numeric|min:0',
             'cost_price' => 'nullable|numeric|min:0',
             'supplier_id' => 'nullable|exists:suppliers,id',
             'notes' => 'nullable|string',
         ]);
 
+        $oldStock = (float) $item->current_stock;
+        $newStock = $request->filled('current_stock') ? (float) $request->current_stock : $oldStock;
+
+        $oldCost = (float) $item->cost_price;
+        $newCost = isset($validated['cost_price']) ? (float) $validated['cost_price'] : $oldCost;
+
+        $oldValues = [
+            'name' => $item->name,
+            'current_stock' => $oldStock,
+            'min_stock' => (float) $item->min_stock,
+            'cost_price' => $oldCost,
+            'unit' => $item->unit,
+        ];
+
+        if ($request->filled('current_stock')) {
+            $validated['current_stock'] = $newStock;
+        }
+
         $item->update($validated);
 
-        return redirect()->route('quanly_kho')->with('success', "Đã cập nhật thông tin mặt hàng '{$item->name}'!");
+        $newValues = [
+            'name' => $item->name,
+            'current_stock' => (float) $item->current_stock,
+            'min_stock' => (float) $item->min_stock,
+            'cost_price' => (float) $item->cost_price,
+            'unit' => $item->unit,
+        ];
+
+        $userName = Auth::user()?->fullname ?? 'Nhân viên';
+
+        // 1. Nếu có thay đổi số lượng tồn kho trực tiếp
+        if (abs($newStock - $oldStock) > 0.001) {
+            \App\Services\AuditLogService::logInventoryAdjustment(
+                $item, 
+                $oldStock, 
+                $newStock, 
+                $request->input('notes') ? "Sửa tồn kho qua form: {$request->notes}" : "Cập nhật tồn kho trực tiếp từ {$oldStock} -> {$newStock} bởi {$userName}"
+            );
+        } else {
+            // 2. Ghi nhận cập nhật định mức / thông tin mặt hàng vào Nhật ký hoạt động
+            \App\Services\AuditLogService::log(
+                'inventory_adjusted',
+                $item,
+                $oldValues,
+                $newValues,
+                "Chỉnh sửa thông tin/định mức kho mặt hàng '{$item->name}' (Mã: {$item->item_code}) bởi {$userName}"
+            );
+        }
+
+        // 3. Nếu có đổi giá vốn nhập
+        if (abs($newCost - $oldCost) > 0.01) {
+            \App\Services\AuditLogService::logPriceChange($item, $oldCost, $newCost, 'cost_price');
+        }
+
+        return redirect()->route('quanly_kho')->with('success', "Đã cập nhật thông tin mặt hàng '{$item->name}' và ghi nhận nhật ký an toàn!");
     }
 
     public function inventoryAdjustStock(Request $request, $id)
     {
-        // Kiểm tra phân quyền RBAC: Chỉ Quản lý hoặc Admin mới có quyền bấm nút "Cân bằng kho"
-        if (!Auth::user()->can('inventory.balance') && !in_array(Auth::user()->role, ['superadmin', 'admin', 'manager'])) {
+        // Kiểm tra phân quyền RBAC: Cấp Quản lý, Admin hoặc Nhân sự được phân quyền
+        if (!Auth::user()->can('inventory.balance') && !in_array(Auth::user()->role, ['superadmin', 'admin', 'manager', 'warehouse', 'staff'])) {
             return redirect()->back()->with('error', 'Bạn không có quyền "Cân bằng kho (Điều chỉnh tồn)"! Thao tác này chỉ dành cho cấp Quản lý hoặc Quản trị viên theo ma trận phân quyền.');
         }
 
